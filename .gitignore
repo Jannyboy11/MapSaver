@@ -25,3 +25,11 @@ hs_err_pid*
 
 # Eclipse IDE
 .settings/
+
+.classpath
+.idea
+*.iml
+.project
+.metals
+.factorypath
+dependency-reduced-pom.xml

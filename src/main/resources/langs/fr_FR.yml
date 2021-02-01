@@ -1,0 +1,10 @@
+Help:
+  Usage: "&6Utilisation :"
+  Help: "&c/mapsaver [help]&6 - Affiche l'aide"
+  Reload: "&c/mapsaver reload&6 - Permet de recharger le plugin"
+  Version: "&c/mapsaver version&6 - Affiche la version du plugin"
+  Save: "&c/mapsaver save <map_name>&6 - Sauvegarde la map en main"
+  Import: "&c/mapsaver import <map_name>&6 - Import la map en paramètre"
+#  List: "&c/mapsaver list detail <shop>&6 - Permet de lister tous les globalshop à distance"
+ErrorMessages:
+  PermissionNotAllowed: "&cVous n'êtes pas autorisé à faire cette action"

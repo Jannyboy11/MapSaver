@@ -1,10 +1,16 @@
-main: fr.ikkino.mapsaver.MapSaverPlugin
+main: fr.epicanard.mapsaver.MapSaverPlugin
 name: MapSaver
 description: Plugin for saving map in database
-author: Ikkino
+author: EpiCanard
+authors:
+  - EpiCanard
+  - Ikkino
 version: ${build.version}
 api-version: 1.16
 commands:
-  mapsa:
-    description: Main user command for map saver
-    usage: "Usage: /mapsa <action>"
+  mapsaver:
+    description: Main command to interact with MapSaver
+    usage: "Usage: /mapsaver <action>"
+    aliases:
+      - maps
+      - msaver
