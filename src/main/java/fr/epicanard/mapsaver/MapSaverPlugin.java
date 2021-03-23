@@ -2,9 +2,11 @@ package fr.epicanard.mapsaver;
 
 import fr.epicanard.duckconfig.DuckLoader;
 import fr.epicanard.duckconfig.annotations.ResourceWrapper;
-import fr.epicanard.mapsaver.config.Config;
 import fr.epicanard.mapsaver.command.MapSaverCommand;
+import fr.epicanard.mapsaver.config.Config;
+import fr.epicanard.mapsaver.database.MapRepository;
 import fr.epicanard.mapsaver.language.Language;
+import fr.epicanard.mapsaver.services.MapService;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,14 +20,19 @@ public class MapSaverPlugin extends JavaPlugin {
     private Config configuration;
     @Getter
     private Language language;
+    @Getter
+    private MapService service;
 
     @Override
     public void onEnable() {
         this.getLogger().info("Enabling MapSaver...");
 
         this.configuration = this.loadFile(Config.class, "config.yml");
-        this.language = this.loadFile(Language.class, String.format("langs/%s.yml", this.configuration.language));
+        this.language = this.loadFile(Language.class, String.format("langs/%s.yml", this.configuration.Language));
 
+        final MapRepository repository = new MapRepository(this);
+        repository.setupDatabase();
+        this.service = new MapService(repository);
 
         this.getCommand("mapsaver").setExecutor(new MapSaverCommand(this));
     }

@@ -1,68 +1,49 @@
 package fr.epicanard.mapsaver.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
+import fr.epicanard.mapsaver.config.Storage;
+import lombok.Getter;
+import org.codejargon.fluentjdbc.api.FluentJdbc;
+import org.codejargon.fluentjdbc.api.FluentJdbcBuilder;
+import org.codejargon.fluentjdbc.api.mapper.ObjectMapperRsExtractor;
+import org.codejargon.fluentjdbc.api.mapper.ObjectMappers;
+import org.codejargon.fluentjdbc.api.query.Query;
 
-public class MapDataBase {
+import javax.sql.DataSource;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-    public MapDataBase(MapSaverPlugin plugin, String host, String database, String username, String password, int port) {
+abstract class MapDataBase {
+
+    private final MapSaverPlugin plugin;
+    private final DataSource dataSource;
+    protected final Query query;
+    protected final ObjectMappers mappers;
+
+    public MapDataBase(final MapSaverPlugin plugin) {
         this.plugin = plugin;
-        this.host = host;
-        this.database = database;
-        this.username = username;
-        this.password = password;
-        this.port = port;
+        final Storage storage = plugin.getConfiguration().Storage;
+
+        this.mappers = initObjectMappers();
+        this.dataSource = new HikariDataSource(new HikariConfig(storage.getProperties()));
+        final FluentJdbc fluentJdbc = new FluentJdbcBuilder().connectionProvider(dataSource).build();
+        this.query = fluentJdbc.query();
     }
 
-    public void connect() throws SQLException {
-        if ((connection != null) && (!connection.isClosed()))
-            return;
+    private static ObjectMappers initObjectMappers() {
+        final ObjectMapperRsExtractor<UUID> uuidExtractor = (resultSet, i) -> UUID.fromString(resultSet.getString(i));
 
-        synchronized (this) {
-            if ((connection != null) && (!connection.isClosed()))
-                return;
-
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.username, this.password);
-        }
+        return ObjectMappers.builder().extractors(Collections.singletonMap(UUID.class, uuidExtractor)).build();
     }
 
-    private void updating(String sqlUpdate) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                try {
-                    connect();
-                    Statement statement = connection.createStatement();
-                    statement.executeUpdate(sqlUpdate);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        runnable.runTaskAsynchronously(this.plugin);
+    /**
+     * Setup the database, recreate tables
+     */
+    public void setupDatabase() {
+        ScriptExecutor.executeScriptFile(this.plugin, this.dataSource, "full.sql");
     }
-
-    public boolean addNewMap(String username, String mapName, List<Byte> rawMap) {
-        this.updating("INSERT INTO SavedMap (PLAYERNAME, MAPNAME, RAWMAP) VALUES ('" + username + "', '" + mapName + "', '" + rawMap.toString() + "');");
-        return true;
-    }
-
-    private MapSaverPlugin plugin;
-
-    private Connection connection = null;
-
-    private String host;
-    private String database;
-    private String username;
-    private String password;
-    private int port;
-
 }

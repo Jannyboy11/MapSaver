@@ -10,4 +10,5 @@ public class Help {
     public String Version;
     public String Save;
     public String Import;
+    public String List;
 }

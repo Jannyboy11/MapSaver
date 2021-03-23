@@ -1,8 +1,6 @@
 package fr.epicanard.mapsaver.config;
 
 import fr.epicanard.duckconfig.annotations.Header;
-import fr.epicanard.duckconfig.annotations.Resource;
-import fr.epicanard.duckconfig.annotations.ResourceLocation;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -15,12 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Config {
-    public String language = "en_US";
-    public String plop = "tata";
-
-    @Override
-    public String toString() {
-        return String.format("[language:%s, plop:%s]", language, plop);
-    }
-
+    public String Language = "en_US";
+    public Storage Storage;
 }
