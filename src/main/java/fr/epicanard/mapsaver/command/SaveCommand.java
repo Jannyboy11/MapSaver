@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +73,6 @@ public class SaveCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return null;
+        return Collections.emptyList();
     }
 }
