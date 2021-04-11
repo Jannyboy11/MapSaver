@@ -5,6 +5,7 @@ import fr.epicanard.mapsaver.map.DataMap;
 import fr.epicanard.mapsaver.map.PlayerMap;
 import fr.epicanard.mapsaver.map.ServerMap;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -65,6 +66,12 @@ public class MapRepository extends MapDataBase {
         return this.query.select(SELECT_PLAYER_MAP_BY_MAP.query(prefix))
             .namedParam("map_uuid", mapUuid.toString())
             .firstResult(mappers.forClass(PlayerMap.class));
+    }
+
+    public List<PlayerMap> selectPlayerMapByPlayerUuid(final UUID playerUuid) {
+        return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER.query(prefix))
+            .namedParam("player_uuid", playerUuid.toString())
+            .listResult(mappers.forClass(PlayerMap.class));
     }
 
     /* ====== SERVER MAP ====== */

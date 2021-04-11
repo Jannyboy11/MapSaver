@@ -61,6 +61,10 @@ public class MapService {
         );
     }
 
+    public List<PlayerMap> listPlayerMaps(final UUID playerUuid) {
+        return repository.selectPlayerMapByPlayerUuid(playerUuid);
+    }
+
     private <T> void match(final Optional<T> opt, final Consumer<T> some, final Runnable none) {
         if (opt.isPresent()) {
             some.accept(opt.get());
