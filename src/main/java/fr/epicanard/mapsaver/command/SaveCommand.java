@@ -3,12 +3,11 @@ package fr.epicanard.mapsaver.command;
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.map.MapToSave;
 import fr.epicanard.mapsaver.map.Visibility;
-import fr.epicanard.mapsaver.services.MapService;
+import fr.epicanard.mapsaver.utils.Messenger;
 import fr.epicanard.mapsaver.utils.ReflectionUtils;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
@@ -19,21 +18,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class SaveCommand implements TabExecutor {
-
-    public MapSaverPlugin plugin;
+public class SaveCommand extends PlayerOnlyCommand {
 
     public SaveCommand(MapSaverPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Command for player only");
-            return true;
-        }
-
         Player player = (Player) sender;
         ItemStack stack = player.getInventory().getItemInMainHand();
 
@@ -59,7 +51,7 @@ public class SaveCommand implements TabExecutor {
                 System.arraycopy((byte[])colors, 0, byteMap, 0, 16384);
                 final MapToSave mapToSave = MapToSave.builder()
                         .id(mapMeta.getMapId())
-                        .server("Freeboulde")
+                        .server(plugin.getConfiguration().ServerName)
                         .bytes(byteMap)
                         .owner(player.getUniqueId())
                         .visibility(Visibility.PUBLIC)

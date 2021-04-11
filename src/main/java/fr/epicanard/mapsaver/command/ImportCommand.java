@@ -2,27 +2,19 @@ package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.map.ServerMap;
-import fr.epicanard.mapsaver.utils.ReflectionUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.map.MapView;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ImportCommand implements TabExecutor {
-
-    public MapSaverPlugin plugin;
+public class ImportCommand extends BaseCommand {
 
     public ImportCommand(MapSaverPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override

@@ -5,18 +5,16 @@ import fr.epicanard.mapsaver.language.Help;
 import fr.epicanard.mapsaver.permission.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
 import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 
-public class HelpCommand implements TabExecutor {
+public class HelpCommand extends BaseCommand{
 
-    public MapSaverPlugin plugin;
 
     public HelpCommand(MapSaverPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override

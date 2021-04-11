@@ -56,7 +56,6 @@ class ScriptExecutor {
                         .lines()
                         .collect(Collectors.joining("\n"))
                         .replaceAll("(\\{prefix})", plugin.getConfiguration().Storage.TablePrefix);
-                System.out.println(file);
                 return Arrays.stream(file.split(";"))
                         .filter(line -> line.trim().length() > 0)
                         .collect(Collectors.toList());
