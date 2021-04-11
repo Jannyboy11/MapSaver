@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.config.Storage;
+import fr.epicanard.mapsaver.map.Visibility;
 import lombok.Getter;
 import org.codejargon.fluentjdbc.api.FluentJdbc;
 import org.codejargon.fluentjdbc.api.FluentJdbcBuilder;
@@ -36,8 +37,13 @@ abstract class MapDataBase {
 
     private static ObjectMappers initObjectMappers() {
         final ObjectMapperRsExtractor<UUID> uuidExtractor = (resultSet, i) -> UUID.fromString(resultSet.getString(i));
+        final ObjectMapperRsExtractor<Visibility> visibilityExtractor = (resultSet, i) -> Visibility.valueOf(resultSet.getString(i));
 
-        return ObjectMappers.builder().extractors(Collections.singletonMap(UUID.class, uuidExtractor)).build();
+        final Map<Class, ObjectMapperRsExtractor> extractors = new HashMap<>();
+        extractors.put(UUID.class, uuidExtractor);
+        extractors.put(Visibility.class, visibilityExtractor);
+
+        return ObjectMappers.builder().extractors(extractors).build();
     }
 
     /**

@@ -8,3 +8,6 @@ Help:
   List: "&c/mapsaver list &6 - Permet de lister tous les maps"
 ErrorMessages:
   PermissionNotAllowed: "&cVous n'êtes pas autorisé à faire cette action"
+  PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
+  MapInHandNeeded: "&cVous devez avoir une carte rempli en main"
+  MissingMapMeta: "&cImpossible de récupérer les MetaDonnées de votre carte"

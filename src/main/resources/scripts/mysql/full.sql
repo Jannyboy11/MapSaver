@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `{prefix}_player_maps`
     `map_uuid`      VARCHAR(36)     NOT NULL,
     `owner`         BOOLEAN         NOT NULL,
     `visibility`    VARCHAR(20)     NOT NULL,
-    -- Map name
+    `name`          VARCHAR(256)    NOT NULL,
+    UNIQUE(`player_uuid`, `name`),
     FOREIGN KEY (map_uuid) REFERENCES {prefix}_data_maps(uuid) ON DELETE CASCADE
 ) ENGINE=InnoDB;

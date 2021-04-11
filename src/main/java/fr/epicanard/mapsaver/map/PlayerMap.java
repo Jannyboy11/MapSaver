@@ -14,4 +14,5 @@ public class PlayerMap {
     private UUID mapUuid;
     private boolean owner;
     private Visibility visibility;
+    private String name;
 }

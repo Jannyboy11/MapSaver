@@ -30,13 +30,13 @@ public class SaveCommand extends PlayerOnlyCommand {
         ItemStack stack = player.getInventory().getItemInMainHand();
 
         if (stack.getType() != Material.FILLED_MAP) {
-            sender.sendMessage("You need to have a filled map in your hand");
+            Messenger.sendMessage(player, plugin.getLanguage().ErrorMessages.MapInHandNeeded);
             return true;
         }
 
         if (!(stack.getItemMeta() instanceof MapMeta)) {
-            sender.sendMessage("Error getting map Meta");
-            this.plugin.getLogger().warning("Player: " + player.getName() + " tried to save " + stack.getType().toString() + " which was considered a map, but itemMeta is not valid!");
+            Messenger.sendMessage(player, plugin.getLanguage().ErrorMessages.MissingMapMeta);
+            this.plugin.getLogger().warning("Player: " + player.getName() + " tried to save " + stack.getType().toString() + " which was considered as a map, but itemMeta is not valid!");
             return true;
         }
 
@@ -46,17 +46,18 @@ public class SaveCommand extends PlayerOnlyCommand {
 
         final Optional<MapRenderer> renderer = mapView.getRenderers().stream().findFirst();
         if (renderer.isPresent()) {
-            final byte[] byteMap =  new byte[16384];
+            final byte[] byteMap = new byte[16384];
             ReflectionUtils.getField(renderer.get(), "worldMap.colors").ifPresent(colors -> {
                 System.arraycopy((byte[])colors, 0, byteMap, 0, 16384);
                 final MapToSave mapToSave = MapToSave.builder()
                         .id(mapMeta.getMapId())
+                        .name((args.length >= 1) ? args[0] : "default")
                         .server(plugin.getConfiguration().ServerName)
                         .bytes(byteMap)
                         .owner(player.getUniqueId())
                         .visibility(Visibility.PUBLIC)
                         .build();
-                this.plugin.getService().saveMap(mapToSave);
+                this.plugin.getService().saveMap(mapToSave, sender);
             });
         }
 

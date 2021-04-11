@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Config {
     public String Language = "en_US";
+    public String ServerName = "server";
     public Storage Storage;
 }

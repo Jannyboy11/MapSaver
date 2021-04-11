@@ -42,6 +42,7 @@ public class MapRepository extends MapDataBase {
                 .namedParam("map_uuid", playerMap.getMapUuid().toString())
                 .namedParam("owner", playerMap.isOwner())
                 .namedParam("visibility", playerMap.getVisibility())
+                .namedParam("name", playerMap.getName())
                 .run();
     }
 
@@ -54,12 +55,17 @@ public class MapRepository extends MapDataBase {
     }
 
     public Optional<PlayerMap> selectPlayerMapByPlayerUuidAndMapUuid(final UUID playerUuid, final UUID mapUuid) {
-        return this.query.select(SELECT_PLAYER_MAP.query(prefix))
+        return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER_AND_MAP_UUID.query(prefix))
                 .namedParam("player_uuid", playerUuid.toString())
                 .namedParam("map_uuid", mapUuid.toString())
                 .firstResult(mappers.forClass(PlayerMap.class));
     }
 
+    public Optional<PlayerMap> selectPlayerMapByMapUuid(final UUID mapUuid) {
+        return this.query.select(SELECT_PLAYER_MAP_BY_MAP.query(prefix))
+            .namedParam("map_uuid", mapUuid.toString())
+            .firstResult(mappers.forClass(PlayerMap.class));
+    }
 
     /* ====== SERVER MAP ====== */
 

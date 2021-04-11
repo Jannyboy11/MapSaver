@@ -12,6 +12,7 @@ import java.util.UUID;
 @Builder
 public class MapToSave {
     private int id;
+    private String name;
     private String server;
     private byte[] bytes;
     private UUID owner;
@@ -26,10 +27,10 @@ public class MapToSave {
     }
 
     public ServerMap toServerMap(final UUID mapUuid, final int lockedId) {
-        return new ServerMap(lockedId, Optional.empty(),this.server, mapUuid);
+        return new ServerMap(lockedId, Optional.of(id), this.server, mapUuid);
     }
 
     public PlayerMap toPlayerMap(final UUID mapUuid) {
-        return new PlayerMap(this.owner, mapUuid, true, this.visibility);
+        return new PlayerMap(this.owner, mapUuid, true, this.visibility, this.name);
     }
 }
