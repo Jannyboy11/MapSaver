@@ -44,11 +44,12 @@ public class MapService {
                 match(repository.selectPlayerMapByMapUuid(serverMap.getMapUuid()),
                     playerMap -> {
                         if (!playerMap.getPlayerUuid().equals(mapToSave.getOwner())) {
-                            sender.sendMessage("You are not the owner of this map");
+                            sender.sendMessage("You are not the owner of this map"); // TODO variabiliser messages
                         } else {
                             sender.sendMessage("Update existing map");
                             repository.updatePlayerMapVisibility(mapToSave.toPlayerMap(serverMap.getMapUuid()));
                             repository.updateDataMap(mapToSave.toDataMap(serverMap.getMapUuid()));
+                            createAndUpdateBukkitMap(serverMap.getLockedId(), mapToSave.getBytes());
                         }
                     },
                     () -> {
