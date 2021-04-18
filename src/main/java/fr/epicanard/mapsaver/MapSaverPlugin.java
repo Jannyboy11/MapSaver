@@ -32,7 +32,7 @@ public class MapSaverPlugin extends JavaPlugin {
 
         final MapRepository repository = new MapRepository(this);
         repository.setupDatabase();
-        this.service = new MapService(repository);
+        this.service = new MapService(this, repository);
 
         this.getCommand("mapsaver").setExecutor(new MapSaverCommand(this));
     }

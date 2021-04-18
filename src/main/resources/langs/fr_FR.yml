@@ -11,3 +11,6 @@ ErrorMessages:
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
   MapInHandNeeded: "&cVous devez avoir une carte rempli en main"
   MissingMapMeta: "&cImpossible de récupérer les MetaDonnées de votre carte"
+  MissingMapName: "&cLe nom de map est manquant"
+  MissingMapOrNotPublic: "&cCette map n'existe pas ou n'est pas publique"
+  MissingDataMap: "&cErreur inatendue, impossible de trouver les données de la map"

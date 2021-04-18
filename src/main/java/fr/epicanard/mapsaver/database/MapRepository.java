@@ -2,6 +2,7 @@ package fr.epicanard.mapsaver.database;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.map.DataMap;
+import fr.epicanard.mapsaver.map.MapByName;
 import fr.epicanard.mapsaver.map.PlayerMap;
 import fr.epicanard.mapsaver.map.ServerMap;
 
@@ -24,15 +25,21 @@ public class MapRepository extends MapDataBase {
     public void insertDataMap(final DataMap map) {
         this.query.update(INSERT_DATA_MAP.query(prefix))
                 .namedParam("uuid", map.getUuid().toString())
-                .namedParam("bytes", map.getByteMap())
+                .namedParam("bytes", map.getBytes())
                 .run();
     }
 
     public void updateDataMap(final DataMap map) {
         this.query.update(UPDATE_DATA_MAP.query(prefix))
                 .namedParam("uuid", map.getUuid().toString())
-                .namedParam("bytes", map.getByteMap())
+                .namedParam("bytes", map.getBytes())
                 .run();
+    }
+
+    public Optional<DataMap> selectDataMap(final UUID mapUuid) {
+        return this.query.select(SELECT_DATA_MAP.query(prefix))
+                .namedParam("uuid", mapUuid.toString())
+                .firstResult(mappers.forClass(DataMap.class));
     }
 
     /* ====== PLAYER MAP ====== */
@@ -97,5 +104,12 @@ public class MapRepository extends MapDataBase {
                 .namedParam("locked_id", lockedId)
                 .namedParam("server", server)
                 .firstResult(mappers.forClass(ServerMap.class));
+    }
+
+    public List<MapByName> selectServerMapByName(final String mapName, final UUID playerUuid) {
+        return this.query.select(SELECT_SERVER_MAP_BY_NAME.query(prefix))
+                .namedParam("map_name", mapName)
+                .namedParam("player_uuid", playerUuid.toString())
+                .listResult(mappers.forClass(MapByName.class));
     }
 }

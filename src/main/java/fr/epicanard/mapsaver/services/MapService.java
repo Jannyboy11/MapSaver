@@ -1,10 +1,9 @@
 package fr.epicanard.mapsaver.services;
 
+import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.database.MapRepository;
-import fr.epicanard.mapsaver.map.DataMap;
-import fr.epicanard.mapsaver.map.MapToSave;
-import fr.epicanard.mapsaver.map.PlayerMap;
-import fr.epicanard.mapsaver.map.ServerMap;
+import fr.epicanard.mapsaver.map.*;
+import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.ReflectionUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -19,11 +18,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static fr.epicanard.mapsaver.utils.Either.Left;
+import static fr.epicanard.mapsaver.utils.Either.Right;
+
 public class MapService {
     @Getter
     private MapRepository repository;
+    private MapSaverPlugin plugin;
 
-    public MapService(final MapRepository repository) {
+    public MapService(final MapSaverPlugin plugin, final MapRepository repository) {
+        this.plugin = plugin;
         this.repository = repository;
     }
 
@@ -65,16 +69,39 @@ public class MapService {
         return repository.selectPlayerMapByPlayerUuid(playerUuid);
     }
 
-    private <T> void match(final Optional<T> opt, final Consumer<T> some, final Runnable none) {
-        if (opt.isPresent()) {
-            some.accept(opt.get());
-        } else {
-            none.run();
+    public Either<String, ItemStack> getPlayerMap(final String mapName, final UUID playerUuid) {
+        final List<MapByName> maps = this.repository.selectServerMapByName(mapName, playerUuid);
+
+        if (maps.isEmpty()) {
+            return Left(this.plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic);
         }
+        final Optional<MapByName> existingMap = maps.stream()
+            .filter(map -> map.getServer().map(this.plugin.getConfiguration().ServerName::equals).orElse(false))
+            .findFirst();
+
+        final UUID mapUuid = maps.stream().findFirst().get().getMapUuid();
+        return existingMap
+            .<Either<String, ItemStack>>flatMap(map -> map.getLockedId().map(id -> Right(createMapItem(id))))
+            .orElseGet(() -> {
+                final int id = newBukkitMapId();
+                return createBukkitMap(id, mapUuid)
+                    .apply(m -> this.repository.insertServerMap(new ServerMap(
+                        id, Optional.empty(), this.plugin.getConfiguration().ServerName, mapUuid
+                    )));
+            });
     }
 
-    public static ItemStack createBukkitMap(final byte[] bytes) {
-        final int id = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
+    public Either<String, ItemStack> createBukkitMap(final int id, final UUID mapUUID) {
+        return this.repository.selectDataMap(mapUUID)
+            .<Either<String, ItemStack>>map(map -> Right(createAndUpdateBukkitMap(id, map.getBytes())))
+            .orElseGet(() -> Left(this.plugin.getLanguage().ErrorMessages.MissingDataMap));
+    }
+
+    public static int newBukkitMapId() {
+        return Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
+    }
+
+    public static ItemStack createAndUpdateBukkitMap(final int id, final byte[] bytes) {
         final ItemStack mapItem = createMapItem(id);
         final MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
         final MapView mapView = mapMeta.getMapView();
@@ -91,6 +118,14 @@ public class MapService {
         return mapItem;
     }
 
+    private <T> void match(final Optional<T> opt, final Consumer<T> some, final Runnable none) {
+        if (opt.isPresent()) {
+            some.accept(opt.get());
+        } else {
+            none.run();
+        }
+    }
+
     private static ItemStack createMapItem(int mapID) {
         final ItemStack mapItem = new ItemStack(Material.FILLED_MAP, 1);
         final MapMeta meta = (MapMeta) mapItem.getItemMeta();
@@ -102,10 +137,12 @@ public class MapService {
 
     private void createNewMap(final MapToSave mapToSave) {
         final DataMap dataMap = mapToSave.toDataMap();
-        final int id = ((MapMeta) MapService.createBukkitMap(mapToSave.getBytes()).getItemMeta()).getMapId();
+        final int id = newBukkitMapId();
+        MapService.createAndUpdateBukkitMap(id, mapToSave.getBytes());
 
         repository.insertDataMap(dataMap);
         repository.insertServerMap(mapToSave.toServerMap(dataMap.getUuid(), id));
         repository.insertPlayerMap(mapToSave.toPlayerMap(dataMap.getUuid()));
     }
+
 }

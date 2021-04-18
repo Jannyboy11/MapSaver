@@ -2,16 +2,20 @@ package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.map.ServerMap;
+import fr.epicanard.mapsaver.utils.Either;
+import fr.epicanard.mapsaver.utils.Messenger;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public class ImportCommand extends BaseCommand {
+public class ImportCommand extends PlayerOnlyCommand {
 
     public ImportCommand(MapSaverPlugin plugin) {
         super(plugin);
@@ -19,48 +23,21 @@ public class ImportCommand extends BaseCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Optional<ServerMap> maps = this.plugin.getService().getRepository().selectServerMapByLockedIdAndServer(42, "Freeboulde");
-        maps.ifPresent(map -> {
-            System.out.println(map.getLockedId());
-            System.out.println(map.getOriginalId());
-            System.out.println(map.getServer());
-            System.out.println(map.getMapUuid());
-        });
-//        if (!(sender instanceof Player)) {
-//            sender.sendMessage("Command for player only");
-//            return true;
-//        }
-//
-//        if (!this.plugin.byteMap.isPresent()) return true;
-//
-//        byte[] bytes = this.plugin.byteMap.get();
-//        Player player = (Player) sender;
-//
-//        int id = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
-//        ItemStack mapItem = createMapItem(id);
-//        MapMeta mapMeta = (MapMeta) mapItem.getItemMeta();
-//        MapView mapView = mapMeta.getMapView();
-//
-//        mapView.setLocked(true);
-//        mapView.getRenderers().forEach(renderer -> {
-//            ReflectionUtils.getField(renderer, "worldMap.colors").ifPresent(colors -> {
-//                System.arraycopy(bytes, 0, (byte[])colors, 0, bytes.length);
-//            });
-//        });
-//
-//        mapMeta.setMapView(mapView);
-//        mapItem.setItemMeta(mapMeta);
-//
-//        player.getInventory().addItem(mapItem);
-        return true;
-    }
+        if (args.length < 1 || args[0].isEmpty()) {
+            Messenger.sendMessage(sender, this.plugin.getLanguage().ErrorMessages.MissingMapName);
+            return false;
+        }
 
-    public static ItemStack createMapItem(int mapID) {
-        ItemStack mapItem = new ItemStack(Material.FILLED_MAP, 1);
-        final MapMeta meta = (MapMeta) mapItem.getItemMeta();
-        meta.setMapId(mapID);
-        mapItem.setItemMeta(meta);
-        return mapItem;
+        final Player player = (Player) sender;
+
+        final UUID playerUuid = (args.length >= 2) ?
+            this.plugin.getServer().getOfflinePlayer(args[1]).getUniqueId() :
+            player.getUniqueId();
+
+        return this.plugin.getService().getPlayerMap(args[0], playerUuid).match(
+            error -> Messenger.sendMessage(sender, "&c" + error),
+            result -> player.getInventory().addItem(result)
+        ).isRight();
     }
 
     @Override
