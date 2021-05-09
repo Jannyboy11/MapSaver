@@ -9,6 +9,7 @@ public class Help {
     public String Reload;
     public String Version;
     public String Save;
+    public String Update;
     public String Import;
     public String List;
 }

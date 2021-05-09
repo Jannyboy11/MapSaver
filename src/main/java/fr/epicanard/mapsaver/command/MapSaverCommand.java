@@ -25,6 +25,7 @@ public class MapSaverCommand extends BaseCommand {
         this.subCmd = new HashMap<>();
 
         this.registerSubCmd("save", new SaveCommand(this.plugin));
+        this.registerSubCmd("update", new UpdateCommand(this.plugin));
         this.registerSubCmd("list", new ListCommand(this.plugin));
         this.registerSubCmd("import", new ImportCommand(this.plugin));
         this.registerSubCmd("help", new HelpCommand(this.plugin));

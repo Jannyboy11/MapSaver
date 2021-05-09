@@ -11,20 +11,18 @@ import java.util.List;
 import static fr.epicanard.mapsaver.utils.MapUtils.extractMapToSaveFromPlayer;
 import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 
-public class SaveCommand extends PlayerOnlyCommand {
+public class UpdateCommand extends PlayerOnlyCommand {
 
-    public SaveCommand(MapSaverPlugin plugin) {
+    public UpdateCommand(MapSaverPlugin plugin) {
         super(plugin);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        final String mapName = (args.length >= 1) ? args[0] : "default";
-
-        extractMapToSaveFromPlayer(plugin, (Player) sender, mapName)
+        extractMapToSaveFromPlayer(plugin, (Player) sender, null)
             .match(
                 left  -> sendMessage(sender, left),
-                right -> this.plugin.getService().saveMap(right, sender)
+                right -> this.plugin.getService().updateMap(right, sender)
             );
 
         return true;

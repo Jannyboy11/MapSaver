@@ -13,6 +13,7 @@ enum Queries {
     SELECT_PLAYER_MAP_BY_MAP("SELECT * FROM {prefix}_player_maps WHERE `map_uuid` = :map_uuid"),
     INSERT_SERVER_MAP("INSERT INTO {prefix}_server_maps (`locked_id`, `original_id`, `server`, `map_uuid`) VALUES (:locked_id, :original_id, :server, :map_uuid)"),
     SELECT_SERVER_MAP_BY_ORIGINAL_ID("SELECT * FROM {prefix}_server_maps WHERE `original_id` = :original_id AND `server` = :server"),
+    SELECT_SERVER_MAP_BY_ORIGINAL_ID_OR_LOCKED_ID("SELECT * FROM {prefix}_server_maps WHERE (`original_id` = :original_id OR `locked_id` = :locked_id) AND `server` = :server"),
     SELECT_SERVER_MAP_BY_LOCKED_ID("SELECT * FROM {prefix}_server_maps WHERE `locked_id` = :locked_id AND `server` = :server"),
     SELECT_SERVER_MAP_BY_NAME(
         "SELECT {prefix}_player_maps.player_uuid, {prefix}_player_maps.map_uuid, {prefix}_server_maps.locked_id, {prefix}_server_maps.server " +

@@ -4,41 +4,41 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Either<E, R> {
-    final Optional<E> error;
-    final Optional<R> result;
+public class Either<L, R> {
+    final Optional<L> left;
+    final Optional<R> right;
 
-    private Either(final Optional<E> error, final Optional<R> result) {
-        this.error = error;
-        this.result = result;
+    private Either(final Optional<L> left, final Optional<R> right) {
+        this.left = left;
+        this.right = right;
     }
 
-    public static <E, R> Either<E, R> Left(E error) {
-        return new Either<>(Optional.of(error), Optional.empty());
+    public static <L, R> Either<L, R> Left(L left) {
+        return new Either<>(Optional.of(left), Optional.empty());
     }
 
-    public static <E, R> Either<E, R> Right(R result) {
-        return new Either<>(Optional.empty(), Optional.of(result));
+    public static <L, R> Either<L, R> Right(R right) {
+        return new Either<>(Optional.empty(), Optional.of(right));
     }
 
     public boolean isRight() {
-        return result.isPresent();
+        return right.isPresent();
     }
 
     public boolean isLeft() {
-        return error.isPresent();
+        return left.isPresent();
     }
 
-    public Either<E, R> apply(final Consumer<R> applier) {
-        this.result.ifPresent(applier);
+    public Either<L, R> apply(final Consumer<R> applier) {
+        this.right.ifPresent(applier);
         return this;
     }
 
-    public Either<E, R> match(final Consumer<E> left, final Consumer<R> right) {
+    public Either<L, R> match(final Consumer<L> left, final Consumer<R> right) {
         if (isLeft()) {
-            this.error.ifPresent(left);
+            this.left.ifPresent(left);
         } else {
-            this.result.ifPresent(right);
+            this.right.ifPresent(right);
         }
         return this;
     }

@@ -99,6 +99,14 @@ public class MapRepository extends MapDataBase {
                 .firstResult(mappers.forClass(ServerMap.class));
     }
 
+    public Optional<ServerMap> selectServerMapByMapIdAndServer(final int searchedId, final String server) {
+        return this.query.select(SELECT_SERVER_MAP_BY_ORIGINAL_ID_OR_LOCKED_ID.query(prefix))
+                .namedParam("original_id", searchedId)
+                .namedParam("locked_id", searchedId)
+                .namedParam("server", server)
+                .firstResult(mappers.forClass(ServerMap.class));
+    }
+
     public Optional<ServerMap> selectServerMapByLockedIdAndServer(final int lockedId, final String server) {
         return this.query.select(SELECT_SERVER_MAP_BY_LOCKED_ID.query(prefix))
                 .namedParam("locked_id", lockedId)

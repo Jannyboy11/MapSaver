@@ -16,51 +16,76 @@ import org.bukkit.map.MapView;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import static fr.epicanard.mapsaver.utils.Either.Left;
 import static fr.epicanard.mapsaver.utils.Either.Right;
+import static fr.epicanard.mapsaver.utils.Match.match;
+import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 
 public class MapService {
     @Getter
-    private MapRepository repository;
-    private MapSaverPlugin plugin;
+    private final MapRepository repository;
+    private final MapSaverPlugin plugin;
 
     public MapService(final MapSaverPlugin plugin, final MapRepository repository) {
         this.plugin = plugin;
         this.repository = repository;
     }
 
-    // TODO worms. Quand tu sauvegarde une map tu fais un doublon lock il faut
-    // garder un tracking sur la première non lock en cas de second save
-    // Aucune vérification sur le owner
-    // Erreur de duplication quand save deux fois avec le même nom
-    public void saveMap(final MapToSave mapToSave, final CommandSender sender) {
-        Optional<ServerMap> maybeServerMap = repository.selectServerMapByOriginalIdAndServer(mapToSave.getId(),
-                mapToSave.getServer());
+    public void updateMap(final MapToSave mapToSave, final CommandSender sender) {
+        final Optional<ServerMap> maybeServerMap = repository
+            .selectServerMapByMapIdAndServer(mapToSave.getId(), mapToSave.getServer());
 
-        match(maybeServerMap,
-            serverMap -> {
+        match(maybeServerMap, serverMap -> {
                 match(repository.selectPlayerMapByMapUuid(serverMap.getMapUuid()),
                     playerMap -> {
                         if (!playerMap.getPlayerUuid().equals(mapToSave.getOwner())) {
-                            sender.sendMessage("You are not the owner of this map"); // TODO variabiliser messages
+                            sendMessage(sender, plugin.getLanguage().ErrorMessages.NotTheOwner);
+                        } else if (serverMap.getLockedId() == mapToSave.getId()) {
+                            sendMessage(sender, plugin.getLanguage().ErrorMessages.NotTheOriginal);
                         } else {
-                            sender.sendMessage("Update existing map");
+                            sendMessage(sender, plugin.getLanguage().InfoMessages.UpdatingExistingMap);
                             repository.updatePlayerMapVisibility(mapToSave.toPlayerMap(serverMap.getMapUuid()));
                             repository.updateDataMap(mapToSave.toDataMap(serverMap.getMapUuid()));
                             createAndUpdateBukkitMap(serverMap.getLockedId(), mapToSave.getBytes());
                         }
                     },
                     () -> {
-                        sender.sendMessage("Associate map");
+                        sendMessage(sender, plugin.getLanguage().InfoMessages.AssociationNewMap);
                         repository.insertPlayerMap(mapToSave.toPlayerMap(serverMap.getMapUuid()));
                         repository.updateDataMap(mapToSave.toDataMap(serverMap.getMapUuid()));
                     }
                 );
             },
             () -> {
-                sender.sendMessage("Create new map");
+                sendMessage(sender, plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic);
+            }
+        );
+    }
+
+    public void saveMap(final MapToSave mapToSave, final CommandSender sender) {
+        final Optional<ServerMap> maybeServerMap = repository
+            .selectServerMapByMapIdAndServer(mapToSave.getId(), mapToSave.getServer());
+
+        match(maybeServerMap,
+            serverMap -> {
+                match(repository.selectPlayerMapByMapUuid(serverMap.getMapUuid()),
+                    playerMap -> {
+                        if (!playerMap.getPlayerUuid().equals(mapToSave.getOwner())) {
+                            sendMessage(sender, plugin.getLanguage().ErrorMessages.NotTheOwner);
+                        } else {
+                            sendMessage(sender, plugin.getLanguage().ErrorMessages.AlreadySaved);
+                        }
+                    },
+                    () -> {
+                        sendMessage(sender, plugin.getLanguage().InfoMessages.AssociationNewMap);
+                        repository.insertPlayerMap(mapToSave.toPlayerMap(serverMap.getMapUuid()));
+                        repository.updateDataMap(mapToSave.toDataMap(serverMap.getMapUuid()));
+                    }
+                );
+            },
+            () -> {
+                sendMessage(sender, plugin.getLanguage().InfoMessages.CreatingNewMap);
                 this.createNewMap(mapToSave);
             }
         );
@@ -70,7 +95,7 @@ public class MapService {
         return repository.selectPlayerMapByPlayerUuid(playerUuid);
     }
 
-    public Either<String, ItemStack> getPlayerMap(final String mapName, final UUID playerUuid) {
+    public Either<String, ItemStack> getPlayerMap(final String mapName, final UUID playerUuid, final Boolean canGetMap) {
         final List<MapByName> maps = this.repository.selectServerMapByName(mapName, playerUuid);
 
         if (maps.isEmpty()) {
@@ -80,7 +105,13 @@ public class MapService {
             .filter(map -> map.getServer().map(this.plugin.getConfiguration().ServerName::equals).orElse(false))
             .findFirst();
 
-        final UUID mapUuid = maps.stream().findFirst().get().getMapUuid();
+        final MapByName first = maps.stream().findFirst().get();
+
+        if (!canGetMap && first.getVisibility() != Visibility.PUBLIC) {
+            Left(plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic);
+        }
+
+        final UUID mapUuid = first.getMapUuid();
         return existingMap
             .<Either<String, ItemStack>>flatMap(map -> map.getLockedId().map(id -> Right(createMapItem(id))))
             .orElseGet(() -> {
@@ -117,14 +148,6 @@ public class MapService {
         mapMeta.setMapView(mapView);
         mapItem.setItemMeta(mapMeta);
         return mapItem;
-    }
-
-    private <T> void match(final Optional<T> opt, final Consumer<T> some, final Runnable none) {
-        if (opt.isPresent()) {
-            some.accept(opt.get());
-        } else {
-            none.run();
-        }
     }
 
     private static ItemStack createMapItem(int mapID) {

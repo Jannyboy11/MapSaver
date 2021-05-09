@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
  */
 public enum Permissions {
     SAVE_MAP("mapsaver.commands.save"),
-    IMPORT_MAP("mapsaver.commands.save"),
-    LIST_MAP("mapsaver.commands.save"),
-    RELOAD("mapsaver.admin.commands.reload");
+    UPDATE_MAP("mapsaver.commands.update"),
+    IMPORT_MAP("mapsaver.commands.import"),
+    LIST_MAP("mapsaver.commands.list"),
+    RELOAD("mapsaver.admin.commands.reload"),
+    ;
 
     private final String permission;
 
