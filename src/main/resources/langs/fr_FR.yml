@@ -7,6 +7,7 @@ Help:
   Update: "&6/mapsaver update&f - Met à jour une carte existante"
   Import: "&6/mapsaver import <nom_carte>&f - Importe la carte avec le nom spécifié"
   List: "&6/mapsaver list &f - Permet de lister tous les cartes"
+  Info: "&6/mapsaver info [nom_carte] &f - Affiche les détails d'une map ou de celle en main"
 ErrorMessages:
   PermissionNotAllowed: "&cVous n'êtes pas autorisé à faire cette action"
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
@@ -23,3 +24,9 @@ InfoMessages:
   CreatingNewMap: "Création d'une nouvelle carte"
   UpdatingExistingMap: "Mise à jour d'une carte existante"
   AssociationNewMap: "Association d'une nouvelle carte"
+MapInfo:
+  Name: "&6Nom : &f"
+  Owner: "&6Propriétaire : &f"
+  Visibility: "&6Visibilité : &f"
+  OriginalMap: "&6Carte originale : &f"
+  CopyMaps: "&6Copies verrouillées : &f"

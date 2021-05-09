@@ -13,6 +13,7 @@ public enum Permissions {
     UPDATE_MAP("mapsaver.commands.update"),
     IMPORT_MAP("mapsaver.commands.import"),
     LIST_MAP("mapsaver.commands.list"),
+    INFO_MAP("mapsaver.commands.info"),
     RELOAD("mapsaver.admin.commands.reload"),
     ADMIN_IMPORT_MAP("mapsaver.admin.commands.import"),
     ;

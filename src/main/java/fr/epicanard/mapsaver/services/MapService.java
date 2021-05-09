@@ -91,6 +91,34 @@ public class MapService {
         );
     }
 
+    public Optional<PlayerAllMap> getMapInfo(final int id) {
+        final PlayerAllMap.PlayerAllMapBuilder builder = PlayerAllMap.builder();
+
+        return repository.selectServerMapByMapIdAndServer(id, plugin.getConfiguration().ServerName)
+            .map(serverMap -> {
+                builder
+                    .originalMap(serverMap)
+                    .serverMaps(repository.selectServerMapByMapUuid(serverMap.getMapUuid()));
+                return serverMap;
+            })
+            .flatMap(serverMap -> repository.selectPlayerMapByMapUuid(serverMap.getMapUuid()))
+            .map(playerMap -> builder.playerMap(playerMap).build());
+    }
+
+    public Optional<PlayerAllMap> getMapInfo(final UUID playerUuid, final String mapName) {
+        final PlayerAllMap.PlayerAllMapBuilder builder = PlayerAllMap.builder();
+
+        return repository.selectPlayerMapByPlayerUuidAndName(playerUuid, mapName)
+            .map(playerMap -> {
+                final List<ServerMap> serverMaps = repository.selectServerMapByMapUuid(playerMap.getMapUuid());
+                return builder
+                    .playerMap(playerMap)
+                    .serverMaps(serverMaps)
+                    .originalMap(serverMaps.stream().filter(map -> map.getOriginalId().isPresent()).findFirst().get())
+                    .build();
+            });
+    }
+
     public List<PlayerMap> listPlayerMaps(final UUID playerUuid) {
         return repository.selectPlayerMapByPlayerUuid(playerUuid);
     }

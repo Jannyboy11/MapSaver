@@ -28,6 +28,7 @@ public class MapSaverCommand extends BaseCommand {
         this.registerSubCmd("update", new UpdateCommand(this.plugin));
         this.registerSubCmd("list", new ListCommand(this.plugin));
         this.registerSubCmd("import", new ImportCommand(this.plugin));
+        this.registerSubCmd("info", new InfoCommand(this.plugin));
         this.registerSubCmd("version", new VersionCommand(this.plugin));
         this.registerSubCmd("help", new HelpCommand(this.plugin));
     }

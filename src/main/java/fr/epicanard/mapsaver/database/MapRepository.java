@@ -75,6 +75,13 @@ public class MapRepository extends MapDataBase {
             .firstResult(mappers.forClass(PlayerMap.class));
     }
 
+    public Optional<PlayerMap> selectPlayerMapByPlayerUuidAndName(final UUID playerUuid, final String name) {
+        return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER_AND_NAME.query(prefix))
+            .namedParam("player_uuid", playerUuid.toString())
+            .namedParam("name", name)
+            .firstResult(mappers.forClass(PlayerMap.class));
+    }
+
     public List<PlayerMap> selectPlayerMapByPlayerUuid(final UUID playerUuid) {
         return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER.query(prefix))
             .namedParam("player_uuid", playerUuid.toString())
@@ -112,6 +119,12 @@ public class MapRepository extends MapDataBase {
                 .namedParam("locked_id", lockedId)
                 .namedParam("server", server)
                 .firstResult(mappers.forClass(ServerMap.class));
+    }
+
+    public List<ServerMap> selectServerMapByMapUuid(final UUID mapUuid) {
+        return this.query.select(SELECT_SERVER_MAP_BY_MAP_UUID.query(prefix))
+                .namedParam("map_uuid", mapUuid.toString())
+                .listResult(mappers.forClass(ServerMap.class));
     }
 
     public List<MapByName> selectServerMapByName(final String mapName, final UUID playerUuid) {

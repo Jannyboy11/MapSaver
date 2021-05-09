@@ -11,4 +11,5 @@ public class Language {
     public Help Help;
     public ErrorMessages ErrorMessages;
     public InfoMessages InfoMessages;
+    public MapInfo MapInfo;
 }

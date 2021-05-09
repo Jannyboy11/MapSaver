@@ -10,7 +10,7 @@ import java.util.List;
 
 import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 
-public class HelpCommand extends BaseCommand{
+public class HelpCommand extends BaseCommand {
 
 
     public HelpCommand(MapSaverPlugin plugin) {
@@ -27,6 +27,7 @@ public class HelpCommand extends BaseCommand{
         sendMessageByPermission(sender, Permissions.UPDATE_MAP, helpMessages.Update);
         sendMessageByPermission(sender, Permissions.IMPORT_MAP, helpMessages.Import);
         sendMessageByPermission(sender, Permissions.LIST_MAP, helpMessages.List);
+        sendMessageByPermission(sender, Permissions.INFO_MAP, helpMessages.Info);
         sendMessageByPermission(sender, Permissions.RELOAD, helpMessages.Reload);
         sendMessage(sender, helpMessages.Version);
 
