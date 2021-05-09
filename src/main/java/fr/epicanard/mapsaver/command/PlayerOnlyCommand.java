@@ -17,10 +17,10 @@ public abstract class PlayerOnlyCommand extends BaseCommand {
 
     @Override
     public Boolean canExecute(CommandSender sender, String[] args) {
-        return this.isPlayerOnly(sender, args) && sender instanceof Player && super.canExecute(sender, args);
+        return this.isPlayerOnly(sender, args) && super.canExecute(sender, args);
     }
 
     public boolean isPlayerOnly(final CommandSender sender, final String[] args) {
-        return true;
+        return sender instanceof Player;
     }
 }

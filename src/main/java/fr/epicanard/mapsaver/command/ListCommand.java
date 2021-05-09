@@ -36,7 +36,7 @@ public class ListCommand extends PlayerOnlyCommand {
 
     @Override
     public boolean isPlayerOnly(final CommandSender sender, final String[] args) {
-        return (args.length == 0);
+        return (args.length >= 1) || super.isPlayerOnly(sender, args);
     }
 
     @Override
