@@ -13,6 +13,7 @@ import java.util.UUID;
 public class MapByName {
     private UUID mapUuid;
     private UUID playerUuid;
+    private Visibility visibility;
     private Optional<Integer> lockedId;
     private Optional<String> server;
 }

@@ -16,9 +16,9 @@ enum Queries {
     SELECT_SERVER_MAP_BY_ORIGINAL_ID_OR_LOCKED_ID("SELECT * FROM {prefix}_server_maps WHERE (`original_id` = :original_id OR `locked_id` = :locked_id) AND `server` = :server"),
     SELECT_SERVER_MAP_BY_LOCKED_ID("SELECT * FROM {prefix}_server_maps WHERE `locked_id` = :locked_id AND `server` = :server"),
     SELECT_SERVER_MAP_BY_NAME(
-        "SELECT {prefix}_player_maps.player_uuid, {prefix}_player_maps.map_uuid, {prefix}_server_maps.locked_id, {prefix}_server_maps.server " +
+        "SELECT {prefix}_player_maps.player_uuid, {prefix}_player_maps.map_uuid, {prefix}_player_maps.visibility, {prefix}_server_maps.locked_id, {prefix}_server_maps.server " +
         "FROM {prefix}_player_maps LEFT JOIN {prefix}_server_maps ON {prefix}_player_maps.map_uuid = {prefix}_server_maps.map_uuid " +
-        "WHERE {prefix}_player_maps.name = :map_name AND (visibility = 'PUBLIC' OR player_uuid = :player_uuid)"
+        "WHERE {prefix}_player_maps.name = :map_name AND player_uuid = :player_uuid"
     ),
     ;
 

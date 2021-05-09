@@ -2,6 +2,7 @@ package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.map.ServerMap;
+import fr.epicanard.mapsaver.permission.Permissions;
 import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.Messenger;
 import org.bukkit.Material;
@@ -34,7 +35,8 @@ public class ImportCommand extends PlayerOnlyCommand {
             this.plugin.getServer().getOfflinePlayer(args[1]).getUniqueId() :
             player.getUniqueId();
 
-        return this.plugin.getService().getPlayerMap(args[0], playerUuid).match(
+        final Boolean canGetMap = playerUuid.equals(player.getUniqueId()) || Permissions.ADMIN_IMPORT_MAP.isSetOn(sender);
+        return this.plugin.getService().getPlayerMap(args[0], playerUuid, canGetMap).match(
             error -> Messenger.sendMessage(sender, "&c" + error),
             result -> player.getInventory().addItem(result)
         ).isRight();
