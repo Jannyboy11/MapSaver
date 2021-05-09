@@ -1,6 +1,7 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.permission.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,7 +15,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class UpdateCommand extends PlayerOnlyCommand {
 
     public UpdateCommand(MapSaverPlugin plugin) {
-        super(plugin);
+        super(plugin, Permissions.UPDATE_MAP);
     }
 
     @Override

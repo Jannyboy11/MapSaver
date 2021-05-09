@@ -1,6 +1,7 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.permission.Permissions;
 import fr.epicanard.mapsaver.utils.Messenger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,7 +14,7 @@ import java.util.UUID;
 public class ListCommand extends PlayerOnlyCommand {
 
     public ListCommand(MapSaverPlugin plugin) {
-        super(plugin);
+        super(plugin, Permissions.LIST_MAP);
     }
 
     @Override

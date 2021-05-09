@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MapSaverCommand extends BaseCommand {
-    private final Map<String, TabExecutor> subCmd;
+    private final Map<String, BaseCommand> subCmd;
 
 
     public MapSaverCommand(MapSaverPlugin plugin) {
@@ -36,23 +36,29 @@ public class MapSaverCommand extends BaseCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         final String cmd = (args.length > 0) ? args[0] : "help";
         final String[] subArgs = (args.length > 0) ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
-        final CommandExecutor subCommand = this.subCmd.getOrDefault(cmd, this.subCmd.get("help"));
+        final BaseCommand subCommand = this.subCmd.getOrDefault(cmd, this.subCmd.get("help"));
 
-        if (subCommand instanceof PlayerOnlyCommand && ((PlayerOnlyCommand)subCommand).isPlayerOnly(sender, subArgs) && !(sender instanceof Player)) {
-            Messenger.sendMessage(sender, this.plugin.getLanguage().ErrorMessages.PlayerOnlyCommand);
-            return true;
+        if (subCommand.canExecute(sender, subArgs)) {
+            return subCommand.onCommand(sender, command, cmd, subArgs);
         }
-        return subCommand.onCommand(sender, command, cmd, subArgs);
+
+        Messenger.sendMessage(sender, !(sender instanceof Player) ?
+            this.plugin.getLanguage().ErrorMessages.PlayerOnlyCommand :
+            this.plugin.getLanguage().ErrorMessages.PermissionNotAllowed);
+        return true;
     }
 
-    public void registerSubCmd(final String label, final TabExecutor executor) {
+    public void registerSubCmd(final String label, final BaseCommand executor) {
         this.subCmd.put(label, executor);
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length <= 1) {
-            return this.subCmd.keySet().stream().filter(key -> key.startsWith(args[0])).collect(Collectors.toList());
+        if (args.length == 1) {
+            return this.subCmd.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(args[0]) && entry.getValue().canExecute(sender, new String[0]))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
         } else if (this.subCmd.containsKey(args[0])){
             return this.subCmd.get(args[0]).onTabComplete(sender, command, label, Arrays.copyOfRange(args, 1, args.length));
         }

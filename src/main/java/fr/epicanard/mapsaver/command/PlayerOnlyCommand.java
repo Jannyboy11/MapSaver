@@ -1,23 +1,26 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.permission.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class PlayerOnlyCommand extends BaseCommand {
-    public PlayerOnlyCommand(MapSaverPlugin plugin) {
-        super(plugin);
+    public PlayerOnlyCommand(MapSaverPlugin plugin, Permissions permission) {
+        super(plugin, permission);
+    }
+
+    @Override
+    public Boolean canExecute(CommandSender sender, String[] args) {
+        return this.isPlayerOnly(sender, args) && sender instanceof Player && super.canExecute(sender, args);
     }
 
     public boolean isPlayerOnly(final CommandSender sender, final String[] args) {
         return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return Collections.emptyList();
     }
 }
