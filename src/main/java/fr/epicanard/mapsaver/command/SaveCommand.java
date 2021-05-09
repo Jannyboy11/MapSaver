@@ -29,9 +29,4 @@ public class SaveCommand extends PlayerOnlyCommand {
 
         return true;
     }
-
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return Collections.emptyList();
-    }
 }

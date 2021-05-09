@@ -34,15 +34,14 @@ public class MapSaverCommand extends BaseCommand {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         final String cmd = (args.length > 0) ? args[0] : "help";
-
+        final String[] subArgs = (args.length > 0) ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
         final CommandExecutor subCommand = this.subCmd.getOrDefault(cmd, this.subCmd.get("help"));
-        final String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
 
         if (subCommand instanceof PlayerOnlyCommand && ((PlayerOnlyCommand)subCommand).isPlayerOnly(sender, subArgs) && !(sender instanceof Player)) {
             Messenger.sendMessage(sender, this.plugin.getLanguage().ErrorMessages.PlayerOnlyCommand);
             return true;
         }
-        return subCommand.onCommand(sender, command, args[0], subArgs);
+        return subCommand.onCommand(sender, command, cmd, subArgs);
     }
 
     public void registerSubCmd(final String label, final TabExecutor executor) {

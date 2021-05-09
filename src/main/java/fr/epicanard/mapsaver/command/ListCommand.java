@@ -39,7 +39,7 @@ public class ListCommand extends PlayerOnlyCommand {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return Collections.emptyList();
+    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
+        return null;
     }
 }
