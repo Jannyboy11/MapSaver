@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Config {
     public String Language = "en_US";
+    public String Prefix = "&a[MapSaver] &f";
     public String ServerName = "server";
     public Storage Storage;
 }

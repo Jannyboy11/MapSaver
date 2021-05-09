@@ -2,6 +2,7 @@
 # Config file for plugin MapSaver
 # ==============
 Language: "fr_FR"
+Prefix: "&a[MapSaver] &f"
 ServerName: "server"
 Storage:
   Type: "mysql"

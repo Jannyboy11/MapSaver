@@ -7,6 +7,7 @@ import fr.epicanard.mapsaver.config.Config;
 import fr.epicanard.mapsaver.database.MapRepository;
 import fr.epicanard.mapsaver.language.Language;
 import fr.epicanard.mapsaver.services.MapService;
+import fr.epicanard.mapsaver.utils.Messenger;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +30,8 @@ public class MapSaverPlugin extends JavaPlugin {
 
         this.configuration = this.loadFile(Config.class, "config.yml");
         this.language = this.loadFile(Language.class, String.format("langs/%s.yml", this.configuration.Language));
+
+        Messenger.setPrefix(this.configuration.Prefix);
 
         final MapRepository repository = new MapRepository(this);
         repository.setupDatabase();
