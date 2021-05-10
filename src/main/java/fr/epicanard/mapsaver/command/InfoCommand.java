@@ -3,6 +3,7 @@ package fr.epicanard.mapsaver.command;
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.language.MapInfo;
 import fr.epicanard.mapsaver.map.PlayerAllMap;
+import fr.epicanard.mapsaver.map.Visibility;
 import fr.epicanard.mapsaver.permission.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -25,13 +26,13 @@ public class InfoCommand extends PlayerOnlyCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
         getPlayerAllMap(sender, args)
             .ifPresent(p -> {
                 final MapInfo mapInfo = plugin.getLanguage().MapInfo;
+                final Visibility visibility = p.getPlayerMap().getVisibility();
                 sendMessage(sender, mapInfo.Name + p.getPlayerMap().getName());
                 sendMessage(sender, mapInfo.Owner + Bukkit.getOfflinePlayer(p.getPlayerMap().getPlayerUuid()).getName());
-                sendMessage(sender, mapInfo.Visibility + p.getPlayerMap().getVisibility());
+                sendMessage(sender, mapInfo.Visibility + plugin.getLanguage().Visibility.getOrDefault(visibility.name(), visibility.name()));
                 sendMessage(sender, String.format("%s%d ~ %s",mapInfo.OriginalMap, p.getOriginalMap().getOriginalId().get(), p.getOriginalMap().getServer()));
                 sendMessage(sender, mapInfo.CopyMaps);
                 p.getServerMaps().forEach(serverMap ->

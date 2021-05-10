@@ -30,3 +30,6 @@ MapInfo:
   Visibility: "&6Visibilité : &f"
   OriginalMap: "&6Carte originale : &f"
   CopyMaps: "&6Copies verrouillées : &f"
+Visibility:
+  PUBLIC: "Publique"
+  PRIVATE: "Privée"
