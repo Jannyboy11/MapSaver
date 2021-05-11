@@ -28,7 +28,7 @@ public class HelpCommand extends BaseCommand {
         sendMessageByPermission(sender, Permissions.IMPORT_MAP, helpMessages.Import);
         sendMessageByPermission(sender, Permissions.LIST_MAP, helpMessages.List);
         sendMessageByPermission(sender, Permissions.INFO_MAP, helpMessages.Info);
-        sendMessageByPermission(sender, Permissions.RELOAD, helpMessages.Reload);
+        sendMessageByPermission(sender, Permissions.ADMIN_RELOAD, helpMessages.Reload);
         sendMessage(sender, helpMessages.Version);
 
         return true;

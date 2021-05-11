@@ -136,7 +136,7 @@ public class MapService {
         final MapByName first = maps.stream().findFirst().get();
 
         if (!canGetMap && first.getVisibility() != Visibility.PUBLIC) {
-            Left(plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic);
+            return Left(plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic);
         }
 
         final UUID mapUuid = first.getMapUuid();
