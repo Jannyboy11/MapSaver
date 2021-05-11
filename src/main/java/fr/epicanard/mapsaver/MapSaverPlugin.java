@@ -11,12 +11,10 @@ import fr.epicanard.mapsaver.utils.Messenger;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Optional;
 import java.util.logging.Level;
 
 public class MapSaverPlugin extends JavaPlugin {
 
-    public Optional<byte[]> byteMap = Optional.empty();
     @Getter
     private Config configuration;
     @Getter

@@ -45,7 +45,9 @@ public class MapService {
                             sendMessage(sender, plugin.getLanguage().ErrorMessages.NotTheOriginal);
                         } else {
                             sendMessage(sender, plugin.getLanguage().InfoMessages.UpdatingExistingMap);
-                            repository.updatePlayerMapVisibility(mapToSave.toPlayerMap(serverMap.getMapUuid()));
+                            if (mapToSave.getVisibility() != null) {
+                                repository.updatePlayerMapVisibility(mapToSave.toPlayerMap(serverMap.getMapUuid()));
+                            }
                             repository.updateDataMap(mapToSave.toDataMap(serverMap.getMapUuid()));
                             createAndUpdateBukkitMap(serverMap.getLockedId(), mapToSave.getBytes());
                         }

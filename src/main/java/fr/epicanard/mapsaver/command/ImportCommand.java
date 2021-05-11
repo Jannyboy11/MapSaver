@@ -1,19 +1,13 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.map.ServerMap;
 import fr.epicanard.mapsaver.permission.Permissions;
-import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.Messenger;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class ImportCommand extends PlayerOnlyCommand {

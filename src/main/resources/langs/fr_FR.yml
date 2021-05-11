@@ -3,8 +3,8 @@ Help:
   Help: "&6/mapsaver [help]&f - Affiche l'aide"
   Reload: "&6/mapsaver reload&f - Permet de recharger le plugin"
   Version: "&6/mapsaver version&f - Affiche la version du plugin"
-  Save: "&6/mapsaver save <nom_carte>&f - Sauvegarde la carte en main"
-  Update: "&6/mapsaver update&f - Met à jour une carte existante"
+  Save: "&6/mapsaver save <nom_carte> [visibilité]&f - Sauvegarde la carte en main"
+  Update: "&6/mapsaver update [visibilité]&f - Met à jour une carte existante"
   Import: "&6/mapsaver import <nom_carte>&f - Importe la carte avec le nom spécifié"
   List: "&6/mapsaver list &f - Permet de lister tous les cartes"
   Info: "&6/mapsaver info [nom_carte] &f - Affiche les détails d'une map ou de celle en main"
@@ -20,6 +20,7 @@ ErrorMessages:
   NotTheOwner: "&cVous n'êtes pas le propriétaire de cette carte"
   NotTheOriginal: "&cCette carte n'est pas l'originale"
   AlreadySaved: "&cVous avez déjà enregistré cette carte.\n&fUtilises &6/mapsaver update&f pour mettre à jour cette carte"
+  WrongVisibility: "&cMauvaise visibilité : %s. Attendue : %s"
 InfoMessages:
   CreatingNewMap: "Création d'une nouvelle carte"
   UpdatingExistingMap: "Mise à jour d'une carte existante"

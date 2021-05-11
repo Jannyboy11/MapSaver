@@ -3,11 +3,14 @@ package fr.epicanard.mapsaver.command;
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.map.Visibility;
 import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.utils.OptionalUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fr.epicanard.mapsaver.utils.MapUtils.extractMapToSaveFromPlayer;
 import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
@@ -20,10 +23,14 @@ public class UpdateCommand extends PlayerOnlyCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        final Visibility visibility = Optional
-            .ofNullable((args.length >= 1) ? args[0] : null)
-            .flatMap(Visibility::find)
-            .orElse(plugin.getConfiguration().Privacy.DefaultVisibility);
+        Visibility visibility = null;
+
+        if (args.length >= 1 ) {
+            visibility = getValidity(sender, args[0]).orElse(null);
+            if (visibility == null) {
+                return true;
+            }
+        }
 
         extractMapToSaveFromPlayer(plugin, (Player) sender, null, visibility)
             .match(
@@ -32,5 +39,14 @@ public class UpdateCommand extends PlayerOnlyCommand {
             );
 
         return true;
+    }
+
+    public Optional<Visibility> getValidity(CommandSender sender, String arg) {
+        return OptionalUtils.ifEmpty(Visibility.find(arg), () ->
+                sendMessage(sender, String.format(plugin.getLanguage().ErrorMessages.WrongVisibility, arg, Arrays
+                    .stream(Visibility.values())
+                    .map(Enum::name)
+                    .collect(Collectors.joining(", "))))
+            );
     }
 }

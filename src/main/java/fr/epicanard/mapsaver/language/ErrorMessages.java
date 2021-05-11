@@ -12,4 +12,5 @@ public class ErrorMessages {
     public String NotTheOwner = "&cYou are not the owner of this map";
     public String NotTheOriginal = "&cThis is not the original map";
     public String AlreadySaved = "&cYou already saved this map.\n&fUse &6/mapsaver update&f to update this map";
+    public String WrongVisibility = "&cWrong visibility : %s. Expected : %s";
 }
