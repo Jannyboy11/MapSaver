@@ -15,12 +15,13 @@ Storage:
     Password: "my_password"
     UseSSL: true
 Privacy:
+  DefaultVisibility: "PRIVATE"
   # PRIMARY_OWNER => seul le owner (premier save) peut choisir la privacy policy tous les autres seront privée
   # PUBLIC => toutes les maps sont public
   # PRIVATE => toutes les maps sont privées
   # ALL => No restriction
   # UNIQUE => seul le owner peut sauvegarder la map
-  Mode: "" # PRIMARY_OWNER, PUBLIC, UNIQUE
+#  Mode: "" # PRIMARY_OWNER, PUBLIC, UNIQUE
 
 # A save 1 public => private
 # B save 1 private

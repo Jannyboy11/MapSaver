@@ -14,7 +14,7 @@ import java.util.Optional;
 import static fr.epicanard.mapsaver.utils.Either.Left;
 
 public class MapUtils {
-    public static Either<String, MapToSave> extractMapToSaveFromPlayer(final MapSaverPlugin plugin, final Player player, final String name) {
+    public static Either<String, MapToSave> extractMapToSaveFromPlayer(final MapSaverPlugin plugin, final Player player, final String name, final Visibility visibility) {
         ItemStack stack = player.getInventory().getItemInMainHand();
 
         if (stack.getType() != Material.FILLED_MAP) {
@@ -35,16 +35,16 @@ public class MapUtils {
             .flatMap(renderer -> ReflectionUtils.getField(renderer, "worldMap.colors"))
             .map(colors -> {
                 final byte[] byteMap = new byte[16384];
-                System.arraycopy((byte[])colors, 0, byteMap, 0, 16384);
+                System.arraycopy((byte[]) colors, 0, byteMap, 0, 16384);
                 return MapToSave.builder()
                     .id(mapMeta.getMapId())
                     .name(name)
                     .server(plugin.getConfiguration().ServerName)
                     .bytes(byteMap)
                     .owner(player.getUniqueId())
-                    .visibility(Visibility.PUBLIC)
+                    .visibility(visibility)
                     .build();
-           });
+            });
 
         return maybeMapToSave
             .<Either<String, MapToSave>>map(Either::Right)

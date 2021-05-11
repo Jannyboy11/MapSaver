@@ -26,7 +26,7 @@ public class ImportCommand extends PlayerOnlyCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1 || args[0].isEmpty()) {
             Messenger.sendMessage(sender, this.plugin.getLanguage().ErrorMessages.MissingMapName);
-            return false;
+            return true;
         }
 
         final Player player = (Player) sender;
@@ -36,10 +36,12 @@ public class ImportCommand extends PlayerOnlyCommand {
             player.getUniqueId();
 
         final Boolean canGetMap = playerUuid.equals(player.getUniqueId()) || Permissions.ADMIN_IMPORT_MAP.isSetOn(sender);
-        return this.plugin.getService().getPlayerMap(args[0], playerUuid, canGetMap).match(
-            error -> Messenger.sendMessage(sender, "&c" + error),
-            result -> player.getInventory().addItem(result)
-        ).isRight();
+        this.plugin.getService().getPlayerMap(args[0], playerUuid, canGetMap).match(
+            left -> Messenger.sendMessage(sender, "&c" + left),
+            right -> player.getInventory().addItem(right)
+        );
+
+        return true;
     }
 
     @Override
