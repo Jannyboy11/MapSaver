@@ -3,13 +3,11 @@ package fr.epicanard.mapsaver.command;
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.utils.Messenger;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,18 +17,18 @@ public class MapSaverCommand extends BaseCommand {
 
 
     public MapSaverCommand(MapSaverPlugin plugin) {
-        super(plugin);
+        super(plugin, null);
         this.plugin = plugin;
 
-        this.subCmd = new HashMap<>();
+        this.subCmd = new LinkedHashMap<>();
 
+        this.registerSubCmd("help", new HelpCommand(this.plugin, subCmd));
         this.registerSubCmd("save", new SaveCommand(this.plugin));
         this.registerSubCmd("update", new UpdateCommand(this.plugin));
-        this.registerSubCmd("list", new ListCommand(this.plugin));
         this.registerSubCmd("import", new ImportCommand(this.plugin));
+        this.registerSubCmd("list", new ListCommand(this.plugin));
         this.registerSubCmd("info", new InfoCommand(this.plugin));
         this.registerSubCmd("version", new VersionCommand(this.plugin));
-        this.registerSubCmd("help", new HelpCommand(this.plugin));
     }
 
     @Override
@@ -40,7 +38,10 @@ public class MapSaverCommand extends BaseCommand {
         final BaseCommand subCommand = this.subCmd.getOrDefault(cmd, this.subCmd.get("help"));
 
         if (subCommand.canExecute(sender, subArgs)) {
-            return subCommand.onCommand(sender, command, cmd, subArgs);
+            if (!subCommand.onCommand(sender, command, cmd, subArgs)) {
+                Messenger.sendMessage(sender, subCommand.getHelpMessage());
+            }
+            return true;
         }
 
         Messenger.sendMessage(sender, !(sender instanceof Player) ?

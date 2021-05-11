@@ -21,7 +21,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class InfoCommand extends PlayerOnlyCommand {
 
     public InfoCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.INFO_MAP);
+        super(plugin, Permissions.INFO_MAP, plugin.getLanguage().Help.Info);
     }
 
     @Override

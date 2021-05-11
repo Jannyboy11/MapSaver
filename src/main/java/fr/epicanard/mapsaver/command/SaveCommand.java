@@ -15,7 +15,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class SaveCommand extends PlayerOnlyCommand {
 
     public SaveCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.SAVE_MAP);
+        super(plugin, Permissions.SAVE_MAP, plugin.getLanguage().Help.Save);
     }
 
     @Override

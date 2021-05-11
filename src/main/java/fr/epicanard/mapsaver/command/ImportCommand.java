@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ImportCommand extends PlayerOnlyCommand {
 
     public ImportCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.IMPORT_MAP);
+        super(plugin, Permissions.IMPORT_MAP, plugin.getLanguage().Help.Import);
     }
 
     @Override

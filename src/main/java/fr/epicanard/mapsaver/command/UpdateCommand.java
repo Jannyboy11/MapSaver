@@ -15,7 +15,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class UpdateCommand extends PlayerOnlyCommand {
 
     public UpdateCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.UPDATE_MAP);
+        super(plugin, Permissions.UPDATE_MAP, plugin.getLanguage().Help.Update);
     }
 
     @Override

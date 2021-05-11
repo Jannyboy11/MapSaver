@@ -12,7 +12,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class VersionCommand extends BaseCommand {
 
     public VersionCommand(MapSaverPlugin plugin) {
-        super(plugin);
+        super(plugin, plugin.getLanguage().Help.Version);
     }
 
     @Override

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class PlayerOnlyCommand extends BaseCommand {
-    public PlayerOnlyCommand(MapSaverPlugin plugin, Permissions permission) {
-        super(plugin, permission);
+    public PlayerOnlyCommand(MapSaverPlugin plugin, Permissions permission, String helpMessage) {
+        super(plugin, permission, helpMessage);
     }
 
     @Override

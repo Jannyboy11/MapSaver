@@ -7,14 +7,17 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 
 public class HelpCommand extends BaseCommand {
+    private final Map<String, BaseCommand> subCmd;
 
-
-    public HelpCommand(MapSaverPlugin plugin) {
-        super(plugin);
+    public HelpCommand(MapSaverPlugin plugin, Map<String, BaseCommand> subCmd) {
+        super(plugin, plugin.getLanguage().Help.Help);
+        this.subCmd = subCmd;
     }
 
     @Override
@@ -22,20 +25,15 @@ public class HelpCommand extends BaseCommand {
         final Help helpMessages = this.plugin.getLanguage().Help;
 
         sendMessage(sender, helpMessages.Usage);
-        sendMessage(sender, helpMessages.Help);
-        sendMessageByPermission(sender, Permissions.SAVE_MAP, helpMessages.Save);
-        sendMessageByPermission(sender, Permissions.UPDATE_MAP, helpMessages.Update);
-        sendMessageByPermission(sender, Permissions.IMPORT_MAP, helpMessages.Import);
-        sendMessageByPermission(sender, Permissions.LIST_MAP, helpMessages.List);
-        sendMessageByPermission(sender, Permissions.INFO_MAP, helpMessages.Info);
-        sendMessageByPermission(sender, Permissions.ADMIN_RELOAD, helpMessages.Reload);
-        sendMessage(sender, helpMessages.Version);
+        subCmd.forEach((cmdName, cmd) -> {
+            sendMessageByPermission(sender, cmd.getPermission(), cmd.getHelpMessage());
+        });
 
         return true;
     }
 
-    private void sendMessageByPermission(final CommandSender sender, final Permissions permission, final String message){
-        if (permission.isSetOn(sender)) {
+    private void sendMessageByPermission(final CommandSender sender, final Optional<Permissions> permission, final String message){
+        if (!permission.filter(perm -> !perm.isSetOn(sender)).isPresent()) {
             sendMessage(sender, message);
         }
     }

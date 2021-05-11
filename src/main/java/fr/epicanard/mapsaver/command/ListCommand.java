@@ -14,7 +14,7 @@ import java.util.UUID;
 public class ListCommand extends PlayerOnlyCommand {
 
     public ListCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.LIST_MAP);
+        super(plugin, Permissions.LIST_MAP, plugin.getLanguage().Help.List);
     }
 
     @Override
