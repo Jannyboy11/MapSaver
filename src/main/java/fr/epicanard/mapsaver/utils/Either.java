@@ -43,11 +43,11 @@ public class Either<L, R> {
         return this;
     }
 
-//    public <S> Either<E, S> map(Function<R, S> mapper) {
-//        if (!this.isRight()) {
-//            return (Either<E, S>) this;
-//        } else {
-//            return new Either<>(this.error, this.result.map(mapper));
-//        }
-//    }
+    public <S> Either<L, S> map(Function<R, S> mapper) {
+        if (!this.isRight()) {
+            return (Either<L, S>) this;
+        } else {
+            return new Either<>(this.left, this.right.map(mapper));
+        }
+    }
 }

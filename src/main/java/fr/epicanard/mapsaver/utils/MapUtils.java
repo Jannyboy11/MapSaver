@@ -1,17 +1,24 @@
 package fr.epicanard.mapsaver.utils;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.language.Language;
 import fr.epicanard.mapsaver.map.MapToSave;
 import fr.epicanard.mapsaver.map.Visibility;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static fr.epicanard.mapsaver.utils.Either.Left;
+import static fr.epicanard.mapsaver.utils.Messenger.toColor;
 
 public class MapUtils {
     public static Either<String, MapToSave> extractMapToSaveFromPlayer(final MapSaverPlugin plugin, final Player player, final String name, final Visibility visibility) {
@@ -50,4 +57,18 @@ public class MapUtils {
             .<Either<String, MapToSave>>map(Either::Right)
             .orElseGet(() -> Left(plugin.getLanguage().ErrorMessages.MissingMapRenderer));
     }
+
+    public static ItemStack applyDescription(final Language language, final ItemStack item, final String mapName, final UUID playerUuid) {
+        final ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(toColor("&a" + mapName));
+
+        final List<String> lore = (meta.getLore() != null) ? meta.getLore() : new ArrayList<>();
+        lore.add(toColor(language.MapInfo.Owner + Bukkit.getOfflinePlayer(playerUuid).getName()));
+        meta.setLore(lore);
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
 }

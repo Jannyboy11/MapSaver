@@ -19,7 +19,7 @@ public class Messenger {
         player.sendMessage(toColor(message));
     }
 
-    private static String toColor(final String message) {
+    public static String toColor(final String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 }

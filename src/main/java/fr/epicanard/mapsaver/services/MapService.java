@@ -4,6 +4,7 @@ import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.database.MapRepository;
 import fr.epicanard.mapsaver.map.*;
 import fr.epicanard.mapsaver.utils.Either;
+import fr.epicanard.mapsaver.utils.MapUtils;
 import fr.epicanard.mapsaver.utils.ReflectionUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -150,7 +151,8 @@ public class MapService {
                     .apply(m -> this.repository.insertServerMap(new ServerMap(
                         id, Optional.empty(), this.plugin.getConfiguration().ServerName, mapUuid
                     )));
-            });
+            })
+            .map(item -> MapUtils.applyDescription(plugin.getLanguage(), item, mapName, playerUuid));
     }
 
     public Either<String, ItemStack> createBukkitMap(final int id, final UUID mapUUID) {
