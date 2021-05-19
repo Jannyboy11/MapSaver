@@ -31,6 +31,10 @@ MapInfo:
   Visibility: "&6Visibilité : &f"
   OriginalMap: "&6Carte originale : &f"
   CopyMaps: "&6Copies verrouillées : &f"
+List:
+  ListMaps: "Liste des cartes :"
+  InfoHover: "Afficher les détails de cette carte"
+  ImportHover: "Importer cette carte"
 Visibility:
   PUBLIC: "Publique"
   PRIVATE: "Privée"

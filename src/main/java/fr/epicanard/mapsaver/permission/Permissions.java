@@ -16,6 +16,8 @@ public enum Permissions {
     INFO_MAP("mapsaver.commands.info"),
     ADMIN_RELOAD("mapsaver.admin.commands.reload"),
     ADMIN_IMPORT_MAP("mapsaver.admin.commands.import"),
+    ADMIN_LIST_MAP("mapsaver.admin.commands.list"),
+    ADMIN_INFO_MAP("mapsaver.admin.commands.info"),
     ;
 
     private final String permission;

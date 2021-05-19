@@ -33,10 +33,10 @@ public class InfoCommand extends PlayerOnlyCommand {
                 sendMessage(sender, mapInfo.Name + p.getPlayerMap().getName());
                 sendMessage(sender, mapInfo.Owner + Bukkit.getOfflinePlayer(p.getPlayerMap().getPlayerUuid()).getName());
                 sendMessage(sender, mapInfo.Visibility + plugin.getLanguage().Visibility.getOrDefault(visibility.name(), visibility.name()));
-                sendMessage(sender, String.format("%s%d ~ %s",mapInfo.OriginalMap, p.getOriginalMap().getOriginalId().get(), p.getOriginalMap().getServer()));
+                sendMessage(sender, String.format("%s%d - %s", mapInfo.OriginalMap, p.getOriginalMap().getOriginalId().get(), p.getOriginalMap().getServer()));
                 sendMessage(sender, mapInfo.CopyMaps);
                 p.getServerMaps().forEach(serverMap ->
-                    sendMessage(sender, String.format("- %d ~ %s", serverMap.getLockedId(), serverMap.getServer()))
+                    sendMessage(sender, String.format(" • %d - %s", serverMap.getLockedId(), serverMap.getServer()))
                 );
             });
         return true;

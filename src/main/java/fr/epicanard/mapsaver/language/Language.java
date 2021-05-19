@@ -14,5 +14,6 @@ public class Language {
     public ErrorMessages ErrorMessages;
     public InfoMessages InfoMessages;
     public MapInfo MapInfo;
+    public List List;
     public Map<String, String> Visibility;
 }

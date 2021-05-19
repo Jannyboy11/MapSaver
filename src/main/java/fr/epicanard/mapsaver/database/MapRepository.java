@@ -1,10 +1,7 @@
 package fr.epicanard.mapsaver.database;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.map.DataMap;
-import fr.epicanard.mapsaver.map.MapByName;
-import fr.epicanard.mapsaver.map.PlayerMap;
-import fr.epicanard.mapsaver.map.ServerMap;
+import fr.epicanard.mapsaver.map.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,6 +82,13 @@ public class MapRepository extends MapDataBase {
     public List<PlayerMap> selectPlayerMapByPlayerUuid(final UUID playerUuid) {
         return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER.query(prefix))
             .namedParam("player_uuid", playerUuid.toString())
+            .listResult(mappers.forClass(PlayerMap.class));
+    }
+
+    public List<PlayerMap> selectPlayerMapByPlayerUuidWithVisibility(final UUID playerUuid, final Visibility visibility) {
+        return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER_WITH_VISIBILITY.query(prefix))
+            .namedParam("player_uuid", playerUuid.toString())
+            .namedParam("visibility", visibility.name())
             .listResult(mappers.forClass(PlayerMap.class));
     }
 

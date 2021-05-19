@@ -1,7 +1,9 @@
 CREATE TABLE IF NOT EXISTS `{prefix}_data_maps`
 (
     `uuid`          VARCHAR(36)         PRIMARY KEY NOT NULL,
-    `bytes`         VARBINARY(16384)                NOT NULL
+    `bytes`         VARBINARY(16384)                NOT NULL,
+    `created_at`    DATETIME                        NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`    DATETIME                        NOT NULL    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `{prefix}_server_maps`

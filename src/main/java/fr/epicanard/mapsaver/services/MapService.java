@@ -122,8 +122,12 @@ public class MapService {
             });
     }
 
-    public List<PlayerMap> listPlayerMaps(final UUID playerUuid) {
+    public List<PlayerMap> listAllPlayerMaps(final UUID playerUuid) {
         return repository.selectPlayerMapByPlayerUuid(playerUuid);
+    }
+
+    public List<PlayerMap> listPublicPlayerMaps(final UUID playerUuid) {
+        return repository.selectPlayerMapByPlayerUuidWithVisibility(playerUuid, Visibility.PUBLIC);
     }
 
     public Either<String, ItemStack> getPlayerMap(final String mapName, final UUID playerUuid, final Boolean canGetMap) {
