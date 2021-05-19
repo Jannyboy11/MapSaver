@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.language;
+package fr.epicanard.mapsaver.models.language;
 
 public class InfoMessages {
     public String CreatingNewMap = "Creating a new map";

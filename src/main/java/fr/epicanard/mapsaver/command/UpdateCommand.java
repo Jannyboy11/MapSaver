@@ -1,8 +1,8 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.map.Visibility;
-import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.models.map.Visibility;
+import fr.epicanard.mapsaver.models.Permission;
 import fr.epicanard.mapsaver.utils.OptionalUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,7 +18,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class UpdateCommand extends PlayerOnlyCommand {
 
     public UpdateCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.UPDATE_MAP, plugin.getLanguage().Help.Update);
+        super(plugin, Permission.UPDATE_MAP, plugin.getLanguage().Help.Update);
     }
 
     @Override

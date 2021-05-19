@@ -1,8 +1,8 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.language.Help;
-import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.models.language.Help;
+import fr.epicanard.mapsaver.models.Permission;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -32,7 +32,7 @@ public class HelpCommand extends BaseCommand {
         return true;
     }
 
-    private void sendMessageByPermission(final CommandSender sender, final Optional<Permissions> permission, final String message){
+    private void sendMessageByPermission(final CommandSender sender, final Optional<Permission> permission, final String message){
         if (!permission.filter(perm -> !perm.isSetOn(sender)).isPresent()) {
             sendMessage(sender, message);
         }

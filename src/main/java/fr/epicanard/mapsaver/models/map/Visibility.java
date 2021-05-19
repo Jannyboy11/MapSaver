@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.map;
+package fr.epicanard.mapsaver.models.map;
 
 import java.util.Arrays;
 import java.util.Optional;

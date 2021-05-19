@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.language;
+package fr.epicanard.mapsaver.models.language;
 
 public class MapInfo {
     public String Name = "&6Name : &f";

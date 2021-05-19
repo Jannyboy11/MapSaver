@@ -1,7 +1,6 @@
-package fr.epicanard.mapsaver.config;
+package fr.epicanard.mapsaver.models.config;
 
 import fr.epicanard.duckconfig.annotations.Header;
-import fr.epicanard.mapsaver.map.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

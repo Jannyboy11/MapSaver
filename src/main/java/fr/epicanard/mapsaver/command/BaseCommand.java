@@ -1,7 +1,7 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.models.Permission;
 import lombok.Getter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,11 +14,11 @@ import java.util.Optional;
 public abstract class BaseCommand implements TabExecutor {
     protected MapSaverPlugin plugin;
     @Getter
-    private final Optional<Permissions> permission;
+    private final Optional<Permission> permission;
     @Getter
     private final String helpMessage;
 
-    public BaseCommand(MapSaverPlugin plugin, Permissions permission, String helpMessage) {
+    public BaseCommand(MapSaverPlugin plugin, Permission permission, String helpMessage) {
         this.plugin = plugin;
         this.permission = Optional.ofNullable(permission);
         this.helpMessage = helpMessage;

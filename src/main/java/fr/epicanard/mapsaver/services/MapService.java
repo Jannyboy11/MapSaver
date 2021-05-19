@@ -2,7 +2,7 @@ package fr.epicanard.mapsaver.services;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.database.MapRepository;
-import fr.epicanard.mapsaver.map.*;
+import fr.epicanard.mapsaver.models.map.*;
 import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.MapUtils;
 import fr.epicanard.mapsaver.utils.ReflectionUtils;

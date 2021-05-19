@@ -1,10 +1,10 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.language.MapInfo;
-import fr.epicanard.mapsaver.map.PlayerAllMap;
-import fr.epicanard.mapsaver.map.Visibility;
-import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.models.language.MapInfo;
+import fr.epicanard.mapsaver.models.map.PlayerAllMap;
+import fr.epicanard.mapsaver.models.map.Visibility;
+import fr.epicanard.mapsaver.models.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -21,7 +21,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class InfoCommand extends PlayerOnlyCommand {
 
     public InfoCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.INFO_MAP, plugin.getLanguage().Help.Info);
+        super(plugin, Permission.INFO_MAP, plugin.getLanguage().Help.Info);
     }
 
     @Override

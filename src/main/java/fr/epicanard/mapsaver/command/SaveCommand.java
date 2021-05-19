@@ -1,8 +1,8 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.map.Visibility;
-import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.models.map.Visibility;
+import fr.epicanard.mapsaver.models.Permission;
 import fr.epicanard.mapsaver.utils.Messenger;
 import fr.epicanard.mapsaver.utils.OptionalUtils;
 import org.bukkit.command.Command;
@@ -19,7 +19,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 public class SaveCommand extends PlayerOnlyCommand {
 
     public SaveCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.SAVE_MAP, plugin.getLanguage().Help.Save);
+        super(plugin, Permission.SAVE_MAP, plugin.getLanguage().Help.Save);
     }
 
     @Override

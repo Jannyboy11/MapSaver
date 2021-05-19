@@ -1,7 +1,7 @@
 package fr.epicanard.mapsaver.database;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.map.*;
+import fr.epicanard.mapsaver.models.map.*;
 
 import java.util.List;
 import java.util.Optional;

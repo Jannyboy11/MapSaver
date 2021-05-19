@@ -1,9 +1,9 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.map.PlayerMap;
-import fr.epicanard.mapsaver.map.Visibility;
-import fr.epicanard.mapsaver.permission.Permissions;
+import fr.epicanard.mapsaver.models.map.PlayerMap;
+import fr.epicanard.mapsaver.models.map.Visibility;
+import fr.epicanard.mapsaver.models.Permission;
 import fr.epicanard.mapsaver.utils.Messenger;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -21,7 +21,7 @@ import static fr.epicanard.mapsaver.utils.Messenger.toColor;
 public class ListCommand extends PlayerOnlyCommand {
 
     public ListCommand(MapSaverPlugin plugin) {
-        super(plugin, Permissions.LIST_MAP, plugin.getLanguage().Help.List);
+        super(plugin, Permission.LIST_MAP, plugin.getLanguage().Help.List);
     }
 
     @Override
@@ -32,13 +32,13 @@ public class ListCommand extends PlayerOnlyCommand {
             final String visibilityText = plugin.getLanguage().Visibility.getOrDefault(map.getVisibility().name(), map.getVisibility().name());
             final TextComponent line = newComponent(" • &6%s&f - %s%s&f", map.getName(), getVisibilityColor(map.getVisibility()), visibilityText);
 
-            if (Permissions.INFO_MAP.isSetOn(sender) || Permissions.LIST_MAP.isSetOn(sender)) {
+            if (Permission.INFO_MAP.isSetOn(sender) || Permission.LIST_MAP.isSetOn(sender)) {
                 line.addExtra(" - ");
-                if (Permissions.INFO_MAP.isSetOn(sender)) {
+                if (Permission.INFO_MAP.isSetOn(sender)) {
                     line.addExtra(createLink("info", plugin.getLanguage().List.InfoHover, ChatColor.DARK_GREEN, String.format("/mapsaver info %s %s", map.getName(), (args.length > 0) ? args[0] : "")));
                     line.addExtra(toColor("&7/"));
                 }
-                if (Permissions.IMPORT_MAP.isSetOn(sender)) {
+                if (Permission.IMPORT_MAP.isSetOn(sender)) {
                     line.addExtra(createLink("import", plugin.getLanguage().List.ImportHover, ChatColor.DARK_GREEN, String.format("/mapsaver import %s %s", map.getName(), (args.length > 0) ? args[0] : "")));
                 }
             }
@@ -75,7 +75,7 @@ public class ListCommand extends PlayerOnlyCommand {
             playerUuid = ((Player) sender).getUniqueId();
         }
 
-        if (!(sender instanceof Player) || playerUuid == ((Player) sender).getUniqueId() || Permissions.ADMIN_LIST_MAP.isSetOn(sender)) {
+        if (!(sender instanceof Player) || playerUuid == ((Player) sender).getUniqueId() || Permission.ADMIN_LIST_MAP.isSetOn(sender)) {
             return this.plugin.getService().listAllPlayerMaps(playerUuid);
         }
         return this.plugin.getService().listPublicPlayerMaps(playerUuid);

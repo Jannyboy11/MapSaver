@@ -1,9 +1,9 @@
 package fr.epicanard.mapsaver.utils;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.language.Language;
-import fr.epicanard.mapsaver.map.MapToSave;
-import fr.epicanard.mapsaver.map.Visibility;
+import fr.epicanard.mapsaver.models.language.Language;
+import fr.epicanard.mapsaver.models.map.MapToSave;
+import fr.epicanard.mapsaver.models.map.Visibility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.language;
+package fr.epicanard.mapsaver.models.language;
 
 import fr.epicanard.duckconfig.annotations.Header;
 

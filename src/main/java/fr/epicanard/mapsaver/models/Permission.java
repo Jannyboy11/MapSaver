@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.permission;
+package fr.epicanard.mapsaver.models;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import org.bukkit.command.CommandSender;
@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 /**
  * Class that handle permissions of plugin
  */
-public enum Permissions {
+public enum Permission {
     SAVE_MAP("mapsaver.commands.save"),
     UPDATE_MAP("mapsaver.commands.update"),
     IMPORT_MAP("mapsaver.commands.import"),
@@ -26,7 +26,7 @@ public enum Permissions {
      * Enum constructor
      * @param permission String permission
      */
-    Permissions(String permission) {
+    Permission(String permission) {
         this.permission = permission;
     }
 
@@ -76,7 +76,7 @@ public enum Permissions {
         final Boolean isSet = this.isSetOn(player);
 
         if (!isSet) {
-            Permissions.sendMessage(plugin, player);
+            Permission.sendMessage(plugin, player);
         }
 
         return isSet;

@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.config;
+package fr.epicanard.mapsaver.models.config;
 
 import java.util.Properties;
 

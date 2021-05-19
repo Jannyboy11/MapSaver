@@ -1,17 +1,12 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
-import fr.epicanard.mapsaver.permission.Permissions;
-import org.bukkit.command.Command;
+import fr.epicanard.mapsaver.models.Permission;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 public abstract class PlayerOnlyCommand extends BaseCommand {
-    public PlayerOnlyCommand(MapSaverPlugin plugin, Permissions permission, String helpMessage) {
+    public PlayerOnlyCommand(MapSaverPlugin plugin, Permission permission, String helpMessage) {
         super(plugin, permission, helpMessage);
     }
 

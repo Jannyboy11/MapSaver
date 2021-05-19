@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.language;
+package fr.epicanard.mapsaver.models.language;
 
 public class List {
     public String ListMaps = "List of maps :";
