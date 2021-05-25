@@ -1,9 +1,13 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.models.ListArguments;
+import fr.epicanard.mapsaver.models.Pageable;
+import fr.epicanard.mapsaver.models.Permission;
+import fr.epicanard.mapsaver.models.language.Pagination;
 import fr.epicanard.mapsaver.models.map.PlayerMap;
 import fr.epicanard.mapsaver.models.map.Visibility;
-import fr.epicanard.mapsaver.models.Permission;
+import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.Messenger;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -12,11 +16,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static fr.epicanard.mapsaver.utils.Messenger.createLink;
-import static fr.epicanard.mapsaver.utils.Messenger.newComponent;
-import static fr.epicanard.mapsaver.utils.Messenger.toColor;
+import static fr.epicanard.mapsaver.utils.Messenger.*;
+import static fr.epicanard.mapsaver.utils.OptionalUtils.when;
 
 public class ListCommand extends PlayerOnlyCommand {
 
@@ -26,9 +30,24 @@ public class ListCommand extends PlayerOnlyCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        final TextComponent message = newComponent(plugin.getLanguage().List.ListMaps);
+        final Either<String, ListArguments> argumentsEither = ListArguments.parse(plugin, args);
+        if (argumentsEither.isLeft()) {
+            sendMessage(sender, argumentsEither.getLeft().get());
+            return false;
+        }
+        final ListArguments arguments = argumentsEither.getRight().get();
 
-        listPlayerMaps(args, sender).forEach(map -> {
+        final Pageable pageable = new Pageable(plugin, arguments.getPage());
+
+        final List<PlayerMap> playerMaps = listPlayerMaps(arguments.getPlayerName(), sender, pageable);
+
+        if (playerMaps.isEmpty()) {
+            sendMessage(sender, plugin.getLanguage().InfoMessages.PlayerNoSavedMap);
+            return true;
+        }
+
+        final TextComponent message = newComponent(plugin.getLanguage().List.ListMaps);
+        playerMaps.forEach(map -> {
             final String visibilityText = plugin.getLanguage().Visibility.getOrDefault(map.getVisibility().name(), map.getVisibility().name());
             final TextComponent line = newComponent(" • &6%s&f - %s%s&f", map.getName(), getVisibilityColor(map.getVisibility()), visibilityText);
 
@@ -46,6 +65,9 @@ public class ListCommand extends PlayerOnlyCommand {
             message.addExtra("\n");
             message.addExtra(line);
         });
+
+        message.addExtra("\n");
+        message.addExtra(buildPaginationLine(plugin, pageable, "Skay_Duck"));
         Messenger.sendMessage(sender, message);
 
         return true;
@@ -67,18 +89,42 @@ public class ListCommand extends PlayerOnlyCommand {
      * 3. If admin permission Return all maps
      * 4. If not owner Return public maps only
      */
-    private List<PlayerMap> listPlayerMaps(final String[] args, final CommandSender sender) {
+    private List<PlayerMap> listPlayerMaps(final String playerName, final CommandSender sender, final Pageable pageable) {
         UUID playerUuid;
-        if (args.length > 0) {
-            playerUuid = plugin.getServer().getOfflinePlayer(args[0]).getUniqueId();
+        if (playerName != null) {
+            playerUuid = plugin.getServer().getOfflinePlayer(playerName).getUniqueId();
         } else {
             playerUuid = ((Player) sender).getUniqueId();
         }
 
-        if (!(sender instanceof Player) || playerUuid == ((Player) sender).getUniqueId() || Permission.ADMIN_LIST_MAP.isSetOn(sender)) {
-            return this.plugin.getService().listAllPlayerMaps(playerUuid);
+        final Optional<Visibility> visibilityOpt = when(
+            () -> sender instanceof Player && playerUuid != ((Player) sender).getUniqueId() && !Permission.ADMIN_LIST_MAP.isSetOn(sender),
+            Visibility.PUBLIC
+        );
+
+        pageable.setMaxPage((int) Math.ceil((float)this.plugin.getService().countPlayerMaps(playerUuid, visibilityOpt) / (float)pageable.getSize()));
+        return this.plugin.getService().listPlayerMaps(playerUuid, pageable, visibilityOpt);
+    }
+
+    private TextComponent buildPaginationLine(final MapSaverPlugin plugin, final Pageable pageable, final String playerName) {
+        TextComponent paginationLine = newComponent("    ");
+
+        paginationLine.addExtra(newArrow(true, pageable, playerName, plugin.getLanguage().Pagination));
+        paginationLine.addExtra(String.format(" [%d/%d] ", pageable.getPage(), pageable.getMaxPage()));
+        paginationLine.addExtra(newArrow(false, pageable, playerName, plugin.getLanguage().Pagination));
+        return paginationLine;
+    }
+
+    private TextComponent newArrow(final boolean left, final Pageable pageable, final String playerName, final Pagination pagination) {
+        final String arrow = (left) ? "<-" : "->";
+        final String hoverText = (left) ? pagination.PreviousPageHover : pagination.NextPageHover;
+        final boolean enabled = (left) ? pageable.getPage() > 1 : pageable.getPage() < pageable.getMaxPage();
+        final int pageOffset = (left) ? -1 :  1;
+
+        if (enabled) {
+            return createLink(arrow, hoverText, ChatColor.GREEN, String.format("/mapsaver list %s %d", playerName, pageable.getPage() + pageOffset));
         }
-        return this.plugin.getService().listPublicPlayerMaps(playerUuid);
+        return newRawComponent("&8" + arrow);
     }
 
     private String getVisibilityColor(final Visibility visibility) {

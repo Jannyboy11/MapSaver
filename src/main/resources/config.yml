@@ -14,6 +14,8 @@ Storage:
     User: "my_user"
     Password: "my_password"
     UseSSL: true
+Options:
+  PageSize: 10
 Privacy:
   DefaultVisibility: "PRIVATE"
   # PRIMARY_OWNER => seul le owner (premier save) peut choisir la privacy policy tous les autres seront privée

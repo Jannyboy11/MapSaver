@@ -15,5 +15,6 @@ public class Language {
     public InfoMessages InfoMessages;
     public MapInfo MapInfo;
     public List List;
+    public Pagination Pagination;
     public Map<String, String> Visibility;
 }

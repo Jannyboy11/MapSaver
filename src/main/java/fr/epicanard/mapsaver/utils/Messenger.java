@@ -41,6 +41,10 @@ public class Messenger {
         return newComponent(String.format(format, args));
     }
 
+    public static TextComponent newRawComponent(String text) {
+        return new TextComponent(toColor(text));
+    }
+
     public static TextComponent createLinkWithBracket(String text, String hover, net.md_5.bungee.api.ChatColor color, String command) {
         return createLink("[" + text + "]", hover, color, command);
     }

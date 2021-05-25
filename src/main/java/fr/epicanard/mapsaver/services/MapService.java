@@ -2,6 +2,7 @@ package fr.epicanard.mapsaver.services;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.database.MapRepository;
+import fr.epicanard.mapsaver.models.Pageable;
 import fr.epicanard.mapsaver.models.map.*;
 import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.MapUtils;
@@ -122,12 +123,16 @@ public class MapService {
             });
     }
 
-    public List<PlayerMap> listAllPlayerMaps(final UUID playerUuid) {
-        return repository.selectPlayerMapByPlayerUuid(playerUuid);
+    public List<PlayerMap> listPlayerMaps(final UUID playerUuid, final Pageable pageable, final Optional<Visibility> visibility) {
+        return visibility
+            .map(vis -> repository.selectPlayerMapByPlayerUuidWithVisibility(playerUuid, vis, pageable))
+            .orElseGet(() -> repository.selectPlayerMapByPlayerUuid(playerUuid, pageable));
     }
 
-    public List<PlayerMap> listPublicPlayerMaps(final UUID playerUuid) {
-        return repository.selectPlayerMapByPlayerUuidWithVisibility(playerUuid, Visibility.PUBLIC);
+    public int countPlayerMaps(final UUID playerUuid, final Optional<Visibility> visibility) {
+        return visibility
+            .map(vis -> repository.countTotalPlayerMapByPlayerUuidWithVisibility(playerUuid, vis))
+            .orElseGet(() -> repository.countTotalPlayerMapByPlayerUuid(playerUuid));
     }
 
     public Either<String, ItemStack> getPlayerMap(final String mapName, final UUID playerUuid, final Boolean canGetMap) {

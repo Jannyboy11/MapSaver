@@ -1,9 +1,12 @@
 package fr.epicanard.mapsaver.utils;
 
+import lombok.Getter;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Getter
 public class Either<L, R> {
     final Optional<L> left;
     final Optional<R> right;

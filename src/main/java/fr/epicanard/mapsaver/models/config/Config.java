@@ -16,6 +16,7 @@ public class Config {
     public String Language = "en_US";
     public String Prefix = "&a[MapSaver] &f";
     public String ServerName = "server";
-    public Storage Storage;
-    public Privacy Privacy;
+    public Storage Storage = new Storage();
+    public Options Options = new Options();
+    public Privacy Privacy = new Privacy();
 }

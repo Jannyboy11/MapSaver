@@ -14,12 +14,16 @@ enum Queries {
         "SELECT * FROM {prefix}_player_maps " +
             "LEFT JOIN {prefix}_data_maps ON {prefix}_player_maps.map_uuid = {prefix}_data_maps.uuid " +
             "WHERE `player_uuid` = :player_uuid " +
-            "ORDER BY {prefix}_data_maps.updated_at DESC"),
+            "ORDER BY {prefix}_data_maps.updated_at DESC " +
+            "LIMIT :start,:size"),
     SELECT_PLAYER_MAP_BY_PLAYER_WITH_VISIBILITY(
         "SELECT * FROM {prefix}_player_maps " +
             "LEFT JOIN {prefix}_data_maps ON {prefix}_player_maps.map_uuid = {prefix}_data_maps.uuid " +
             "WHERE `player_uuid` = :player_uuid AND `visibility` = :visibility " +
-            "ORDER BY {prefix}_data_maps.updated_at DESC"),
+            "ORDER BY {prefix}_data_maps.updated_at DESC " +
+            "LIMIT :start,:size"),
+    COUNT_PLAYER_MAP_BY_PLAYER("SELECT COUNT(*) AS count FROM {prefix}_player_maps WHERE `player_uuid` = :player_uuid "),
+    COUNT_PLAYER_MAP_BY_PLAYER_WITH_VISIBILITY("SELECT COUNT(*) AS count FROM {prefix}_player_maps WHERE `player_uuid` = :player_uuid AND `visibility` = :visibility"),
     SELECT_PLAYER_MAP_BY_MAP("SELECT * FROM {prefix}_player_maps WHERE `map_uuid` = :map_uuid"),
     INSERT_SERVER_MAP("INSERT INTO {prefix}_server_maps (`locked_id`, `original_id`, `server`, `map_uuid`) VALUES (:locked_id, :original_id, :server, :map_uuid)"),
     SELECT_SERVER_MAP_BY_MAP_UUID("SELECT * FROM {prefix}_server_maps WHERE `map_uuid` = :map_uuid"),

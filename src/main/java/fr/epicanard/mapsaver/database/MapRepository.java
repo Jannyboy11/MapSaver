@@ -1,6 +1,7 @@
 package fr.epicanard.mapsaver.database;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.models.Pageable;
 import fr.epicanard.mapsaver.models.map.*;
 
 import java.util.List;
@@ -79,17 +80,36 @@ public class MapRepository extends MapDataBase {
             .firstResult(mappers.forClass(PlayerMap.class));
     }
 
-    public List<PlayerMap> selectPlayerMapByPlayerUuid(final UUID playerUuid) {
+    public List<PlayerMap> selectPlayerMapByPlayerUuid(final UUID playerUuid, final Pageable pageable) {
         return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER.query(prefix))
             .namedParam("player_uuid", playerUuid.toString())
+            .namedParam("start", (pageable.getPage() - 1) * pageable.getSize())
+            .namedParam("size", pageable.getSize())
             .listResult(mappers.forClass(PlayerMap.class));
     }
 
-    public List<PlayerMap> selectPlayerMapByPlayerUuidWithVisibility(final UUID playerUuid, final Visibility visibility) {
+    public List<PlayerMap> selectPlayerMapByPlayerUuidWithVisibility(final UUID playerUuid, final Visibility visibility, final Pageable pageable) {
         return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER_WITH_VISIBILITY.query(prefix))
             .namedParam("player_uuid", playerUuid.toString())
             .namedParam("visibility", visibility.name())
+            .namedParam("start", (pageable.getPage() - 1) * pageable.getSize())
+            .namedParam("size", pageable.getSize())
             .listResult(mappers.forClass(PlayerMap.class));
+    }
+
+    public int countTotalPlayerMapByPlayerUuid(final UUID playerUuid) {
+        return this.query.select(COUNT_PLAYER_MAP_BY_PLAYER.query(prefix))
+            .namedParam("player_uuid", playerUuid.toString())
+            .singleResult(mappers.forClass(Count.class))
+            .getCount();
+    }
+
+    public int countTotalPlayerMapByPlayerUuidWithVisibility(final UUID playerUuid, final Visibility visibility) {
+        return this.query.select(COUNT_PLAYER_MAP_BY_PLAYER_WITH_VISIBILITY.query(prefix))
+            .namedParam("player_uuid", playerUuid.toString())
+            .namedParam("visibility", visibility.name())
+            .singleResult(mappers.forClass(Count.class))
+            .getCount();
     }
 
     /* ====== SERVER MAP ====== */
