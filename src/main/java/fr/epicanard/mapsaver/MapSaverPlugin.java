@@ -3,15 +3,14 @@ package fr.epicanard.mapsaver;
 import fr.epicanard.duckconfig.DuckLoader;
 import fr.epicanard.duckconfig.annotations.ResourceWrapper;
 import fr.epicanard.mapsaver.command.MapSaverCommand;
-import fr.epicanard.mapsaver.models.config.Config;
 import fr.epicanard.mapsaver.database.MapRepository;
+import fr.epicanard.mapsaver.models.config.Config;
 import fr.epicanard.mapsaver.models.language.Language;
 import fr.epicanard.mapsaver.services.MapService;
 import fr.epicanard.mapsaver.utils.Messenger;
 import lombok.Getter;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.logging.Level;
 
 public class MapSaverPlugin extends JavaPlugin {
 
@@ -31,9 +30,15 @@ public class MapSaverPlugin extends JavaPlugin {
 
         Messenger.setPrefix(this.configuration.Prefix);
 
-        final MapRepository repository = new MapRepository(this);
-        repository.setupDatabase();
-        this.service = new MapService(this, repository);
+        try {
+            final MapRepository repository = new MapRepository(this);
+            repository.setupDatabase();
+            this.service = new MapService(this, repository);
+        } catch (Exception e) {
+            this.getLogger().severe("Impossible to init database. " + e.getMessage());
+            this.disable();
+            return;
+        }
 
         this.getCommand("mapsaver").setExecutor(new MapSaverCommand(this));
     }
@@ -41,6 +46,10 @@ public class MapSaverPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         this.getLogger().info("Disabling MapSaver...");
+        this.configuration = null;
+        this.language = null;
+        this.service = null;
+        HandlerList.unregisterAll(this);
     }
 
     /**
@@ -63,6 +72,6 @@ public class MapSaverPlugin extends JavaPlugin {
      */
     private void disable() {
         this.setEnabled(false);
-        this.getLogger().log(Level.WARNING, "Plugin GlobalMarketChest disabled");
+        this.getLogger().warning("Plugin MapSaver force disabled");
     }
 }
