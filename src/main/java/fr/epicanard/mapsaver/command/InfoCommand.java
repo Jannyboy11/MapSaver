@@ -1,10 +1,11 @@
 package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
+import fr.epicanard.mapsaver.models.Permission;
 import fr.epicanard.mapsaver.models.language.MapInfo;
 import fr.epicanard.mapsaver.models.map.PlayerAllMap;
 import fr.epicanard.mapsaver.models.map.Visibility;
-import fr.epicanard.mapsaver.models.Permission;
+import fr.epicanard.mapsaver.utils.TextComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -16,8 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
-
 public class InfoCommand extends PlayerOnlyCommand {
 
     public InfoCommand(MapSaverPlugin plugin) {
@@ -26,19 +25,25 @@ public class InfoCommand extends PlayerOnlyCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        getPlayerAllMap(sender, args)
-            .ifPresent(p -> {
+        final Optional<PlayerAllMap> playerAllMap = getPlayerAllMap(sender, args);
+
+        playerAllMap
+            .map(p -> {
                 final MapInfo mapInfo = plugin.getLanguage().MapInfo;
                 final Visibility visibility = p.getPlayerMap().getVisibility();
-                sendMessage(sender, mapInfo.Name + p.getPlayerMap().getName());
-                sendMessage(sender, mapInfo.Owner + Bukkit.getOfflinePlayer(p.getPlayerMap().getPlayerUuid()).getName());
-                sendMessage(sender, mapInfo.Visibility + plugin.getLanguage().Visibility.getOrDefault(visibility.name(), visibility.name()));
-                sendMessage(sender, String.format("%s%d - %s", mapInfo.OriginalMap, p.getOriginalMap().getOriginalId().get(), p.getOriginalMap().getServer()));
-                sendMessage(sender, mapInfo.CopyMaps);
-                p.getServerMaps().forEach(serverMap ->
-                    sendMessage(sender, String.format(" • %d - %s", serverMap.getLockedId(), serverMap.getServer()))
-                );
-            });
+                return TextComponentBuilder.of()
+                    .addLine("&6%s : &f%s", mapInfo.Name, p.getPlayerMap().getName())
+                    .addLine("&6%s : &f%s", mapInfo.Owner, Bukkit.getOfflinePlayer(p.getPlayerMap().getPlayerUuid()).getName())
+                    .addLine("&6%s : &f%s", mapInfo.Visibility, plugin.getLanguage().Visibility.getOrDefault(visibility.name(), visibility.name()))
+                    .addLine("&6%s : &f%d - %s", mapInfo.OriginalMap, p.getOriginalMap().getOriginalId().get(), p.getOriginalMap().getServer())
+                    .prefix().add("&6%s :&f", mapInfo.CopyMaps)
+                    .apply(builder -> p.getServerMaps().forEach(serverMap ->
+                        builder.bl().prefix().add(" • %d - %s", serverMap.getLockedId(), serverMap.getServer())
+                    ));
+            })
+            .orElseGet(() -> TextComponentBuilder.of(plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic))
+            .send(sender);
+
         return true;
     }
 

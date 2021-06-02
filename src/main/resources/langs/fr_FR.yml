@@ -28,11 +28,11 @@ InfoMessages:
   AssociationNewMap: "Association d'une nouvelle carte"
   PlayerNoSavedMap: "Ce joueur n'a pas de cartes sauvegardées"
 MapInfo:
-  Name: "&6Nom : &f"
-  Owner: "&6Propriétaire : &f"
-  Visibility: "&6Visibilité : &f"
-  OriginalMap: "&6Carte originale : &f"
-  CopyMaps: "&6Copies verrouillées : &f"
+  Name: "Nom"
+  Owner: "Propriétaire"
+  Visibility: "Visibilité"
+  OriginalMap: "Carte originale"
+  CopyMaps: "Copies verrouillées"
 List:
   ListMaps: "Liste des cartes :"
   InfoHover: "Afficher les détails de cette carte"

@@ -64,7 +64,7 @@ public class MapUtils {
         meta.setDisplayName(toColor("&a" + mapName));
 
         final List<String> lore = (meta.getLore() != null) ? meta.getLore() : new ArrayList<>();
-        lore.add(toColor(language.MapInfo.Owner + Bukkit.getOfflinePlayer(playerUuid).getName()));
+        lore.add(toColor(String.format("&6%s : &f%s", language.MapInfo.Owner, Bukkit.getOfflinePlayer(playerUuid).getName())));
         meta.setLore(lore);
 
         item.setItemMeta(meta);

@@ -1,9 +1,9 @@
 package fr.epicanard.mapsaver.models.language;
 
 public class MapInfo {
-    public String Name = "&6Name : &f";
-    public String Owner = "&6Owner : &f";
-    public String Visibility = "&6Visibility : &f";
-    public String OriginalMap = "&6Original map : &f";
-    public String CopyMaps = "&6Locked copies : &f";
+    public String Name = "Name";
+    public String Owner = "Owner";
+    public String Visibility = "Visibility";
+    public String OriginalMap = "Original map";
+    public String CopyMaps = "Locked copies";
 }

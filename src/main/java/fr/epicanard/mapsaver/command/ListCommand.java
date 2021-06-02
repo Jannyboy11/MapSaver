@@ -8,7 +8,7 @@ import fr.epicanard.mapsaver.models.language.Pagination;
 import fr.epicanard.mapsaver.models.map.PlayerMap;
 import fr.epicanard.mapsaver.models.map.Visibility;
 import fr.epicanard.mapsaver.utils.Either;
-import fr.epicanard.mapsaver.utils.Messenger;
+import fr.epicanard.mapsaver.utils.TextComponentBuilder;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static fr.epicanard.mapsaver.utils.Messenger.*;
+import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
 import static fr.epicanard.mapsaver.utils.OptionalUtils.when;
 
 public class ListCommand extends PlayerOnlyCommand {
@@ -46,29 +46,31 @@ public class ListCommand extends PlayerOnlyCommand {
             return true;
         }
 
-        final TextComponent message = newComponent(plugin.getLanguage().List.ListMaps);
+        final TextComponentBuilder builder = TextComponentBuilder.of().prefix().add(plugin.getLanguage().List.ListMaps);
         playerMaps.forEach(map -> {
             final String visibilityText = plugin.getLanguage().Visibility.getOrDefault(map.getVisibility().name(), map.getVisibility().name());
-            final TextComponent line = newComponent(" • &6%s&f - %s%s&f", map.getName(), getVisibilityColor(map.getVisibility()), visibilityText);
+            builder
+                .bl()
+                .prefix()
+                .add(" •&6 %s &f- %s%s&f", map.getName(), getVisibilityColor(map.getVisibility()), visibilityText);
 
             if (Permission.INFO_MAP.isSetOn(sender) || Permission.LIST_MAP.isSetOn(sender)) {
-                line.addExtra(" - ");
+                builder.add(" - ");
                 if (Permission.INFO_MAP.isSetOn(sender)) {
-                    line.addExtra(createLink("info", plugin.getLanguage().List.InfoHover, ChatColor.DARK_GREEN, String.format("/mapsaver info %s %s", map.getName(), (args.length > 0) ? args[0] : "")));
-                    line.addExtra(toColor("&7/"));
+                    builder
+                        .addLink("info", plugin.getLanguage().List.InfoHover, ChatColor.DARK_GREEN, String.format("/mapsaver info %s %s", map.getName(), (args.length > 0) ? args[0] : ""))
+                        .add("&7/");
                 }
                 if (Permission.IMPORT_MAP.isSetOn(sender)) {
-                    line.addExtra(createLink("import", plugin.getLanguage().List.ImportHover, ChatColor.DARK_GREEN, String.format("/mapsaver import %s %s", map.getName(), (args.length > 0) ? args[0] : "")));
+                    builder.addLink("import", plugin.getLanguage().List.ImportHover, ChatColor.DARK_GREEN, String.format("/mapsaver import %s %s", map.getName(), (args.length > 0) ? args[0] : ""));
                 }
             }
-
-            message.addExtra("\n");
-            message.addExtra(line);
         });
 
-        message.addExtra("\n");
-        message.addExtra(buildPaginationLine(plugin, pageable, "Skay_Duck"));
-        Messenger.sendMessage(sender, message);
+        builder
+            .bl()
+            .add(buildPaginationLine(plugin, pageable, "Skay_Duck"))
+            .send(sender);
 
         return true;
     }
@@ -107,12 +109,12 @@ public class ListCommand extends PlayerOnlyCommand {
     }
 
     private TextComponent buildPaginationLine(final MapSaverPlugin plugin, final Pageable pageable, final String playerName) {
-        TextComponent paginationLine = newComponent("    ");
-
-        paginationLine.addExtra(newArrow(true, pageable, playerName, plugin.getLanguage().Pagination));
-        paginationLine.addExtra(String.format(" [%d/%d] ", pageable.getPage(), pageable.getMaxPage()));
-        paginationLine.addExtra(newArrow(false, pageable, playerName, plugin.getLanguage().Pagination));
-        return paginationLine;
+        return TextComponentBuilder.of()
+            .prefix()
+            .add(newArrow(true, pageable, playerName, plugin.getLanguage().Pagination))
+            .add(String.format(" [%d/%d] ", pageable.getPage(), pageable.getMaxPage()))
+            .add(newArrow(false, pageable, playerName, plugin.getLanguage().Pagination))
+            .build();
     }
 
     private TextComponent newArrow(final boolean left, final Pageable pageable, final String playerName, final Pagination pagination) {
@@ -122,9 +124,9 @@ public class ListCommand extends PlayerOnlyCommand {
         final int pageOffset = (left) ? -1 :  1;
 
         if (enabled) {
-            return createLink(arrow, hoverText, ChatColor.GREEN, String.format("/mapsaver list %s %d", playerName, pageable.getPage() + pageOffset));
+            return TextComponentBuilder.createLink(arrow, hoverText, ChatColor.GREEN, String.format("/mapsaver list %s %d", playerName, pageable.getPage() + pageOffset));
         }
-        return newRawComponent("&8" + arrow);
+        return TextComponentBuilder.of("&8" + arrow).build();
     }
 
     private String getVisibilityColor(final Visibility visibility) {
