@@ -4,6 +4,7 @@ import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.utils.Either;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.command.CommandSender;
 
 import static fr.epicanard.mapsaver.utils.Either.Left;
 import static fr.epicanard.mapsaver.utils.Either.Right;
@@ -14,18 +15,18 @@ public class ListArguments {
     final String playerName;
     final int page;
 
-    public static Either<String, ListArguments> parse(final MapSaverPlugin plugin, final String[] args) {
+    public static Either<String, ListArguments> parse(final MapSaverPlugin plugin, final CommandSender sender, final String[] args) {
         try {
-            return Right(getArguments(args));
+            return Right(getArguments(sender, args));
         } catch (NumberFormatException exception) {
             return Left(plugin.getLanguage().ErrorMessages.PageNumberNotValid);
         }
     }
 
-    private static ListArguments getArguments(final String[] args) {
+    private static ListArguments getArguments(final CommandSender sender, final String[] args) {
         switch (args.length) {
             case 0:
-                return new ListArguments(null, 1);
+                return new ListArguments(sender.getName(), 1);
             case 1:
                 return ListArguments.of(args[0]);
             default:

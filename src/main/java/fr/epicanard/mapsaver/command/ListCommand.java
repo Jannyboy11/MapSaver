@@ -28,7 +28,7 @@ public class ListCommand extends PlayerOnlyCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        final Either<String, ListArguments> argumentsEither = ListArguments.parse(plugin, args);
+        final Either<String, ListArguments> argumentsEither = ListArguments.parse(plugin, sender, args);
         if (argumentsEither.isLeft()) {
             sendMessage(sender, argumentsEither.getLeft().get());
             return false;
@@ -67,7 +67,7 @@ public class ListCommand extends PlayerOnlyCommand {
 
         builder
             .bl()
-            .add(buildPaginationLine(plugin, pageable, "Skay_Duck"))
+            .add(buildPaginationLine(plugin, pageable, arguments.getPlayerName()))
             .send(sender);
 
         return true;
