@@ -6,4 +6,5 @@ public class MapInfo {
     public String Visibility = "Visibility";
     public String OriginalMap = "Original map";
     public String CopyMaps = "Locked copies";
+    public String Actions = "Actions";
 }

@@ -33,8 +33,9 @@ MapInfo:
   Visibility: "Visibilité"
   OriginalMap: "Carte originale"
   CopyMaps: "Copies verrouillées"
+  Actions: "Actions"
 List:
-  ListMaps: "Liste des cartes :"
+  ListMaps: "Liste des cartes de &6%s&f :"
   InfoHover: "Afficher les détails de cette carte"
   ImportHover: "Importer cette carte"
 Pagination:

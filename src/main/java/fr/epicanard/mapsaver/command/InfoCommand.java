@@ -9,6 +9,7 @@ import fr.epicanard.mapsaver.models.map.Visibility;
 import fr.epicanard.mapsaver.utils.OptionalUtils;
 import fr.epicanard.mapsaver.utils.PlayerUtils;
 import fr.epicanard.mapsaver.utils.TextComponentBuilder;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,6 @@ import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class InfoCommand extends PlayerOnlyCommand {
 
@@ -34,15 +34,28 @@ public class InfoCommand extends PlayerOnlyCommand {
             .map(p -> {
                 final MapInfo mapInfo = plugin.getLanguage().MapInfo;
                 final Visibility visibility = p.getPlayerMap().getVisibility();
+                final String ownerName = Bukkit.getOfflinePlayer(p.getPlayerMap().getPlayerUuid()).getName();
                 return TextComponentBuilder.of()
+                    .addLine("&7-------------------")
                     .addLine("&6%s : &f%s", mapInfo.Name, p.getPlayerMap().getName())
-                    .addLine("&6%s : &f%s", mapInfo.Owner, Bukkit.getOfflinePlayer(p.getPlayerMap().getPlayerUuid()).getName())
+                    .addLine("&6%s : &f%s", mapInfo.Owner, ownerName)
                     .addLine("&6%s : &f%s", mapInfo.Visibility, plugin.getLanguage().Visibility.getOrDefault(visibility.name(), visibility.name()))
                     .addLine("&6%s : &f%d - %s", mapInfo.OriginalMap, p.getOriginalMap().getOriginalId().get(), p.getOriginalMap().getServer())
-                    .prefix().add("&6%s :&f", mapInfo.CopyMaps)
+                    .addLine("&6%s :&f", mapInfo.CopyMaps)
                     .apply(builder -> p.getServerMaps().forEach(serverMap ->
-                        builder.bl().prefix().add(" • %d - %s", serverMap.getLockedId(), serverMap.getServer())
-                    ));
+                        builder.addLine(" • %d - %s", serverMap.getLockedId(), serverMap.getServer())
+                    ))
+                    .apply(builder -> {
+                        if (Permission.IMPORT_MAP.isSetOn(sender)) {
+                            builder
+                                .prefix()
+                                .add("&6%s : &f", mapInfo.Actions)
+                                .addLink("import", plugin.getLanguage().List.ImportHover, ChatColor.DARK_GREEN, String.format("/mapsaver import %s %s", p.getPlayerMap().getName(), ownerName))
+                            .bl();
+                        }
+                    })
+                    .prefix().add("&7-------------------")
+                    ;
             })
             .orElseGet(() -> TextComponentBuilder.of(plugin.getLanguage().ErrorMessages.MissingMapOrNotPublic))
             .send(sender);

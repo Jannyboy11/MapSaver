@@ -44,7 +44,7 @@ public class ListCommand extends PlayerOnlyCommand {
             return true;
         }
 
-        final TextComponentBuilder builder = TextComponentBuilder.of().prefix().add(plugin.getLanguage().List.ListMaps);
+        final TextComponentBuilder builder = TextComponentBuilder.of().prefix().add(plugin.getLanguage().List.ListMaps, arguments.getPlayerName());
         playerMaps.forEach(map -> {
             final String visibilityText = plugin.getLanguage().Visibility.getOrDefault(map.getVisibility().name(), map.getVisibility().name());
             builder
@@ -52,16 +52,16 @@ public class ListCommand extends PlayerOnlyCommand {
                 .prefix()
                 .add(" •&6 %s &f- %s%s&f", map.getName(), getVisibilityColor(map.getVisibility()), visibilityText);
 
-            if (Permission.INFO_MAP.isSetOn(sender) || Permission.LIST_MAP.isSetOn(sender)) {
-                builder.add(" - ");
-                if (Permission.INFO_MAP.isSetOn(sender)) {
-                    builder
-                        .addLink("info", plugin.getLanguage().List.InfoHover, ChatColor.DARK_GREEN, String.format("/mapsaver info %s %s", map.getName(), (args.length > 0) ? args[0] : ""))
-                        .add("&7/");
-                }
-                if (Permission.IMPORT_MAP.isSetOn(sender)) {
-                    builder.addLink("import", plugin.getLanguage().List.ImportHover, ChatColor.DARK_GREEN, String.format("/mapsaver import %s %s", map.getName(), (args.length > 0) ? args[0] : ""));
-                }
+            final boolean infoSet = Permission.INFO_MAP.isSetOn(sender);
+            final boolean importSet = Permission.IMPORT_MAP.isSetOn(sender);
+            if (infoSet || importSet) builder.add(" - ");
+            if (infoSet) {
+                builder
+                    .addLink("info", plugin.getLanguage().List.InfoHover, ChatColor.DARK_GREEN, String.format("/mapsaver info %s %s", map.getName(), (args.length > 0) ? args[0] : ""));
+            }
+            if (infoSet && importSet) builder.add("&7/");
+            if (importSet) {
+                builder.addLink("import", plugin.getLanguage().List.ImportHover, ChatColor.DARK_GREEN, String.format("/mapsaver import %s %s", map.getName(), (args.length > 0) ? args[0] : ""));
             }
         });
 
