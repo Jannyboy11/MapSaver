@@ -4,23 +4,21 @@ import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.models.ListArguments;
 import fr.epicanard.mapsaver.models.Pageable;
 import fr.epicanard.mapsaver.models.Permission;
+import fr.epicanard.mapsaver.models.PlayerVisibility;
 import fr.epicanard.mapsaver.models.language.Pagination;
 import fr.epicanard.mapsaver.models.map.PlayerMap;
 import fr.epicanard.mapsaver.models.map.Visibility;
 import fr.epicanard.mapsaver.utils.Either;
+import fr.epicanard.mapsaver.utils.PlayerUtils;
 import fr.epicanard.mapsaver.utils.TextComponentBuilder;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static fr.epicanard.mapsaver.utils.Messenger.sendMessage;
-import static fr.epicanard.mapsaver.utils.OptionalUtils.when;
 
 public class ListCommand extends PlayerOnlyCommand {
 
@@ -92,20 +90,12 @@ public class ListCommand extends PlayerOnlyCommand {
      * 4. If not owner Return public maps only
      */
     private List<PlayerMap> listPlayerMaps(final String playerName, final CommandSender sender, final Pageable pageable) {
-        UUID playerUuid;
-        if (playerName != null) {
-            playerUuid = plugin.getServer().getOfflinePlayer(playerName).getUniqueId();
-        } else {
-            playerUuid = ((Player) sender).getUniqueId();
-        }
+        final PlayerVisibility playerVisibility = PlayerUtils.extractPlayerVisibility(plugin, playerName, sender, Permission.ADMIN_LIST_MAP);
 
-        final Optional<Visibility> visibilityOpt = when(
-            () -> sender instanceof Player && playerUuid != ((Player) sender).getUniqueId() && !Permission.ADMIN_LIST_MAP.isSetOn(sender),
-            Visibility.PUBLIC
-        );
+        float countPlayerMaps = this.plugin.getService().countPlayerMaps(playerVisibility.getPlayerUUID(), playerVisibility.getMaybeVisibility());
+        pageable.setMaxPage((int) Math.ceil(countPlayerMaps / (float)pageable.getSize()));
 
-        pageable.setMaxPage((int) Math.ceil((float)this.plugin.getService().countPlayerMaps(playerUuid, visibilityOpt) / (float)pageable.getSize()));
-        return this.plugin.getService().listPlayerMaps(playerUuid, pageable, visibilityOpt);
+        return this.plugin.getService().listPlayerMaps(playerVisibility, pageable);
     }
 
     private TextComponent buildPaginationLine(final MapSaverPlugin plugin, final Pageable pageable, final String playerName) {

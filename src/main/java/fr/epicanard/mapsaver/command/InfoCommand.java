@@ -2,9 +2,12 @@ package fr.epicanard.mapsaver.command;
 
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.models.Permission;
+import fr.epicanard.mapsaver.models.PlayerVisibility;
 import fr.epicanard.mapsaver.models.language.MapInfo;
 import fr.epicanard.mapsaver.models.map.PlayerAllMap;
 import fr.epicanard.mapsaver.models.map.Visibility;
+import fr.epicanard.mapsaver.utils.OptionalUtils;
+import fr.epicanard.mapsaver.utils.PlayerUtils;
 import fr.epicanard.mapsaver.utils.TextComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -48,18 +51,21 @@ public class InfoCommand extends PlayerOnlyCommand {
     }
 
     private Optional<PlayerAllMap> getPlayerAllMap(final CommandSender sender, final String[] args) {
+
         if (args.length == 0) {
+            final PlayerVisibility playerVisibility = new PlayerVisibility(
+                ((Player) sender).getUniqueId(),
+                OptionalUtils.when(() -> !Permission.ADMIN_INFO_MAP.isSetOn(sender), Visibility.PUBLIC)
+            );
             final ItemStack mapItem = ((Player) sender).getInventory().getItemInMainHand();
             return Optional.ofNullable((MapMeta) mapItem.getItemMeta())
                 .map(MapMeta::getMapView)
-                .flatMap(mapView -> plugin.getService().getMapInfo(mapView.getId()));
+                .flatMap(mapView -> plugin.getService().getMapInfo(playerVisibility, mapView.getId()));
         }
 
-        final UUID playerUUID = (args.length >= 2) ?
-            plugin.getServer().getOfflinePlayer(args[1]).getUniqueId() :
-            ((Player) sender).getUniqueId();
-
-        return plugin.getService().getMapInfo(playerUUID, args[0]);
+        final String playerName = (args.length >= 2) ? args[1] : null;
+        final PlayerVisibility playerVisibility = PlayerUtils.extractPlayerVisibility(plugin, playerName, sender, Permission.ADMIN_INFO_MAP);
+        return plugin.getService().getMapInfo(playerVisibility, args[0]);
     }
 
     public boolean isPlayerOnly(final CommandSender sender, final String[] args) {

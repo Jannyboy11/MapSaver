@@ -73,10 +73,26 @@ public class MapRepository extends MapDataBase {
             .firstResult(mappers.forClass(PlayerMap.class));
     }
 
+    public Optional<PlayerMap> selectPlayerMapByMapUuidAndPlayerUuidOrVisibility(final UUID mapUuid, final UUID playerUuid, final Visibility visibility) {
+        return this.query.select(SELECT_PLAYER_MAP_BY_MAP_AND_PLAYER_UUID_OR_VISIBILITY.query(prefix))
+            .namedParam("map_uuid", mapUuid.toString())
+            .namedParam("player_uuid", playerUuid.toString())
+            .namedParam("visibility", visibility)
+            .firstResult(mappers.forClass(PlayerMap.class));
+    }
+
     public Optional<PlayerMap> selectPlayerMapByPlayerUuidAndName(final UUID playerUuid, final String name) {
         return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER_AND_NAME.query(prefix))
             .namedParam("player_uuid", playerUuid.toString())
             .namedParam("name", name)
+            .firstResult(mappers.forClass(PlayerMap.class));
+    }
+
+    public Optional<PlayerMap> selectPlayerMapByPlayerUuidAndNameAndVisibility(final UUID playerUuid, final String name, final Visibility visibility) {
+        return this.query.select(SELECT_PLAYER_MAP_BY_PLAYER_AND_NAME_AND_VISIBILITY.query(prefix))
+            .namedParam("player_uuid", playerUuid.toString())
+            .namedParam("name", name)
+            .namedParam("visibility", visibility)
             .firstResult(mappers.forClass(PlayerMap.class));
     }
 
@@ -132,6 +148,14 @@ public class MapRepository extends MapDataBase {
 
     public Optional<ServerMap> selectServerMapByMapIdAndServer(final int searchedId, final String server) {
         return this.query.select(SELECT_SERVER_MAP_BY_ORIGINAL_ID_OR_LOCKED_ID.query(prefix))
+            .namedParam("original_id", searchedId)
+            .namedParam("locked_id", searchedId)
+            .namedParam("server", server)
+            .firstResult(mappers.forClass(ServerMap.class));
+    }
+
+    public Optional<ServerMap> selectOriginalServerMapByMapIdAndServer(final int searchedId, final String server) {
+        return this.query.select(SELECT_ORIGINAL_SERVER_MAP_BY_ORIGINAL_ID_OR_LOCKED_ID.query(prefix))
                 .namedParam("original_id", searchedId)
                 .namedParam("locked_id", searchedId)
                 .namedParam("server", server)

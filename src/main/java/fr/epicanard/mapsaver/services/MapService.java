@@ -3,6 +3,7 @@ package fr.epicanard.mapsaver.services;
 import fr.epicanard.mapsaver.MapSaverPlugin;
 import fr.epicanard.mapsaver.database.MapRepository;
 import fr.epicanard.mapsaver.models.Pageable;
+import fr.epicanard.mapsaver.models.PlayerVisibility;
 import fr.epicanard.mapsaver.models.map.*;
 import fr.epicanard.mapsaver.utils.Either;
 import fr.epicanard.mapsaver.utils.MapUtils;
@@ -95,24 +96,31 @@ public class MapService {
         );
     }
 
-    public Optional<PlayerAllMap> getMapInfo(final int id) {
+    public Optional<PlayerAllMap> getMapInfo(final PlayerVisibility playerVisibility, final int id) {
         final PlayerAllMap.PlayerAllMapBuilder builder = PlayerAllMap.builder();
 
-        return repository.selectServerMapByMapIdAndServer(id, plugin.getConfiguration().ServerName)
+        return repository.selectOriginalServerMapByMapIdAndServer(id, plugin.getConfiguration().ServerName)
             .map(serverMap -> {
                 builder
                     .originalMap(serverMap)
                     .serverMaps(repository.selectServerMapByMapUuid(serverMap.getMapUuid()));
                 return serverMap;
             })
-            .flatMap(serverMap -> repository.selectPlayerMapByMapUuid(serverMap.getMapUuid()))
+            .flatMap(serverMap ->
+                playerVisibility.getMaybeVisibility()
+                    .map(vis -> repository.selectPlayerMapByMapUuidAndPlayerUuidOrVisibility(serverMap.getMapUuid(), playerVisibility.getPlayerUUID(), vis))
+                    .orElseGet(() -> repository.selectPlayerMapByMapUuid(serverMap.getMapUuid()))
+            )
             .map(playerMap -> builder.playerMap(playerMap).build());
     }
 
-    public Optional<PlayerAllMap> getMapInfo(final UUID playerUuid, final String mapName) {
+    public Optional<PlayerAllMap> getMapInfo(final PlayerVisibility playerVisibility, final String mapName) {
         final PlayerAllMap.PlayerAllMapBuilder builder = PlayerAllMap.builder();
+        final UUID playerUUID = playerVisibility.getPlayerUUID();
 
-        return repository.selectPlayerMapByPlayerUuidAndName(playerUuid, mapName)
+        return playerVisibility.getMaybeVisibility()
+            .map(vis -> repository.selectPlayerMapByPlayerUuidAndNameAndVisibility(playerUUID, mapName, vis))
+            .orElseGet(() -> repository.selectPlayerMapByPlayerUuidAndName(playerUUID, mapName))
             .map(playerMap -> {
                 final List<ServerMap> serverMaps = repository.selectServerMapByMapUuid(playerMap.getMapUuid());
                 return builder
@@ -123,10 +131,10 @@ public class MapService {
             });
     }
 
-    public List<PlayerMap> listPlayerMaps(final UUID playerUuid, final Pageable pageable, final Optional<Visibility> visibility) {
-        return visibility
-            .map(vis -> repository.selectPlayerMapByPlayerUuidWithVisibility(playerUuid, vis, pageable))
-            .orElseGet(() -> repository.selectPlayerMapByPlayerUuid(playerUuid, pageable));
+    public List<PlayerMap> listPlayerMaps(final PlayerVisibility playerVisibility, final Pageable pageable) {
+        return playerVisibility.getMaybeVisibility()
+            .map(vis -> repository.selectPlayerMapByPlayerUuidWithVisibility(playerVisibility.getPlayerUUID(), vis, pageable))
+            .orElseGet(() -> repository.selectPlayerMapByPlayerUuid(playerVisibility.getPlayerUUID(), pageable));
     }
 
     public int countPlayerMaps(final UUID playerUuid, final Optional<Visibility> visibility) {
