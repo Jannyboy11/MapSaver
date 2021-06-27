@@ -1,23 +1,23 @@
 # ==============
 # Config file for plugin MapSaver
 # ==============
-Language: "fr_FR"
-Prefix: "&a[MapSaver] &f"
-ServerName: "server"
-Storage:
-  Type: "mysql"
-  TablePrefix: "MapSaver"
-  Connection:
-    Host: "localhost"
-    Port: "3306"
-    Database: "my_database"
-    User: "my_user"
-    Password: "my_password"
-    UseSSL: true
-Options:
-  PageSize: 10
-Privacy:
-  DefaultVisibility: "PRIVATE"
+language: "fr_FR"
+prefix: "&a[MapSaver] &f"
+serverName: "server"
+storage:
+  type: "mysql"
+  tablePrefix: "MapSaver"
+  connection:
+    host: "localhost"
+    port: "3306"
+    database: "my_database"
+    user: "my_user"
+    password: "my_password"
+    useSSL: true
+options:
+  pageSize: 10
+privacy:
+  defaultVisibility: "PRIVATE"
   # PRIMARY_OWNER => seul le owner (premier save) peut choisir la privacy policy tous les autres seront privée
   # PUBLIC => toutes les maps sont public
   # PRIVATE => toutes les maps sont privées
