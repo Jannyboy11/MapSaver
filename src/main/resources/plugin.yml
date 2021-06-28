@@ -1,11 +1,9 @@
 main: fr.epicanard.mapsaver.MapSaverPlugin
-name: MapSaver
 description: Plugin for saving map in database
 author: EpiCanard
 authors:
   - EpiCanard
   - Ikkino
-version: ${build.version}
 api-version: 1.16
 commands:
   mapsaver:

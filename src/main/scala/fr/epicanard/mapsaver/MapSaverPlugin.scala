@@ -9,10 +9,11 @@ import fr.epicanard.mapsaver.resources.Config
 import fr.epicanard.mapsaver.resources.Config.configDecoder
 import fr.epicanard.mapsaver.resources.Decodable
 import java.io.File
+import buildinfo.BuildInfo
 
 @Scala(ScalaVersion.v3_0_0)
 object MapSaverPlugin
-    extends ScalaPlugin(ScalaPluginDescription("MapSaverPlugin", "0.0.1")):
+    extends ScalaPlugin(ScalaPluginDescription(BuildInfo.name, BuildInfo.version)):
 
   override def onEnable(): Unit =
     val config: Option[Config] = loadResource("config.yml")

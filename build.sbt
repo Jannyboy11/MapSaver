@@ -1,14 +1,16 @@
-name := "MapSaver"
-organization := "fr.epicanard"
-scalaVersion := "3.0.0"
-version := "0.0.1-SNAPSHOT"
-useCoursier := false
+name          := "MapSaver"
+organization  := "fr.epicanard"
+version       := "0.0.1-SNAPSHOT"
+scalaVersion  := "3.0.0"
+useCoursier   := false
 
 resolvers ++= Dependencies.resolvers
 
 libraryDependencies += Dependencies.scalaPluginLoader
 libraryDependencies += Dependencies.spigot
 libraryDependencies ++= Dependencies.circe
+
+enablePlugins(BuildInfoPlugin)
 
 assemblyPackageScala / assembleArtifact := false
 assembly / assemblyMergeStrategy := {
