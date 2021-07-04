@@ -16,7 +16,6 @@ storage:
     useSSL: true
 options:
   pageSize: 10
-privacy:
   defaultVisibility: "PRIVATE"
   # PRIMARY_OWNER => seul le owner (premier save) peut choisir la privacy policy tous les autres seront privée
   # PUBLIC => toutes les maps sont public

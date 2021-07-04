@@ -5,8 +5,8 @@ import xyz.janboerman.scalaloader.plugin.ScalaPluginDescription
 import xyz.janboerman.scalaloader.plugin.description.Scala
 import xyz.janboerman.scalaloader.plugin.description.ScalaVersion
 import fr.epicanard.mapsaver.resources.ResourceLoader
-import fr.epicanard.mapsaver.resources.Config
-import fr.epicanard.mapsaver.resources.Config.configDecoder
+import fr.epicanard.mapsaver.models.config.Config
+import fr.epicanard.mapsaver.models.config.Config.configDecoder
 import fr.epicanard.mapsaver.resources.Decodable
 import java.io.File
 import buildinfo.BuildInfo
@@ -23,3 +23,4 @@ object MapSaverPlugin
     if !new File(getDataFolder, path).exists then
       saveResource(path, false)
     ResourceLoader.loadFromPath(s"$getDataFolder/$path")
+
