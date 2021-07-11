@@ -12,32 +12,34 @@ import scala.util.Failure
 
 import fr.epicanard.mapsaver.MapSaverPlugin
 
-object ResourceLoader:
+object ResourceLoader {
 
-  def loadFromPath[T](path: String): Decodable[Option, T] =
-    (for
+  def loadFromPath[T](path: String)(implicit decoder: Decoder[T]): Option[T] =
+    (for {
       content   <- readFile(path)
       resource  <- parseContent(content)
-    yield resource)
+    } yield resource)
       .recoverWith(handleErrors(path))
       .toOption
 
-  private def parseContent[T](content: String): Decodable[Try, T] =
-    for
+  private def parseContent[T](content: String)(implicit decoder: Decoder[T]): Try[T] =
+    for {
       json      <- parser.parse(content).toTry
       resource  <- json.as[T].toTry
-    yield resource
+    } yield resource
 
   private def readFile(path: String): Try[String] =
-    for
+    for {
       file    <- Try(Source.fromFile(path))
       content = file.getLines.mkString("\n")
       _       <- Try(file.close)
-    yield content
+    } yield content
 
-  private def handleErrors[T](path: String): PartialFunction[Throwable, Try[T]] =
+  private def handleErrors[T](path: String): PartialFunction[Throwable, Try[T]] = {
     case e =>
       MapSaverPlugin.getLogger.warning(s"Can't load file: $path")
       e.printStackTrace()
       Failure(e)
+  }
+}
 

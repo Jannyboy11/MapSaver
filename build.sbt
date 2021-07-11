@@ -1,14 +1,16 @@
 name          := "MapSaver"
 organization  := "fr.epicanard"
 version       := "0.0.1-SNAPSHOT"
-scalaVersion  := "3.0.0"
+scalaVersion  := "2.13.6"
 useCoursier   := false
+scalacOptions  += "-Ymacro-annotations"
 
 resolvers ++= Dependencies.resolvers
 
 libraryDependencies += Dependencies.scalaPluginLoader
 libraryDependencies += Dependencies.spigot
 libraryDependencies ++= Dependencies.circe
+libraryDependencies ++= Dependencies.enumeratum
 
 enablePlugins(BuildInfoPlugin)
 
