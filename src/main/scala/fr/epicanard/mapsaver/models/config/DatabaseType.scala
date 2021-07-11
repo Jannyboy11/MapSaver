@@ -1,7 +1,5 @@
 package fr.epicanard.mapsaver.models.config
 
-import io.circe.Decoder
-import scala.util.Try
 import enumeratum._
 import fr.epicanard.mapsaver.models.circe.CirceEnumInsensitive
 

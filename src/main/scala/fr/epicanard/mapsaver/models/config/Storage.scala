@@ -4,8 +4,7 @@ import io.circe.generic.JsonCodec
 
 @JsonCodec
 case class Storage(
-  `type`: DatabaseType,
-  tablePrefix: String,
-  connection: Connection
+    `type`: DatabaseType,
+    tablePrefix: String,
+    connection: Connection
 )
-

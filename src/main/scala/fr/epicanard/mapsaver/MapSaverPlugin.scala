@@ -13,7 +13,9 @@ import io.circe.Decoder
 
 @Scala(version = ScalaVersion.v2_13_6)
 object MapSaverPlugin
-    extends ScalaPlugin(new ScalaPluginDescription(BuildInfo.name, BuildInfo.version)) {
+    extends ScalaPlugin(
+      new ScalaPluginDescription(BuildInfo.name, BuildInfo.version)
+    ) {
 
   override def onEnable(): Unit = {
     val config: Option[Config] = loadResource("config.yml")

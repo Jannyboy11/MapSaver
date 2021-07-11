@@ -3,7 +3,12 @@ organization  := "fr.epicanard"
 version       := "0.0.1-SNAPSHOT"
 scalaVersion  := "2.13.6"
 useCoursier   := false
-scalacOptions  += "-Ymacro-annotations"
+scalacOptions ++= Seq(
+  "-Xfatal-warnings",
+  "-language:higherKinds",
+  "-Ywarn-unused",
+  "-Ymacro-annotations"
+)
 
 resolvers ++= Dependencies.resolvers
 
