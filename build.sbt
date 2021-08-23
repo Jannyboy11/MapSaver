@@ -4,6 +4,7 @@ version       := "0.0.1-SNAPSHOT"
 scalaVersion  := "2.13.6"
 useCoursier   := false
 scalacOptions ++= Seq(
+  "-deprecation",
   "-Xfatal-warnings",
   "-language:higherKinds",
   "-Ywarn-unused",
@@ -16,6 +17,8 @@ libraryDependencies += Dependencies.scalaPluginLoader
 libraryDependencies += Dependencies.spigot
 libraryDependencies ++= Dependencies.circe
 libraryDependencies ++= Dependencies.enumeratum
+libraryDependencies ++= Dependencies.slick
+libraryDependencies ++= Dependencies.cats
 
 enablePlugins(BuildInfoPlugin)
 

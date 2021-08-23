@@ -5,6 +5,9 @@ object Dependencies {
   private val spigotVersion             = "1.17-R0.1-SNAPSHOT"
   private val circeVersion              = "0.14.0"
   private val enumeratumVersion         = "1.7.0"
+  private val slickVersion              = "3.3.3"
+  private val sl4jVersion               = "1.6.4"
+  private val catsVersion               = "2.3.0"
 
   val resolvers = Seq(
     Resolver.mavenCentral,
@@ -16,7 +19,8 @@ object Dependencies {
   lazy val spigot            = "org.spigotmc"                            % "spigot-api"  % spigotVersion            % "provided"
   lazy val enumeratum        = Seq(
     "com.beachape" %% "enumeratum",
-    "com.beachape" %% "enumeratum-circe"
+    "com.beachape" %% "enumeratum-circe",
+    "com.beachape" %% "enumeratum-slick"
   ).map(_ % enumeratumVersion)
 
   lazy val circe = Seq(
@@ -25,4 +29,14 @@ object Dependencies {
     "io.circe" %% "circe-parser",
     "io.circe" %% "circe-yaml"
   ).map(_ % circeVersion)
+
+  lazy val slick = Seq(
+    "com.typesafe.slick" %% "slick"          % slickVersion,
+    "com.typesafe.slick" %% "slick-hikaricp" % slickVersion,
+    "org.slf4j"          %  "slf4j-nop"      % sl4jVersion,
+  )
+
+  lazy val cats = Seq(
+    "org.typelevel" %% "cats-core" % catsVersion
+  )
 }

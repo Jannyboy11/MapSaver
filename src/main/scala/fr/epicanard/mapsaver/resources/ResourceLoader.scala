@@ -5,19 +5,28 @@ import io.circe.Decoder
 
 import scala.util.Try
 import scala.io.Source
-import scala.util.Failure
+import cats.syntax.either._
+import java.io.File
 
-import fr.epicanard.mapsaver.MapSaverPlugin
+import fr.epicanard.mapsaver.models.errors.MapSaverError
+import fr.epicanard.mapsaver.models.errors.MapSaverError._
+import xyz.janboerman.scalaloader.plugin.ScalaPlugin
 
 object ResourceLoader {
 
-  def loadFromPath[T](path: String)(implicit decoder: Decoder[T]): Option[T] =
+  def extractAndLoadResource[T](plugin: ScalaPlugin, path: String)(implicit
+      decoder: Decoder[T]
+  ): Either[MapSaverError, T] = {
+    if (!new File(plugin.getDataFolder(), path).exists) plugin.saveResource(path, false)
+    loadFromPath[T](s"${plugin.getDataFolder}/$path")
+  }
+
+  def loadFromPath[T](path: String)(implicit decoder: Decoder[T]): Either[MapSaverError, T] =
     (for {
       content  <- readFile(path)
       resource <- parseContent(content)
-    } yield resource)
-      .recoverWith(handleErrors(path))
-      .toOption
+    } yield resource).toEither
+      .leftMap(LoadConfigError(path, _))
 
   private def parseContent[T](
       content: String
@@ -33,12 +42,4 @@ object ResourceLoader {
       content = file.getLines().mkString("\n")
       _ <- Try(file.close)
     } yield content
-
-  private def handleErrors[T](
-      path: String
-  ): PartialFunction[Throwable, Try[T]] = { case e =>
-    MapSaverPlugin.getLogger.warning(s"Can't load file: $path")
-    e.printStackTrace()
-    Failure(e)
-  }
 }

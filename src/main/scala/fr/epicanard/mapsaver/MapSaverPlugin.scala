@@ -1,30 +1,44 @@
 package fr.epicanard.mapsaver
 
+import buildinfo.BuildInfo
+import cats.data.EitherT
+import fr.epicanard.mapsaver.database.MapRepository
+import fr.epicanard.mapsaver.models.config.Config._
+import fr.epicanard.mapsaver.models.errors.MapSaverError
+import fr.epicanard.mapsaver.resources.ResourceLoader
 import xyz.janboerman.scalaloader.plugin.ScalaPlugin
 import xyz.janboerman.scalaloader.plugin.ScalaPluginDescription
 import xyz.janboerman.scalaloader.plugin.description.Scala
 import xyz.janboerman.scalaloader.plugin.description.ScalaVersion
-import fr.epicanard.mapsaver.resources.ResourceLoader
-import fr.epicanard.mapsaver.models.config.Config
-import fr.epicanard.mapsaver.models.config.Config._
-import java.io.File
-import buildinfo.BuildInfo
-import io.circe.Decoder
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
 @Scala(version = ScalaVersion.v2_13_6)
 object MapSaverPlugin
     extends ScalaPlugin(
       new ScalaPluginDescription(BuildInfo.name, BuildInfo.version)
     ) {
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  override def onEnable(): Unit = {
-    val config: Option[Config] = loadResource("config.yml")
-    print(config)
-  }
+  override def onEnable(): Unit =
+    initPlugin(this).onComplete { t =>
+      t match {
+        case Success(Left(error)) => MapSaverError.logError(error, this.getLogger())
+        case Success(Right(_))    => this.getLogger().info("Loading success")
+        case Failure(_)           => this.getLogger().warning("unexpected error")
+      }
+    }
 
-  def loadResource[T](path: String)(implicit decoder: Decoder[T]): Option[T] = {
-    if (!new File(getDataFolder, path).exists) saveResource(path, false)
-    ResourceLoader.loadFromPath[T](s"$getDataFolder/$path")
-  }
+  def initPlugin(plugin: ScalaPlugin): Future[Either[MapSaverError, Unit]] =
+    (for {
+      config <- EitherT.fromEither[Future](ResourceLoader.extractAndLoadResource(plugin, "config.yml"))
+      logger        = plugin.getLogger()
+      database      = MapRepository.buildDatabase(config.storage)
+      mapRepository = new MapRepository(logger, database)
+      _ <- EitherT(mapRepository.initDatabase())
+    } yield ()).value
 
 }
