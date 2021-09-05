@@ -6,6 +6,7 @@ import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.resources.config.Config._
 import fr.epicanard.mapsaver.errors.MapSaverError
 import fr.epicanard.mapsaver.resources.ResourceLoader.extractAndLoadResource
+import fr.epicanard.mapsaver.resources.language.Language
 import xyz.janboerman.scalaloader.plugin.ScalaPlugin
 import xyz.janboerman.scalaloader.plugin.ScalaPluginDescription
 import xyz.janboerman.scalaloader.plugin.description.Scala
@@ -32,7 +33,8 @@ object MapSaverPlugin
 
   def initPlugin(plugin: ScalaPlugin): Future[Either[MapSaverError, Unit]] =
     (for {
-      config <- EitherT.fromEither[Future](extractAndLoadResource(plugin, "config.yml"))
+      config   <- EitherT.fromEither[Future](extractAndLoadResource(plugin, "config.yml"))
+      language <- EitherT.fromEither[Future](extractAndLoadResource[Language](plugin, s"langs/${config.language}.yml"))
       logger        = plugin.getLogger
       database      = MapRepository.buildDatabase(config.storage)
       mapRepository = new MapRepository(logger, database)
