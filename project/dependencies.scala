@@ -27,7 +27,8 @@ object Dependencies {
     "io.circe" %% "circe-core",
     "io.circe" %% "circe-generic",
     "io.circe" %% "circe-parser",
-    "io.circe" %% "circe-yaml"
+    "io.circe" %% "circe-yaml",
+    "io.circe" %% "circe-generic-extras"
   ).map(_ % circeVersion)
 
   lazy val slick = Seq(

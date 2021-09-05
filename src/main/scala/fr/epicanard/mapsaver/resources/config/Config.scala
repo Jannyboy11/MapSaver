@@ -1,8 +1,9 @@
 package fr.epicanard.mapsaver.resources.config
 
-import io.circe.generic.JsonCodec
+import fr.epicanard.mapsaver.circe.CapitalizeConfiguration
+import io.circe.generic.extras.ConfiguredJsonCodec
 
-@JsonCodec
+@ConfiguredJsonCodec
 case class Config(
     language: String,
     prefix: String,
@@ -10,3 +11,5 @@ case class Config(
     storage: Storage,
     options: Options
 )
+
+object Config extends CapitalizeConfiguration

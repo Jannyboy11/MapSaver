@@ -1,8 +1,9 @@
 package fr.epicanard.mapsaver.resources.config
 
-import io.circe.generic.JsonCodec
+import fr.epicanard.mapsaver.circe.CapitalizeConfiguration
+import io.circe.generic.extras.ConfiguredJsonCodec
 
-@JsonCodec
+@ConfiguredJsonCodec
 case class Connection(
     host: String,
     port: Int,
@@ -11,3 +12,5 @@ case class Connection(
     password: String,
     useSSL: Boolean
 )
+
+object Connection extends CapitalizeConfiguration

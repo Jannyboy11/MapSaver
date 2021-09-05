@@ -1,15 +1,16 @@
 package fr.epicanard.mapsaver.resources.config
 
-import io.circe.generic.JsonCodec
+import fr.epicanard.mapsaver.circe.CapitalizeConfiguration
+import io.circe.generic.extras.ConfiguredJsonCodec
 
-@JsonCodec
+@ConfiguredJsonCodec
 case class Storage(
     `type`: DatabaseType,
     tablePrefix: String,
     connection: Connection
 )
 
-object Storage {
+object Storage extends CapitalizeConfiguration {
   def toProperties(storage: Storage): Map[String, String] = Map(
     "user"              -> storage.connection.user,
     "password"          -> storage.connection.password,
