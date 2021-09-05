@@ -8,8 +8,8 @@ import scala.io.Source
 import cats.syntax.either._
 import java.io.File
 
-import fr.epicanard.mapsaver.models.errors.MapSaverError
-import fr.epicanard.mapsaver.models.errors.MapSaverError._
+import fr.epicanard.mapsaver.errors.MapSaverError
+import fr.epicanard.mapsaver.errors.MapSaverError._
 import xyz.janboerman.scalaloader.plugin.ScalaPlugin
 
 object ResourceLoader {

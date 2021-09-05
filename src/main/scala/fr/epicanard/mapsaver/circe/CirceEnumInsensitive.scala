@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.models.circe
+package fr.epicanard.mapsaver.circe
 
 import enumeratum.Circe
 import enumeratum.Enum

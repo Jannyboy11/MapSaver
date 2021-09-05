@@ -1,12 +1,12 @@
 package fr.epicanard.mapsaver.database
 
 import cats.syntax.either._
-import fr.epicanard.mapsaver.models.config.Storage
-import fr.epicanard.mapsaver.models.errors.MapSaverError
-import fr.epicanard.mapsaver.models.errors.MapSaverError.DatabaseError
-import fr.epicanard.mapsaver.models.schema.DataMaps
-import fr.epicanard.mapsaver.models.schema.PlayerMaps
-import fr.epicanard.mapsaver.models.schema.ServerMaps
+import fr.epicanard.mapsaver.resources.config.Storage
+import fr.epicanard.mapsaver.errors.MapSaverError
+import fr.epicanard.mapsaver.errors.MapSaverError.DatabaseError
+import fr.epicanard.mapsaver.database.schema.DataMaps
+import fr.epicanard.mapsaver.database.schema.PlayerMaps
+import fr.epicanard.mapsaver.database.schema.ServerMaps
 import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.meta.MTable
 

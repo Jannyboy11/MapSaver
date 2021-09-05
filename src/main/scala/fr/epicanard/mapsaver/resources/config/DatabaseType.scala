@@ -1,7 +1,7 @@
-package fr.epicanard.mapsaver.models.config
+package fr.epicanard.mapsaver.resources.config
 
 import enumeratum._
-import fr.epicanard.mapsaver.models.circe.CirceEnumInsensitive
+import fr.epicanard.mapsaver.circe.CirceEnumInsensitive
 
 sealed abstract class DatabaseType(val driver: String, val jdbcHeader: String) extends EnumEntry
 

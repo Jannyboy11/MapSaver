@@ -3,8 +3,8 @@ package fr.epicanard.mapsaver
 import buildinfo.BuildInfo
 import cats.data.EitherT
 import fr.epicanard.mapsaver.database.MapRepository
-import fr.epicanard.mapsaver.models.config.Config._
-import fr.epicanard.mapsaver.models.errors.MapSaverError
+import fr.epicanard.mapsaver.resources.config.Config._
+import fr.epicanard.mapsaver.errors.MapSaverError
 import fr.epicanard.mapsaver.resources.ResourceLoader
 import xyz.janboerman.scalaloader.plugin.ScalaPlugin
 import xyz.janboerman.scalaloader.plugin.ScalaPluginDescription

@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.models.config
+package fr.epicanard.mapsaver.resources.config
 
 import io.circe.generic.JsonCodec
 

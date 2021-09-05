@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.models.errors
+package fr.epicanard.mapsaver.errors
 
 import java.util.logging.Logger
 

@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.models.schema
+package fr.epicanard.mapsaver.database.schema
 
 import enumeratum.SlickEnumSupport
 import fr.epicanard.mapsaver.models.map.Visibility

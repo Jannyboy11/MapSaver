@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.models.schema
+package fr.epicanard.mapsaver.database.schema
 
 import fr.epicanard.mapsaver.models.map.DataMap
 import slick.jdbc.MySQLProfile.api._
