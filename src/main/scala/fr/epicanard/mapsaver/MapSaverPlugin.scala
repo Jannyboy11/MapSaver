@@ -2,6 +2,7 @@ package fr.epicanard.mapsaver
 
 import buildinfo.BuildInfo
 import cats.data.EitherT
+import fr.epicanard.mapsaver.commands.MapSaverCommand
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.resources.config.Config._
 import fr.epicanard.mapsaver.errors.TechnicalError
@@ -40,6 +41,8 @@ object MapSaverPlugin
       database      = MapRepository.buildDatabase(config.storage)
       mapRepository = new MapRepository(logger, database)
       _ <- EitherT(mapRepository.initDatabase())
+      mapSaverCommand = MapSaverCommand(messenger)
+      _               = getCommand("mapsaver").setExecutor(mapSaverCommand)
     } yield ()).value
 
 }
