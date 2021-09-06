@@ -35,6 +35,7 @@ object MapSaverPlugin
     (for {
       config   <- EitherT.fromEither[Future](extractAndLoadResource(plugin, "config.yml"))
       language <- EitherT.fromEither[Future](extractAndLoadResource[Language](plugin, s"langs/${config.language}.yml"))
+      messenger     = Messenger(config.prefix, language)
       logger        = plugin.getLogger
       database      = MapRepository.buildDatabase(config.storage)
       mapRepository = new MapRepository(logger, database)
