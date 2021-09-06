@@ -4,7 +4,7 @@ import buildinfo.BuildInfo
 import cats.data.EitherT
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.resources.config.Config._
-import fr.epicanard.mapsaver.errors.MapSaverError
+import fr.epicanard.mapsaver.errors.TechnicalError
 import fr.epicanard.mapsaver.resources.ResourceLoader.extractAndLoadResource
 import fr.epicanard.mapsaver.resources.language.Language
 import xyz.janboerman.scalaloader.plugin.ScalaPlugin
@@ -26,12 +26,12 @@ object MapSaverPlugin
 
   override def onEnable(): Unit =
     initPlugin(this).onComplete {
-      case Success(Left(error)) => MapSaverError.logError(error, this.getLogger)
+      case Success(Left(error)) => TechnicalError.logError(error, this.getLogger)
       case Success(Right(_))    => this.getLogger.info("Loading success")
       case Failure(_)           => this.getLogger.warning("unexpected error")
     }
 
-  def initPlugin(plugin: ScalaPlugin): Future[Either[MapSaverError, Unit]] =
+  def initPlugin(plugin: ScalaPlugin): Future[Either[TechnicalError, Unit]] =
     (for {
       config   <- EitherT.fromEither[Future](extractAndLoadResource(plugin, "config.yml"))
       language <- EitherT.fromEither[Future](extractAndLoadResource[Language](plugin, s"langs/${config.language}.yml"))

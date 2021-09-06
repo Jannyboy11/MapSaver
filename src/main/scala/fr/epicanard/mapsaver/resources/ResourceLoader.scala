@@ -8,20 +8,20 @@ import scala.io.Source
 import cats.syntax.either._
 import java.io.File
 
-import fr.epicanard.mapsaver.errors.MapSaverError
-import fr.epicanard.mapsaver.errors.MapSaverError._
+import fr.epicanard.mapsaver.errors.TechnicalError
+import fr.epicanard.mapsaver.errors.TechnicalError._
 import xyz.janboerman.scalaloader.plugin.ScalaPlugin
 
 object ResourceLoader {
 
   def extractAndLoadResource[T](plugin: ScalaPlugin, path: String)(implicit
       decoder: Decoder[T]
-  ): Either[MapSaverError, T] = {
+  ): Either[TechnicalError, T] = {
     if (!new File(plugin.getDataFolder(), path).exists) plugin.saveResource(path, false)
     loadFromPath[T](s"${plugin.getDataFolder}/$path")
   }
 
-  def loadFromPath[T](path: String)(implicit decoder: Decoder[T]): Either[MapSaverError, T] =
+  def loadFromPath[T](path: String)(implicit decoder: Decoder[T]): Either[TechnicalError, T] =
     (for {
       content  <- readFile(path)
       resource <- parseContent(content)

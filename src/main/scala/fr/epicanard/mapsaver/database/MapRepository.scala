@@ -2,8 +2,8 @@ package fr.epicanard.mapsaver.database
 
 import cats.syntax.either._
 import fr.epicanard.mapsaver.resources.config.Storage
-import fr.epicanard.mapsaver.errors.MapSaverError
-import fr.epicanard.mapsaver.errors.MapSaverError.DatabaseError
+import fr.epicanard.mapsaver.errors.TechnicalError
+import fr.epicanard.mapsaver.errors.TechnicalError.DatabaseError
 import fr.epicanard.mapsaver.database.schema.DataMaps
 import fr.epicanard.mapsaver.database.schema.PlayerMaps
 import fr.epicanard.mapsaver.database.schema.ServerMaps
@@ -22,7 +22,7 @@ class MapRepository(
 
   implicitly(executionContext)
 
-  def initDatabase(): Future[Either[MapSaverError, Unit]] = {
+  def initDatabase(): Future[Either[TechnicalError, Unit]] = {
     val tables = List(
       DataMaps,
       ServerMaps,
@@ -54,6 +54,6 @@ object MapRepository {
   def buildDatabase(storage: Storage): Database =
     Database.forURL(Storage.buildUrl(storage), Storage.toProperties(storage))
 
-  def handleErrors[T](result: Try[T]): Future[Either[MapSaverError, T]] =
+  def handleErrors[T](result: Try[T]): Future[Either[TechnicalError, T]] =
     Future.successful(result.toEither.leftMap(DatabaseError(_)))
 }
