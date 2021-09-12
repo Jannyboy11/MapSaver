@@ -1,11 +1,12 @@
 package fr.epicanard.mapsaver.commands
 
+import cats.implicits._
 import fr.epicanard.mapsaver.Messenger
+import fr.epicanard.mapsaver.commands.CommandContext.shiftArgs
+import fr.epicanard.mapsaver.errors.Error
 import org.bukkit.command.{Command, CommandSender, TabExecutor}
 
 import scala.jdk.CollectionConverters._
-import cats.implicits._
-import fr.epicanard.mapsaver.commands.CommandContext.shiftArgs
 
 case class MapSaverCommand(messenger: Messenger, subCommands: Map[String, BaseCommand]) extends TabExecutor {
   override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean =
@@ -17,9 +18,9 @@ case class MapSaverCommand(messenger: Messenger, subCommands: Map[String, BaseCo
     if (command.canExecute(commandContext)) {
       command
         .onCommand(messenger, CommandContext.shiftArgs(commandContext))
-        .handleError(error => messenger.sendError(commandContext.sender)(_ => error.message))
+        .handleError(Error.handleError(_, messenger, commandContext.sender))
     } else {
-      messenger.sendError(commandContext.sender)(_.permissionNotAllowed)
+      messenger.sendError(commandContext.sender, _.permissionNotAllowed)
     }
     true
   }
@@ -57,7 +58,8 @@ object MapSaverCommand {
     MapSaverCommand(
       messenger = messenger,
       subCommands = Map(
-        "help" -> HelpCommand
+        "help" -> HelpCommand,
+        "save" -> SaveCommand
       )
     )
 }

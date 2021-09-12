@@ -8,8 +8,6 @@ case class ErrorMessages(
     permissionNotAllowed: String,
     playerOnlyCommand: String,
     mapInHandNeeded: String,
-    missingMapMeta: String,
-    missingMapRenderer: String,
     missingMapName: String,
     missingMapOrNotPublic: String,
     missingDataMap: String,
@@ -17,7 +15,8 @@ case class ErrorMessages(
     notTheOriginal: String,
     alreadySaved: String,
     wrongVisibility: String,
-    pageNumberNotValid: String
+    pageNumberNotValid: String,
+    unexpectedError: String
 )
 
 object ErrorMessages extends CapitalizeConfiguration

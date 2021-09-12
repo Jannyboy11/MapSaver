@@ -12,8 +12,6 @@ ErrorMessages:
   PermissionNotAllowed: "&cVous n'êtes pas autorisé à faire cette action"
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
   MapInHandNeeded: "&cVous devez avoir une carte rempli en main"
-  MissingMapMeta: "&cImpossible de récupérer les MetaDonnées de votre carte"
-  MissingMapRenderer: "&cImpossible de récupérer le Renderer de votre carte"
   MissingMapName: "&cLe nom de carte est manquant"
   MissingMapOrNotPublic: "&cCette carte n'existe pas ou n'est pas publique"
   MissingDataMap: "&cErreur inattendue, impossible de trouver les données de la carte"
@@ -22,6 +20,7 @@ ErrorMessages:
   AlreadySaved: "&cVous avez déjà enregistré cette carte.\n&fUtilises &6/mapsaver update&f pour mettre à jour cette carte"
   WrongVisibility: "&cMauvaise visibilité : %s. Attendue : %s"
   PageNumberNotValid: "&cLe numéro de page n'est pas valide"
+  UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails."
 InfoMessages:
   CreatingNewMap: "Création d'une nouvelle carte"
   UpdatingExistingMap: "Mise à jour d'une carte existante"
