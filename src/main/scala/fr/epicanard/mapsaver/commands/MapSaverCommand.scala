@@ -3,14 +3,19 @@ package fr.epicanard.mapsaver.commands
 import cats.implicits._
 import fr.epicanard.mapsaver.Messenger
 import fr.epicanard.mapsaver.commands.CommandContext.shiftArgs
+import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
+import fr.epicanard.mapsaver.errors.TechnicalError.UnexpectedError
+import fr.epicanard.mapsaver.resources.config.Config
 import org.bukkit.command.{Command, CommandSender, TabExecutor}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.jdk.CollectionConverters._
 
-case class MapSaverCommand(messenger: Messenger, subCommands: Map[String, BaseCommand]) extends TabExecutor {
+case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])
+    extends TabExecutor {
   override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean =
-    onCommand(CommandContext(sender, args.toList, subCommands))
+    onCommand(CommandContext(sender, args.toList, subCommands, config))
 
   def onCommand(commandContext: CommandContext): Boolean = {
     val command = getSubCommand(commandContext.args).getOrElse(HelpCommand)
@@ -18,7 +23,12 @@ case class MapSaverCommand(messenger: Messenger, subCommands: Map[String, BaseCo
     if (command.canExecute(commandContext)) {
       command
         .onCommand(messenger, CommandContext.shiftArgs(commandContext))
-        .handleError(Error.handleError(_, messenger, commandContext.sender))
+        .onComplete { tryResult =>
+          tryResult.toEither.leftMap[Error](UnexpectedError).flatten match {
+            case Left(error)          => Error.handleError(error, messenger, commandContext.sender)
+            case Right(maybeMessages) => maybeMessages.foreach(messenger.sendToSender(commandContext.sender))
+          }
+        }
     } else {
       messenger.sendError(commandContext.sender, _.permissionNotAllowed)
     }
@@ -31,7 +41,7 @@ case class MapSaverCommand(messenger: Messenger, subCommands: Map[String, BaseCo
       alias: String,
       args: Array[String]
   ): java.util.List[String] =
-    onTabComplete(CommandContext(sender, args.toList, subCommands)).asJava
+    onTabComplete(CommandContext(sender, args.toList, subCommands, config)).asJava
 
   def onTabComplete(commandContext: CommandContext): List[String] = commandContext.args match {
     case head :: Nil =>
@@ -54,12 +64,13 @@ case class MapSaverCommand(messenger: Messenger, subCommands: Map[String, BaseCo
 }
 
 object MapSaverCommand {
-  def apply(messenger: Messenger): MapSaverCommand =
+  def apply(messenger: Messenger, config: Config, mapRepository: MapRepository): MapSaverCommand =
     MapSaverCommand(
       messenger = messenger,
+      config = config,
       subCommands = Map(
         "help" -> HelpCommand,
-        "save" -> SaveCommand
+        "save" -> SaveCommand(mapRepository)
       )
     )
 }

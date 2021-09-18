@@ -1,11 +1,16 @@
 package fr.epicanard.mapsaver.commands
 
+import fr.epicanard.mapsaver.errors.MapSaverError
+import fr.epicanard.mapsaver.errors.MapSaverError.PlayerOnlyCommand
+import fr.epicanard.mapsaver.resources.config.Config
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 case class CommandContext(
     sender: CommandSender,
     args: List[String],
-    subCommands: Map[String, BaseCommand]
+    subCommands: Map[String, BaseCommand],
+    config: Config
 )
 
 object CommandContext {
@@ -15,6 +20,12 @@ object CommandContext {
       case _ :: tail => tail
       case Nil       => Nil
     },
-    subCommands = commandContext.subCommands
+    subCommands = commandContext.subCommands,
+    config = commandContext.config
   )
+
+  def getPlayer(commandContext: CommandContext): Either[MapSaverError, Player] = commandContext.sender match {
+    case player: Player => Right(player)
+    case _              => Left(PlayerOnlyCommand)
+  }
 }

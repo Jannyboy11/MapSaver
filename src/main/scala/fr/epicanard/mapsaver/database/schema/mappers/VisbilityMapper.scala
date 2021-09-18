@@ -1,11 +1,11 @@
-package fr.epicanard.mapsaver.database.schema
+package fr.epicanard.mapsaver.database.schema.mappers
 
 import enumeratum.SlickEnumSupport
 import fr.epicanard.mapsaver.models.map.Visibility
 import slick.jdbc.MySQLProfile
 import slick.relational.RelationalProfile
 
-object VisibilityMappers extends SlickEnumSupport {
+object VisibilityMapper extends SlickEnumSupport {
 
   val profile: RelationalProfile = MySQLProfile
 

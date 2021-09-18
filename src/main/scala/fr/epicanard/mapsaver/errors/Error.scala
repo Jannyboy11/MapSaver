@@ -1,6 +1,7 @@
 package fr.epicanard.mapsaver.errors
 
 import fr.epicanard.mapsaver.Messenger
+import fr.epicanard.mapsaver.models.map.Visibility
 import fr.epicanard.mapsaver.resources.language.ErrorMessages
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -14,10 +15,21 @@ sealed trait TechnicalError extends Error
 sealed trait MapSaverError extends Error
 
 object MapSaverError {
-  case object MapInHandNeeded extends MapSaverError
+  case object MapInHandNeeded                extends MapSaverError
+  case object MissingMapName                 extends MapSaverError
+  case object PlayerOnlyCommand              extends MapSaverError
+  case object AlreadySaved                   extends MapSaverError
+  case object NotTheOwner                    extends MapSaverError
+  case class WrongVisibility(actual: String) extends MapSaverError
 
   def getMessage(mapSaverError: MapSaverError)(errorMessages: ErrorMessages): String = mapSaverError match {
-    case MapInHandNeeded => errorMessages.mapInHandNeeded
+    case MapInHandNeeded   => errorMessages.mapInHandNeeded
+    case MissingMapName    => errorMessages.missingMapName
+    case PlayerOnlyCommand => errorMessages.playerOnlyCommand
+    case AlreadySaved      => errorMessages.alreadySaved
+    case NotTheOwner       => errorMessages.notTheOwner
+    case WrongVisibility(actual) =>
+      errorMessages.wrongVisibility.format(actual, Visibility.values.map(_.entryName).mkString(", "))
   }
 }
 
@@ -25,7 +37,7 @@ object TechnicalError {
   case class LoadConfigError(path: String, throwable: Throwable) extends TechnicalError
   case class DatabaseError(throwable: Throwable)                 extends TechnicalError
   case class ReflectionError(throwable: Throwable)               extends TechnicalError
-  case class UnexpectedError(message: String)                    extends TechnicalError
+  case class UnexpectedError(throwable: Throwable)               extends TechnicalError
   case class MissingMapRenderer(player: Player, mapId: Int)      extends TechnicalError
   case class InvalidMapMeta(player: Player)                      extends TechnicalError
 
@@ -42,7 +54,7 @@ object TechnicalError {
       s"Unable to retrieve the Renderer from the map $mapId of player ${player.getDisplayName}"
     case InvalidMapMeta(player) =>
       s"The itemMeta from the map of player ${player.getDisplayName} is not valid. Expected : MapMeta."
-    case UnexpectedError(message) => s"Unexpected error : $message"
+    case UnexpectedError(throwable) => s"Unexpected error : ${throwable.getMessage}"
   }
 
   private def getThrowable(technicalError: TechnicalError): Option[Throwable] = technicalError match {
@@ -51,7 +63,7 @@ object TechnicalError {
     case ReflectionError(throwable)    => Some(throwable)
     case MissingMapRenderer(_, _)      => None
     case InvalidMapMeta(_)             => None
-    case UnexpectedError(_)            => None
+    case UnexpectedError(throwable)    => Some(throwable)
   }
 }
 

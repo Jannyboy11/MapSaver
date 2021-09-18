@@ -7,15 +7,15 @@ import java.util.logging.Logger
 
 case class Messenger(prefix: String, language: Language, logger: Logger) {
   def sendError(sender: CommandSender, getMessage: ErrorMessages => String): Unit =
-    send(sender, s"&c${getMessage(language.errorMessages)}")
+    sendToSender(sender)(s"&c${getMessage(language.errorMessages)}")
 
   def sendHelp(sender: CommandSender, getMessage: Help => String): Unit =
-    send(sender, getMessage(language.help))
+    sendToSender(sender)(getMessage(language.help))
 
   def logWarn(message: String): Unit =
     logger.warning(message)
 
-  private def send(sender: CommandSender, message: String): Unit =
+  def sendToSender(sender: CommandSender)(message: String): Unit =
     sender.sendMessage(toColor(s"$prefix$message"))
 
   private def toColor(message: String): String =

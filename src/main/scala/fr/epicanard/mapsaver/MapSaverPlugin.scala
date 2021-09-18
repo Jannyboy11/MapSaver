@@ -4,19 +4,15 @@ import buildinfo.BuildInfo
 import cats.data.EitherT
 import fr.epicanard.mapsaver.commands.MapSaverCommand
 import fr.epicanard.mapsaver.database.MapRepository
-import fr.epicanard.mapsaver.resources.config.Config._
 import fr.epicanard.mapsaver.errors.TechnicalError
 import fr.epicanard.mapsaver.resources.ResourceLoader.extractAndLoadResource
+import fr.epicanard.mapsaver.resources.config.Config._
 import fr.epicanard.mapsaver.resources.language.Language
-import xyz.janboerman.scalaloader.plugin.ScalaPlugin
-import xyz.janboerman.scalaloader.plugin.ScalaPluginDescription
-import xyz.janboerman.scalaloader.plugin.description.Scala
-import xyz.janboerman.scalaloader.plugin.description.ScalaVersion
+import xyz.janboerman.scalaloader.plugin.description.{Scala, ScalaVersion}
+import xyz.janboerman.scalaloader.plugin.{ScalaPlugin, ScalaPluginDescription}
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 @Scala(version = ScalaVersion.v2_13_6)
 object MapSaverPlugin
@@ -41,7 +37,7 @@ object MapSaverPlugin
       database      = MapRepository.buildDatabase(config.storage)
       mapRepository = new MapRepository(logger, database)
       _ <- EitherT(mapRepository.initDatabase())
-      mapSaverCommand = MapSaverCommand(messenger)
+      mapSaverCommand = MapSaverCommand(messenger, config, mapRepository)
       _               = getCommand("mapsaver").setExecutor(mapSaverCommand)
     } yield ()).value
 

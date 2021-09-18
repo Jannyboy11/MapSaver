@@ -5,9 +5,9 @@ import io.circe.generic.extras.ConfiguredJsonCodec
 
 @ConfiguredJsonCodec
 case class InfoMessages(
-    creatingNewMap: String,
-    updatingExistingMap: String,
-    associationNewMap: String,
+    newMapCreated: String,
+    existingMapUpdated: String,
+    newMapAssociated: String,
     playerNoSavedMap: String
 )
 

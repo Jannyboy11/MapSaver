@@ -22,9 +22,9 @@ ErrorMessages:
   PageNumberNotValid: "&cLe numéro de page n'est pas valide"
   UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails."
 InfoMessages:
-  CreatingNewMap: "Création d'une nouvelle carte"
-  UpdatingExistingMap: "Mise à jour d'une carte existante"
-  AssociationNewMap: "Association d'une nouvelle carte"
+  NewMapCreated: "Votre nouvelle carte est sauvegardée"
+  ExistingMapUpdated: "Votre carte a été mise à jour"
+  NewMapAssociated: "Cette carte existante vous a été associée"
   PlayerNoSavedMap: "Ce joueur n'a pas de cartes sauvegardées"
 MapInfo:
   Name: "Nom"

@@ -1,7 +1,7 @@
 package fr.epicanard.mapsaver.database.schema
 
 import fr.epicanard.mapsaver.models.map.ServerMap
-import slick.jdbc.MySQLProfile.api._
+import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 
 class ServerMaps(tag: Tag) extends Table[ServerMap](tag, "server_maps") {
   def lockedId   = column[Int]("locked_id")

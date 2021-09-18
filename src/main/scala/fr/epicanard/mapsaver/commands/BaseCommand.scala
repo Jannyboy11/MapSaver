@@ -1,13 +1,15 @@
 package fr.epicanard.mapsaver.commands
 
 import fr.epicanard.mapsaver.errors.Error
-import fr.epicanard.mapsaver.{Messenger, Permission}
 import fr.epicanard.mapsaver.resources.language.Help
+import fr.epicanard.mapsaver.{Messenger, Permission}
+
+import scala.concurrent.Future
 
 abstract class BaseCommand(permission: Option[Permission]) {
   def helpMessage(help: Help): String
 
-  def onCommand(messenger: Messenger, commandContext: CommandContext): Either[Error, Unit]
+  def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Option[String]]]
 
   def onTabComplete(commandContext: CommandContext): List[String]
 
