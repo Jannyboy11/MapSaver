@@ -3,11 +3,14 @@ package fr.epicanard.mapsaver.database
 import cats.data.{EitherT, OptionT}
 import cats.syntax.either._
 import com.rms.miu.slickcats.DBIOInstances._
+import fr.epicanard.mapsaver.context.SyncContext
+import fr.epicanard.mapsaver.context.SyncContext._
 import fr.epicanard.mapsaver.database.queries.{DataMapQueries, PlayerMapQueries, ServerMapQueries}
 import fr.epicanard.mapsaver.database.schema.{DataMaps, PlayerMaps, ServerMaps}
 import fr.epicanard.mapsaver.errors.MapSaverError.{AlreadySaved, NotTheOwner}
 import fr.epicanard.mapsaver.errors.TechnicalError.DatabaseError
-import fr.epicanard.mapsaver.errors.{Error, MapSaverError, TechnicalError}
+import fr.epicanard.mapsaver.errors.{Error, TechnicalError}
+import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
 import fr.epicanard.mapsaver.models.map.MapCreationStatus.{Associated, Created}
 import fr.epicanard.mapsaver.models.map._
 import fr.epicanard.mapsaver.resources.config.Storage
@@ -21,7 +24,7 @@ import scala.util.Try
 class MapRepository(
     log: Logger,
     db: Database
-)(implicit executionContext: ExecutionContext) {
+)(implicit executionContext: ExecutionContext, syncContext: SyncContext) {
 
   implicitly(executionContext)
 
@@ -57,29 +60,31 @@ class MapRepository(
       server <- ServerMapQueries.selectByMapId(mapToSave.id, mapToSave.server)
       result <- server match {
         case Some(serverMap) => createNewPlayerMap(mapToSave, serverMap)
-        case None            => createNewMap(mapToSave).map(_ => Either.right(Created))
+        case None            => createNewMap(mapToSave)
       }
     } yield result).transactionally
 
-    db.run(exec)
+    db.run(exec).transformWith(MapRepository.handleErrors(_).map(_.flatten))
   }
 
-  private def createNewMap(mapToSave: MapToSave): DBIO[Unit] = for {
-    dataId <- DataMapQueries.insert(mapToSave.bytes)
-    _      <- ServerMapQueries.insert(ServerMap.fromMapToSave(mapToSave, dataId, 42))
-    _      <- PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, dataId))
-  } yield ()
+  private def createNewMap(mapToSave: MapToSave): DBIO[Either[Error, MapCreationStatus]] =
+    (for {
+      lockedId <- EitherT(sync(() => MapViewBuilder.newLockedWithColors(mapToSave.bytes))).map(_.getId)
+      dataId   <- EitherT.right[Error](DataMapQueries.insert(mapToSave.bytes))
+      _        <- EitherT.right[Error](ServerMapQueries.insert(ServerMap.fromMapToSave(mapToSave, dataId, lockedId)))
+      _        <- EitherT.right[Error](PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, dataId)))
+    } yield Created).value
 
   private def createNewPlayerMap(
       mapToSave: MapToSave,
       serverMap: ServerMap
-  ): DBIO[Either[MapSaverError, MapCreationStatus]] =
+  ): DBIO[Either[Error, MapCreationStatus]] =
     (for {
       _ <- OptionT(PlayerMapQueries.selectByDataId(serverMap.dataId))
         .toLeft(())
         .leftMap(playerMap => if (playerMap.playerUuid == mapToSave.owner) AlreadySaved else NotTheOwner)
-      _ <- EitherT.right[MapSaverError](PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, serverMap.dataId)))
-      _ <- EitherT.right[MapSaverError](DataMapQueries.update(serverMap.dataId, mapToSave.bytes))
+      _ <- EitherT.right[Error](PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, serverMap.dataId)))
+      _ <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToSave.bytes))
     } yield Associated).value
 }
 

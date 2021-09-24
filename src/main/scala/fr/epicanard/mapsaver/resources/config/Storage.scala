@@ -14,7 +14,7 @@ object Storage extends CapitalizeConfiguration {
   def toProperties(storage: Storage): Map[String, String] = Map(
     "user"              -> storage.connection.user,
     "password"          -> storage.connection.password,
-    "useSSL"            -> storage.connection.useSSL.toString().toLowerCase(),
+    "useSSL"            -> storage.connection.useSSL.toString.toLowerCase(),
     "driver"            -> storage.`type`.driver,
     "useUnicode"        -> "true",
     "characterEncoding" -> "UTF-8",

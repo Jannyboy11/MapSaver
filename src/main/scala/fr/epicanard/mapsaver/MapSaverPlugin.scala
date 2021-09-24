@@ -3,6 +3,7 @@ package fr.epicanard.mapsaver
 import buildinfo.BuildInfo
 import cats.data.EitherT
 import fr.epicanard.mapsaver.commands.MapSaverCommand
+import fr.epicanard.mapsaver.context.SyncContext
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.TechnicalError
 import fr.epicanard.mapsaver.resources.ResourceLoader.extractAndLoadResource
@@ -20,6 +21,7 @@ object MapSaverPlugin
       new ScalaPluginDescription(BuildInfo.name, BuildInfo.version)
     ) {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  implicit val sc: SyncContext      = SyncContext(this)
 
   override def onEnable(): Unit =
     initPlugin(this).onComplete {

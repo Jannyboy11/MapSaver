@@ -38,7 +38,7 @@ object TechnicalError {
   case class DatabaseError(throwable: Throwable)                 extends TechnicalError
   case class ReflectionError(throwable: Throwable)               extends TechnicalError
   case class UnexpectedError(throwable: Throwable)               extends TechnicalError
-  case class MissingMapRenderer(player: Player, mapId: Int)      extends TechnicalError
+  case class MissingMapRenderer(mapId: Int)                      extends TechnicalError
   case class InvalidMapMeta(player: Player)                      extends TechnicalError
 
   def logError(technicalError: TechnicalError, logger: Logger): Unit = {
@@ -50,8 +50,8 @@ object TechnicalError {
     case LoadConfigError(path, _) => s"Can't load file: $path"
     case DatabaseError(_)         => s"Error with database"
     case ReflectionError(_)       => s"Unexpected error with reflection"
-    case MissingMapRenderer(player, mapId) =>
-      s"Unable to retrieve the Renderer from the map $mapId of player ${player.getDisplayName}"
+    case MissingMapRenderer(mapId) =>
+      s"Unable to retrieve the Renderer from the map $mapId"
     case InvalidMapMeta(player) =>
       s"The itemMeta from the map of player ${player.getDisplayName} is not valid. Expected : MapMeta."
     case UnexpectedError(throwable) => s"Unexpected error : ${throwable.getMessage}"
@@ -61,7 +61,7 @@ object TechnicalError {
     case LoadConfigError(_, throwable) => Some(throwable)
     case DatabaseError(throwable)      => Some(throwable)
     case ReflectionError(throwable)    => Some(throwable)
-    case MissingMapRenderer(_, _)      => None
+    case MissingMapRenderer(_)         => None
     case InvalidMapMeta(_)             => None
     case UnexpectedError(throwable)    => Some(throwable)
   }
