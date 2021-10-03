@@ -1,8 +1,8 @@
 package fr.epicanard.mapsaver.database.queries
 
+import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.schema.ServerMaps
 import fr.epicanard.mapsaver.models.map.ServerMap
-import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 
 object ServerMapQueries {
   def selectByMapId(mapId: Int, serverName: String): DBIO[Option[ServerMap]] =

@@ -5,18 +5,21 @@ import cats.syntax.either._
 import com.rms.miu.slickcats.DBIOInstances._
 import fr.epicanard.mapsaver.context.SyncContext
 import fr.epicanard.mapsaver.context.SyncContext._
+import fr.epicanard.mapsaver.database.MapRepository.run
+import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.queries.{DataMapQueries, PlayerMapQueries, ServerMapQueries}
 import fr.epicanard.mapsaver.database.schema.{DataMaps, PlayerMaps, ServerMaps}
 import fr.epicanard.mapsaver.errors.MapSaverError.{AlreadySaved, NotTheOwner}
 import fr.epicanard.mapsaver.errors.TechnicalError.DatabaseError
 import fr.epicanard.mapsaver.errors.{Error, TechnicalError}
 import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
+import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map.MapCreationStatus.{Associated, Created}
 import fr.epicanard.mapsaver.models.map._
 import fr.epicanard.mapsaver.resources.config.Storage
-import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.meta.MTable
 
+import java.util.UUID
 import java.util.logging.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -35,7 +38,7 @@ class MapRepository(
       PlayerMaps
     ).map(maps => (maps.baseTableRow.tableName, maps.schema)).toMap
 
-    db.run(
+    run(db) {
       MTable
         .getTables("%")
         .flatMap { existingTables =>
@@ -52,7 +55,7 @@ class MapRepository(
           }
         }
         .transactionally
-    ).transformWith(MapRepository.handleErrors)
+    }
   }
 
   def saveMap(mapToSave: MapToSave): Future[Either[Error, MapCreationStatus]] = {
@@ -64,7 +67,18 @@ class MapRepository(
       }
     } yield result).transactionally
 
-    db.run(exec).transformWith(MapRepository.handleErrors(_).map(_.flatten))
+    run(db)(exec).map(_.flatten)
+  }
+
+  def countPlayerMaps(playerUUID: UUID, restrictVisibility: Option[Visibility]): Future[Either[Error, Int]] =
+    run(db)(PlayerMapQueries.countForPlayer(playerUUID, restrictVisibility))
+
+  def listPlayerMaps(
+      pageable: Pageable,
+      restrictVisibility: Option[Visibility]
+  ): Future[Either[Error, List[PlayerMap]]] = {
+    val s = PlayerMapQueries.listForPlayer(pageable, restrictVisibility)
+    run(db)(s).map(_.map(_.toList))
   }
 
   private def createNewMap(mapToSave: MapToSave): DBIO[Either[Error, MapCreationStatus]] =
@@ -92,6 +106,9 @@ object MapRepository {
   def buildDatabase(storage: Storage): Database =
     Database.forURL(Storage.buildUrl(storage), Storage.toProperties(storage))
 
-  def handleErrors[T](result: Try[T]): Future[Either[TechnicalError, T]] =
+  private def handleErrors[T](result: Try[T]): Future[Either[TechnicalError, T]] =
     Future.successful(result.toEither.leftMap(DatabaseError))
+
+  def run[T](db: Database)(exec: DBIO[T])(implicit ec: ExecutionContext): Future[Either[TechnicalError, T]] =
+    db.run(exec).transformWith(handleErrors)
 }

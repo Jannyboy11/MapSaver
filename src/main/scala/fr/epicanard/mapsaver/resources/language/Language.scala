@@ -13,7 +13,7 @@ case class Language(
     mapInfo: MapInfo,
     list: List,
     pagination: Pagination,
-    visibility: Map[Visibility, String]
+    visibilities: Visibilities
 )
 
 object Language extends CapitalizeConfiguration {

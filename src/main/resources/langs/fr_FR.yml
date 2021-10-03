@@ -9,7 +9,7 @@ Help:
   List: "&6/mapsaver list [joueur] [page] &f - Permet de lister tous les cartes"
   Info: "&6/mapsaver info [nom_carte] [joueur] &f - Affiche les détails d'une carte ou de celle en main"
 ErrorMessages:
-  PermissionNotAllowed: "&cVous n'êtes pas autorisé à faire cette action"
+  PermissionDenied: "&cVous n'êtes pas autorisé à faire cette action"
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
   MapInHandNeeded: "&cVous devez avoir une carte rempli en main"
   MissingMapName: "&cLe nom de carte est manquant"
@@ -19,7 +19,7 @@ ErrorMessages:
   NotTheOriginal: "&cCette carte n'est pas l'originale"
   AlreadySaved: "&cVous avez déjà enregistré cette carte.\n&fUtilises &6/mapsaver update&f pour mettre à jour cette carte"
   WrongVisibility: "&cMauvaise visibilité : %s. Attendue : %s"
-  PageNumberNotValid: "&cLe numéro de page n'est pas valide"
+  InvalidPageNumber: "&cLe numéro de page n'est pas valide"
   UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails."
 InfoMessages:
   NewMapCreated: "Votre nouvelle carte est sauvegardée"
@@ -34,12 +34,12 @@ MapInfo:
   CopyMaps: "Copies verrouillées"
   Actions: "Actions"
 List:
-  ListMaps: "Liste des cartes de &6%s&f :"
+  ListMaps: "Liste des cartes de &6{player}&f :"
   InfoHover: "Afficher les détails de cette carte"
   ImportHover: "Importer cette carte"
 Pagination:
   PreviousPageHover: "Page précédente"
   NextPageHover: "Page suivante"
-Visibility:
-  PUBLIC: "Publique"
-  PRIVATE: "Privée"
+Visibilities:
+  Public: "Publique"
+  Private: "Privée"

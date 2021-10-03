@@ -6,6 +6,7 @@ import fr.epicanard.mapsaver.commands.MapSaverCommand
 import fr.epicanard.mapsaver.context.SyncContext
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.TechnicalError
+import fr.epicanard.mapsaver.message.Messenger
 import fr.epicanard.mapsaver.resources.ResourceLoader.extractAndLoadResource
 import fr.epicanard.mapsaver.resources.config.Config._
 import fr.epicanard.mapsaver.resources.language.Language

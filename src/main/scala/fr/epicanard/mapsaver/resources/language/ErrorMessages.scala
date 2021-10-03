@@ -5,7 +5,7 @@ import io.circe.generic.extras.ConfiguredJsonCodec
 
 @ConfiguredJsonCodec
 case class ErrorMessages(
-    permissionNotAllowed: String,
+    permissionDenied: String,
     playerOnlyCommand: String,
     mapInHandNeeded: String,
     missingMapName: String,
@@ -15,7 +15,7 @@ case class ErrorMessages(
     notTheOriginal: String,
     alreadySaved: String,
     wrongVisibility: String,
-    pageNumberNotValid: String,
+    invalidPageNumber: String,
     unexpectedError: String
 )
 

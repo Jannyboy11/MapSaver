@@ -1,6 +1,6 @@
 package fr.epicanard.mapsaver.commands
 
-import fr.epicanard.mapsaver.errors.MapSaverError
+import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.MapSaverError.PlayerOnlyCommand
 import fr.epicanard.mapsaver.resources.config.Config
 import org.bukkit.command.CommandSender
@@ -24,8 +24,13 @@ object CommandContext {
     config = commandContext.config
   )
 
-  def getPlayer(commandContext: CommandContext): Either[MapSaverError, Player] = commandContext.sender match {
+  def getPlayer(commandContext: CommandContext): Either[Error, Player] = commandContext.sender match {
     case player: Player => Right(player)
     case _              => Left(PlayerOnlyCommand)
+  }
+
+  def getPlayerOpt(commandContext: CommandContext): Option[Player] = commandContext.sender match {
+    case player: Player => Some(player)
+    case _              => None
   }
 }

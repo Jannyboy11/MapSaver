@@ -1,6 +1,6 @@
 package fr.epicanard.mapsaver.errors
 
-import fr.epicanard.mapsaver.Messenger
+import fr.epicanard.mapsaver.message.Messenger
 import fr.epicanard.mapsaver.models.map.Visibility
 import fr.epicanard.mapsaver.resources.language.ErrorMessages
 import org.bukkit.command.CommandSender
@@ -20,6 +20,8 @@ object MapSaverError {
   case object PlayerOnlyCommand              extends MapSaverError
   case object AlreadySaved                   extends MapSaverError
   case object NotTheOwner                    extends MapSaverError
+  case object InvalidPageNumber              extends MapSaverError
+  case object PermissionDenied               extends MapSaverError
   case class WrongVisibility(actual: String) extends MapSaverError
 
   def getMessage(mapSaverError: MapSaverError)(errorMessages: ErrorMessages): String = mapSaverError match {
@@ -28,6 +30,8 @@ object MapSaverError {
     case PlayerOnlyCommand => errorMessages.playerOnlyCommand
     case AlreadySaved      => errorMessages.alreadySaved
     case NotTheOwner       => errorMessages.notTheOwner
+    case InvalidPageNumber => errorMessages.permissionDenied
+    case PermissionDenied  => errorMessages.invalidPageNumber
     case WrongVisibility(actual) =>
       errorMessages.wrongVisibility.format(actual, Visibility.values.map(_.entryName).mkString(", "))
   }
