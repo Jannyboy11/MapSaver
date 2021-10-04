@@ -6,11 +6,11 @@ import slick.jdbc.GetResult
 object PlayerMapMapper {
   implicit val playerMapGetResult: GetResult[PlayerMap] = GetResult[PlayerMap](rs =>
     PlayerMap(
-      UUIDMapper.uuidGetResult(rs),
-      rs.nextInt(),
-      rs.nextBoolean(),
-      VisibilityMapper.visibilityGetResult(rs),
-      rs.nextString()
+      playerUuid = UUIDMapper.uuidGetResult(rs),
+      dataId = rs.nextInt(),
+      owner = rs.nextBoolean(),
+      visibility = VisibilityMapper.visibilityGetResult(rs),
+      name = rs.nextString()
     )
   )
 }

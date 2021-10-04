@@ -1,5 +1,6 @@
 package fr.epicanard.mapsaver.database.queries
 
+import fr.epicanard.mapsaver.database.SQLActionBuilderExt._
 import fr.epicanard.mapsaver.database.mappers.PlayerMapMapper._
 import fr.epicanard.mapsaver.database.mappers.UUIDMapper._
 import fr.epicanard.mapsaver.database.mappers.VisibilityMapper._
@@ -7,7 +8,6 @@ import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.schema.PlayerMaps
 import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map.{PlayerMap, Visibility}
-import fr.epicanard.mapsaver.database.SQLActionBuilderExt._
 
 import java.util.UUID
 
@@ -19,11 +19,11 @@ object PlayerMapQueries {
   def insert(playerMap: PlayerMap): DBIO[Int] = PlayerMaps += playerMap
 
   def countForPlayer(playerUUID: UUID, restrictVisibility: Option[Visibility]): DBIO[Int] =
-    PlayerMaps
-      .filter(_.playerUuid === playerUUID)
-      .filterOpt(restrictVisibility) { case (row, vis) => row.visibility === vis }
-      .length
-      .result
+    (sql"""
+      SELECT count(*) FROM player_maps 
+      WHERE `player_uuid` = $playerUUID
+      """
+      +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[Int].head
 
   def listForPlayer(
       pageable: Pageable,
@@ -41,5 +41,21 @@ object PlayerMapQueries {
       LIMIT $start,${pageable.pageSize}
       """).as[PlayerMap]
   }
+
+  def selectPlayerMap(
+      owner: UUID,
+      dataId: Int,
+      restrictVisibility: Option[Visibility]
+  ): DBIO[Option[PlayerMap]] =
+    (sql"""SELECT * FROM player_maps WHERE player_uuid = $owner AND data_id = $dataId"""
+      +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[PlayerMap].headOption
+
+  def selectPlayerMapWithName(
+      owner: UUID,
+      mapName: String,
+      restrictVisibility: Option[Visibility]
+  ): DBIO[Option[PlayerMap]] =
+    (sql"""SELECT * FROM player_maps WHERE `player_uuid` = $owner AND name = $mapName"""
+      +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[PlayerMap].headOption
 
 }

@@ -9,7 +9,7 @@ import fr.epicanard.mapsaver.database.MapRepository.run
 import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.queries.{DataMapQueries, PlayerMapQueries, ServerMapQueries}
 import fr.epicanard.mapsaver.database.schema.{DataMaps, PlayerMaps, ServerMaps}
-import fr.epicanard.mapsaver.errors.MapSaverError.{AlreadySaved, NotTheOwner}
+import fr.epicanard.mapsaver.errors.MapSaverError.{AlreadySaved, MissingMapOrNotPublic, NotTheOwner}
 import fr.epicanard.mapsaver.errors.TechnicalError.DatabaseError
 import fr.epicanard.mapsaver.errors.{Error, TechnicalError}
 import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
@@ -79,6 +79,39 @@ class MapRepository(
   ): Future[Either[Error, List[PlayerMap]]] = {
     val s = PlayerMapQueries.listForPlayer(pageable, restrictVisibility)
     run(db)(s).map(_.map(_.toList))
+  }
+
+  def getMapInfo(
+      owner: UUID,
+      restrictVisibility: Option[Visibility],
+      mapId: Int,
+      serverName: String
+  ): Future[Either[Error, PlayerServerMaps]] = {
+    val requests = (for {
+      original   <- OptionT(ServerMapQueries.selectOriginalMap(mapId, serverName))
+      serverMaps <- OptionT.liftF(ServerMapQueries.selectWithDataId(original.dataId))
+      playerMap  <- OptionT(PlayerMapQueries.selectPlayerMap(owner, original.dataId, restrictVisibility))
+    } yield PlayerServerMaps(playerMap, original, serverMaps.toList))
+      .toRight(MissingMapOrNotPublic)
+      .value
+      .transactionally
+    run(db)(requests).map(_.flatten)
+  }
+
+  def getMapInfo(
+      owner: UUID,
+      restrictVisibility: Option[Visibility],
+      mapName: String
+  ): Future[Either[Error, PlayerServerMaps]] = {
+    val requests = (for {
+      playerMap  <- OptionT(PlayerMapQueries.selectPlayerMapWithName(owner, mapName, restrictVisibility))
+      serverMaps <- OptionT.liftF(ServerMapQueries.selectWithDataId(playerMap.dataId))
+      original   <- OptionT.fromOption(serverMaps.find(_.originalId.isDefined))
+    } yield PlayerServerMaps(playerMap, original, serverMaps.toList))
+      .toRight(MissingMapOrNotPublic)
+      .value
+      .transactionally
+    run(db)(requests).map(_.flatten)
   }
 
   private def createNewMap(mapToSave: MapToSave): DBIO[Either[Error, MapCreationStatus]] =

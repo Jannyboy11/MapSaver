@@ -70,7 +70,8 @@ object MapSaverCommand {
       subCommands = Map(
         "help" -> HelpCommand,
         "save" -> SaveCommand(mapRepository),
-        "list" -> ListCommand(mapRepository)
+        "list" -> ListCommand(mapRepository),
+        "info" -> InfoCommand(mapRepository)
       )
     )
 }

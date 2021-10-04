@@ -10,15 +10,14 @@ import fr.epicanard.mapsaver.message.Component._
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.Replacer._
 import fr.epicanard.mapsaver.message.{Component, Message, Messenger}
-import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map.Visibility.{Private, Public}
 import fr.epicanard.mapsaver.models.map.{PlayerMap, Visibility}
+import fr.epicanard.mapsaver.models.{Pageable, Player}
 import fr.epicanard.mapsaver.resources.language.{Help, Language, Visibilities}
 import net.md_5.bungee.api.ChatColor
+import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
-import org.bukkit.{Bukkit, OfflinePlayer}
 
-import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -94,9 +93,8 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
 
   private case class ListArgs(player: OfflinePlayer, page: Int)
   private object ListArgs {
-    @nowarn
     def apply(name: String, page: Int): ListArgs = ListArgs(
-      player = Bukkit.getServer.getOfflinePlayer(name),
+      player = Player.getOfflinePlayer(name),
       page = if (page <= 0) 1 else page
     )
   }

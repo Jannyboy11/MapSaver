@@ -22,16 +22,18 @@ object MapSaverError {
   case object NotTheOwner                    extends MapSaverError
   case object InvalidPageNumber              extends MapSaverError
   case object PermissionDenied               extends MapSaverError
+  case object MissingMapOrNotPublic          extends MapSaverError
   case class WrongVisibility(actual: String) extends MapSaverError
 
   def getMessage(mapSaverError: MapSaverError)(errorMessages: ErrorMessages): String = mapSaverError match {
-    case MapInHandNeeded   => errorMessages.mapInHandNeeded
-    case MissingMapName    => errorMessages.missingMapName
-    case PlayerOnlyCommand => errorMessages.playerOnlyCommand
-    case AlreadySaved      => errorMessages.alreadySaved
-    case NotTheOwner       => errorMessages.notTheOwner
-    case InvalidPageNumber => errorMessages.permissionDenied
-    case PermissionDenied  => errorMessages.invalidPageNumber
+    case MapInHandNeeded       => errorMessages.mapInHandNeeded
+    case MissingMapName        => errorMessages.missingMapName
+    case PlayerOnlyCommand     => errorMessages.playerOnlyCommand
+    case AlreadySaved          => errorMessages.alreadySaved
+    case NotTheOwner           => errorMessages.notTheOwner
+    case InvalidPageNumber     => errorMessages.permissionDenied
+    case PermissionDenied      => errorMessages.invalidPageNumber
+    case MissingMapOrNotPublic => errorMessages.missingMapOrNotPublic
     case WrongVisibility(actual) =>
       errorMessages.wrongVisibility.format(actual, Visibility.values.map(_.entryName).mkString(", "))
   }
@@ -44,6 +46,7 @@ object TechnicalError {
   case class UnexpectedError(throwable: Throwable)               extends TechnicalError
   case class MissingMapRenderer(mapId: Int)                      extends TechnicalError
   case class InvalidMapMeta(player: Player)                      extends TechnicalError
+  case class InvalidMapView(player: Player)                      extends TechnicalError
 
   def logError(technicalError: TechnicalError, logger: Logger): Unit = {
     logger.severe(getMessage(technicalError))
@@ -58,6 +61,8 @@ object TechnicalError {
       s"Unable to retrieve the Renderer from the map $mapId"
     case InvalidMapMeta(player) =>
       s"The itemMeta from the map of player ${player.getDisplayName} is not valid. Expected : MapMeta."
+    case InvalidMapView(player) =>
+      s"The mapView from the map of player ${player.getDisplayName} is not valid. Expected : MapView."
     case UnexpectedError(throwable) => s"Unexpected error : ${throwable.getMessage}"
   }
 
@@ -67,6 +72,7 @@ object TechnicalError {
     case ReflectionError(throwable)    => Some(throwable)
     case MissingMapRenderer(_)         => None
     case InvalidMapMeta(_)             => None
+    case InvalidMapView(_)             => None
     case UnexpectedError(throwable)    => Some(throwable)
   }
 }

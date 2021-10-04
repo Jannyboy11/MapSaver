@@ -10,6 +10,9 @@ case class Message(components: List[Component]) {
   def +(component: Component): Message =
     Message(components ++ List(component))
 
+  def +?(maybeComponent: Option[Component]): Message =
+    maybeComponent.map(+).getOrElse(this)
+
 }
 
 object Message {
