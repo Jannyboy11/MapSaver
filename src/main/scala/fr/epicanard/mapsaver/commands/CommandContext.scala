@@ -14,6 +14,28 @@ case class CommandContext(
 )
 
 object CommandContext {
+  private val quoteArgsPattern = """(?:(?:["']+)([^"']*)?(?:["']+)|(\w*))(?:\s|$)""".r
+
+  def apply(
+      sender: CommandSender,
+      args: Array[String],
+      subCommands: Map[String, BaseCommand],
+      config: Config
+  ): CommandContext = {
+    val parsedArgs = quoteArgsPattern
+      .findAllMatchIn(args.mkString(" "))
+      .map(m => Option(m.group(1)).getOrElse(m.group(2)))
+      .filter(!_.isBlank)
+      .toList
+
+    CommandContext(
+      sender = sender,
+      args = parsedArgs,
+      subCommands = subCommands,
+      config = config
+    )
+  }
+
   def shiftArgs(commandContext: CommandContext): CommandContext = CommandContext(
     sender = commandContext.sender,
     args = commandContext.args match {

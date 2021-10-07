@@ -17,7 +17,7 @@ import scala.jdk.CollectionConverters._
 case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])
     extends TabExecutor {
   override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean =
-    onCommand(CommandContext(sender, args.toList, subCommands, config))
+    onCommand(CommandContext(sender, args, subCommands, config))
 
   def onCommand(commandContext: CommandContext): Boolean = {
     val command = getSubCommand(commandContext.args).getOrElse(HelpCommand)

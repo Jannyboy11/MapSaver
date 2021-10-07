@@ -109,7 +109,7 @@ object InfoCommand {
           "import",
           language.list.importHover,
           ChatColor.DARK_GREEN,
-          s"/mapsaver import ${playerServerMaps.playerMap.name} ${mapsWithOwner.owner.getName}"
+          s"""/mapsaver import "${playerServerMaps.playerMap.name}" ${mapsWithOwner.owner.getName}"""
         )
       ) ++
       msg"""&7-------------------"""

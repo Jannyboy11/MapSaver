@@ -72,10 +72,15 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
 
   def buildInfoImport(language: Language, sender: CommandSender, player: OfflinePlayer)(mapName: String): Component = {
     val maybeInfo = Option.when(Permission.InfoMap.isSetOn(sender, defaultSender = false))(
-      link("info", language.list.infoHover, ChatColor.DARK_GREEN, s"/mapsaver info $mapName ${player.getName}")
+      link("info", language.list.infoHover, ChatColor.DARK_GREEN, s"""/mapsaver info "$mapName" ${player.getName}""")
     )
     val maybeImport = Option.when(Permission.ImportMap.isSetOn(sender, defaultSender = false))(
-      link("import", language.list.importHover, ChatColor.DARK_GREEN, s"/mapsaver import $mapName ${player.getName}")
+      link(
+        "import",
+        language.list.importHover,
+        ChatColor.DARK_GREEN,
+        s"""/mapsaver import "$mapName" ${player.getName}"""
+      )
     )
 
     List(maybeInfo, maybeImport).flatten match {
