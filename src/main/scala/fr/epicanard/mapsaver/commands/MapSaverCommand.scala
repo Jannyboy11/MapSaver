@@ -68,10 +68,11 @@ object MapSaverCommand {
       messenger = messenger,
       config = config,
       subCommands = Map(
-        "help" -> HelpCommand,
-        "save" -> SaveCommand(mapRepository),
-        "list" -> ListCommand(mapRepository),
-        "info" -> InfoCommand(mapRepository)
+        "help"   -> HelpCommand,
+        "save"   -> SaveCommand(mapRepository),
+        "list"   -> ListCommand(mapRepository),
+        "info"   -> InfoCommand(mapRepository),
+        "update" -> UpdateCommand(mapRepository)
       )
     )
 }

@@ -20,6 +20,7 @@ object MapSaverError {
   case object PlayerOnlyCommand              extends MapSaverError
   case object AlreadySaved                   extends MapSaverError
   case object NotTheOwner                    extends MapSaverError
+  case object NotTheOriginal                 extends MapSaverError
   case object InvalidPageNumber              extends MapSaverError
   case object PermissionDenied               extends MapSaverError
   case object MissingMapOrNotPublic          extends MapSaverError
@@ -31,6 +32,7 @@ object MapSaverError {
     case PlayerOnlyCommand     => errorMessages.playerOnlyCommand
     case AlreadySaved          => errorMessages.alreadySaved
     case NotTheOwner           => errorMessages.notTheOwner
+    case NotTheOriginal        => errorMessages.notTheOriginal
     case InvalidPageNumber     => errorMessages.permissionDenied
     case PermissionDenied      => errorMessages.invalidPageNumber
     case MissingMapOrNotPublic => errorMessages.missingMapOrNotPublic

@@ -18,17 +18,17 @@ object BukkitMapBuilder {
     @nowarn
     def fromId(id: Int): MapView = Bukkit.getMap(id)
 
+    def updateMapColors(mapView: MapView, bytes: Array[Byte]): Either[Error, MapView] =
+      getRenderer(mapView).map { renderer =>
+        getColorsMap(renderer).map(Array.copy(bytes, 0, _, 0, bytes.length))
+        mapView
+      }
+
     private def newLocked: MapView = {
       val mapView = Bukkit.createMap(Bukkit.getWorlds.get(0))
       mapView.setLocked(true)
       mapView
     }
-
-    private def updateMapColors(mapView: MapView, bytes: Array[Byte]): Either[Error, MapView] =
-      getRenderer(mapView).map { renderer =>
-        getColorsMap(renderer).map(Array.copy(bytes, 0, _, 0, bytes.length))
-        mapView
-      }
 
     def getRenderer(mapView: MapView): Either[Error, MapRenderer] = {
       val renderers = mapView.getRenderers.asScala.toList

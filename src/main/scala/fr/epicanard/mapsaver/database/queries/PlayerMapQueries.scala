@@ -60,4 +60,11 @@ object PlayerMapQueries {
     (sql"""SELECT * FROM player_maps WHERE `player_uuid` = $owner AND name = $mapName"""
       +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[PlayerMap].headOption
 
+  def updateVisibility(
+      owner: UUID,
+      dataId: Int,
+      visibility: Visibility
+  ): DBIO[Int] =
+    sqlu"""UPDATE player_maps SET `visibility` = $visibility WHERE `player_uuid` = $owner AND data_id = $dataId"""
+
 }

@@ -1,6 +1,9 @@
 package fr.epicanard.mapsaver.database
 
+import cats.Applicative
 import cats.data.{EitherT, OptionT}
+import cats.syntax.bifunctor._
+import cats.syntax.functor._
 import cats.syntax.either._
 import com.rms.miu.slickcats.DBIOInstances._
 import fr.epicanard.mapsaver.context.SyncContext
@@ -9,12 +12,13 @@ import fr.epicanard.mapsaver.database.MapRepository.run
 import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.queries.{DataMapQueries, PlayerMapQueries, ServerMapQueries}
 import fr.epicanard.mapsaver.database.schema.{DataMaps, PlayerMaps, ServerMaps}
-import fr.epicanard.mapsaver.errors.MapSaverError.{AlreadySaved, MissingMapOrNotPublic, NotTheOwner}
+import fr.epicanard.mapsaver.errors.MapSaverError._
 import fr.epicanard.mapsaver.errors.TechnicalError.DatabaseError
 import fr.epicanard.mapsaver.errors.{Error, TechnicalError}
-import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
+import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder._
 import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map.MapCreationStatus.{Associated, Created}
+import fr.epicanard.mapsaver.models.map.MapUpdateStatus.ExistingMapUpdated
 import fr.epicanard.mapsaver.models.map._
 import fr.epicanard.mapsaver.resources.config.Storage
 import slick.jdbc.meta.MTable
@@ -28,8 +32,6 @@ class MapRepository(
     log: Logger,
     db: Database
 )(implicit executionContext: ExecutionContext, syncContext: SyncContext) {
-
-  implicitly(executionContext)
 
   def initDatabase(): Future[Either[TechnicalError, Unit]] = {
     val tables = List(
@@ -66,6 +68,21 @@ class MapRepository(
         case None            => createNewMap(mapToSave)
       }
     } yield result).transactionally
+
+    run(db)(exec).map(_.flatten)
+  }
+
+  def updateMap(mapToUpdate: MapToUpdate): Future[Either[Error, MapUpdateStatus]] = {
+    val exec = (for {
+      serverMap <- OptionT(ServerMapQueries.selectByMapId(mapToUpdate.id, mapToUpdate.server))
+        .toRight[Error](MissingMapOrNotPublic)
+      playerMap <- OptionT(PlayerMapQueries.selectByDataId(serverMap.dataId)).toRight[Error](MissingMapOrNotPublic)
+      _         <- EitherT.cond(playerMap.playerUuid == mapToUpdate.owner, (), NotTheOwner).leftWiden[Error]
+      _         <- EitherT.cond(serverMap.lockedId != mapToUpdate.id, (), NotTheOriginal).leftWiden[Error]
+      _         <- EitherT.right[Error](updateVisibilityIfNeeded(playerMap, mapToUpdate.visibility))
+      _         <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToUpdate.bytes))
+      _         <- EitherT.fromEither(updateMapColors(fromId(serverMap.lockedId), mapToUpdate.bytes))
+    } yield ExistingMapUpdated).value.transactionally
 
     run(db)(exec).map(_.flatten)
   }
@@ -114,9 +131,14 @@ class MapRepository(
     run(db)(requests).map(_.flatten)
   }
 
+  private def updateVisibilityIfNeeded(playerMap: PlayerMap, maybeVisibility: Option[Visibility]): DBIO[Unit] =
+    maybeVisibility
+      .map(PlayerMapQueries.updateVisibility(playerMap.playerUuid, playerMap.dataId, _).void)
+      .getOrElse(Applicative[DBIO].unit)
+
   private def createNewMap(mapToSave: MapToSave): DBIO[Either[Error, MapCreationStatus]] =
     (for {
-      lockedId <- EitherT(sync(() => MapViewBuilder.newLockedWithColors(mapToSave.bytes))).map(_.getId)
+      lockedId <- EitherT(sync(() => newLockedWithColors(mapToSave.bytes))).map(_.getId)
       dataId   <- EitherT.right[Error](DataMapQueries.insert(mapToSave.bytes))
       _        <- EitherT.right[Error](ServerMapQueries.insert(ServerMap.fromMapToSave(mapToSave, dataId, lockedId)))
       _        <- EitherT.right[Error](PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, dataId)))
