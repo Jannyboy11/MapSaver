@@ -47,8 +47,10 @@ object PlayerMapQueries {
       dataId: Int,
       restrictVisibility: Option[Visibility]
   ): DBIO[Option[PlayerMap]] =
-    (sql"""SELECT * FROM player_maps WHERE player_uuid = $owner AND data_id = $dataId"""
-      +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[PlayerMap].headOption
+    (sql"""SELECT * FROM player_maps WHERE data_id = $dataId"""
+      +? restrictVisibility.map(vis => sql" AND (player_uuid = $owner OR`visibility` = $vis) "))
+      .as[PlayerMap]
+      .headOption
 
   def selectPlayerMapWithName(
       owner: UUID,

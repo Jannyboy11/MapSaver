@@ -2,6 +2,7 @@ package fr.epicanard.mapsaver.commands
 
 import cats.data.EitherT
 import fr.epicanard.mapsaver.Permission
+import fr.epicanard.mapsaver.commands.SaveCommand.buildMapToSave
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.MapSaverError.{MissingMapName, WrongVisibility}
@@ -25,8 +26,9 @@ case class SaveCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
     } yield msg"$statusMsg").value
 
   def onTabComplete(commandContext: CommandContext): List[String] = Nil
-
-  def buildMapToSave(commandContext: CommandContext): Either[Error, MapToSave] =
+}
+object SaveCommand {
+  private def buildMapToSave(commandContext: CommandContext): Either[Error, MapToSave] =
     for {
       player     <- CommandContext.getPlayer(commandContext)
       mapName    <- commandContext.args.headOption.toRight(MissingMapName)

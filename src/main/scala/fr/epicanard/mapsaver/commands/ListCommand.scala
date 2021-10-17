@@ -3,6 +3,7 @@ package fr.epicanard.mapsaver.commands
 import cats.data.EitherT
 import fr.epicanard.mapsaver.Permission
 import fr.epicanard.mapsaver.commands.CommandContext.{getPlayer, getPlayerOpt}
+import fr.epicanard.mapsaver.commands.ListCommand.{buildMessage, parseArguments}
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.MapSaverError.InvalidPageNumber
@@ -46,7 +47,9 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
     } yield message).value
 
   def onTabComplete(commandContext: CommandContext): List[String] = Nil
+}
 
+object ListCommand {
   private def parseArguments(commandContext: CommandContext): Either[Error, ListArgs] =
     commandContext.args match {
       case Nil => getPlayer(commandContext).map(player => ListArgs(player, 1))
@@ -57,7 +60,7 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
       case name :: page :: _ => page.toIntOption.toRight[Error](InvalidPageNumber).map(ListArgs(name, _))
     }
 
-  def buildMessage(
+  private def buildMessage(
       playerMaps: List[PlayerMap],
       pageable: Pageable,
       language: Language,
@@ -70,7 +73,9 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
     } + pagination(pageable, language.pagination, s"/mapsaver list ${pageable.player.getName}")
   }
 
-  def buildInfoImport(language: Language, sender: CommandSender, player: OfflinePlayer)(mapName: String): Component = {
+  private def buildInfoImport(language: Language, sender: CommandSender, player: OfflinePlayer)(
+      mapName: String
+  ): Component = {
     val maybeInfo = Option.when(Permission.InfoMap.isSetOn(sender, defaultSender = false))(
       link("info", language.list.infoHover, ChatColor.DARK_GREEN, s"""/mapsaver info "$mapName" ${player.getName}""")
     )

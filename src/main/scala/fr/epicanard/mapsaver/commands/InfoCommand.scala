@@ -51,13 +51,14 @@ object InfoCommand {
   ): Future[Either[Error, MapsWithOwner]] =
     (for {
       player <- EitherT.fromEither[Future](getPlayer(commandContext))
-      restrictVisibility = Option.unless(!Permission.AdminInfoMap.isSetOn(player))(Visibility.Public)
+      restrictVisibility = Option.unless(Permission.AdminInfoMap.isSetOn(player))(Visibility.Public)
       mapView <- EitherT.fromEither[Future](MapExtractor.extractMapView(player))
       playerServerMaps <- EitherT(
         mapRepository
           .getMapInfo(player.getUniqueId, restrictVisibility, mapView.getId, commandContext.config.serverName)
       )
-    } yield MapsWithOwner(playerServerMaps, player)).value
+      owner = Player.getOfflinePlayer(playerServerMaps.playerMap.playerUuid)
+    } yield MapsWithOwner(playerServerMaps, owner)).value
 
   private def getInfoOfSender(
       mapRepository: MapRepository,
