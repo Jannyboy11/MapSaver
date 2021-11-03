@@ -1,4 +1,4 @@
-package fr.epicanard.mapsaver.models.map
+package fr.epicanard.mapsaver.models.map.status
 
 import fr.epicanard.mapsaver.resources.language.InfoMessages
 

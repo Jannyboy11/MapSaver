@@ -24,6 +24,7 @@ object MapSaverError {
   case object InvalidPageNumber              extends MapSaverError
   case object PermissionDenied               extends MapSaverError
   case object MissingMapOrNotPublic          extends MapSaverError
+  case object MissingDataMap                 extends MapSaverError
   case class WrongVisibility(actual: String) extends MapSaverError
 
   def getMessage(mapSaverError: MapSaverError)(errorMessages: ErrorMessages): String = mapSaverError match {
@@ -36,6 +37,7 @@ object MapSaverError {
     case InvalidPageNumber     => errorMessages.permissionDenied
     case PermissionDenied      => errorMessages.invalidPageNumber
     case MissingMapOrNotPublic => errorMessages.missingMapOrNotPublic
+    case MissingDataMap        => errorMessages.missingDataMap
     case WrongVisibility(actual) =>
       errorMessages.wrongVisibility.format(actual, Visibility.values.map(_.entryName).mkString(", "))
   }

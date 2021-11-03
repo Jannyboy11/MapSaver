@@ -9,7 +9,8 @@ import fr.epicanard.mapsaver.errors.MapSaverError.{MissingMapName, WrongVisibili
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
-import fr.epicanard.mapsaver.models.map.{MapCreationStatus, MapToSave, Visibility}
+import fr.epicanard.mapsaver.models.map.status.MapCreationStatus
+import fr.epicanard.mapsaver.models.map.{MapToSave, Visibility}
 import fr.epicanard.mapsaver.resources.language.Help
 
 import scala.concurrent.ExecutionContext.Implicits.global

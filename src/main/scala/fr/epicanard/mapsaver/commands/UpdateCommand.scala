@@ -9,13 +9,14 @@ import fr.epicanard.mapsaver.errors.MapSaverError.WrongVisibility
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
-import fr.epicanard.mapsaver.models.map.{MapToUpdate, MapUpdateStatus, Visibility}
+import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus
+import fr.epicanard.mapsaver.models.map.{MapToUpdate, Visibility}
 import fr.epicanard.mapsaver.resources.language.Help
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class UpdateCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.SaveMap)) {
+case class UpdateCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.UpdateMap)) {
   def helpMessage(help: Help): String = help.update
 
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =

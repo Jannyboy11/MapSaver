@@ -25,6 +25,7 @@ InfoMessages:
   NewMapCreated: "Votre nouvelle carte est sauvegardée"
   ExistingMapUpdated: "Votre carte a été mise à jour"
   NewMapAssociated: "Cette carte existante vous a été associée"
+  MapImported: "La carte a été importée correctement"
   PlayerNoSavedMap: "Ce joueur n'a pas de cartes sauvegardées"
 MapInfo:
   Name: "Nom"

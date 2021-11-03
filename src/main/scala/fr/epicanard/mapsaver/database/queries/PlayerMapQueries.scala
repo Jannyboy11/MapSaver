@@ -2,12 +2,13 @@ package fr.epicanard.mapsaver.database.queries
 
 import fr.epicanard.mapsaver.database.SQLActionBuilderExt._
 import fr.epicanard.mapsaver.database.mappers.PlayerMapMapper._
+import fr.epicanard.mapsaver.database.mappers.MapByNameMapper._
 import fr.epicanard.mapsaver.database.mappers.UUIDMapper._
 import fr.epicanard.mapsaver.database.mappers.VisibilityMapper._
 import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.schema.PlayerMaps
 import fr.epicanard.mapsaver.models.Pageable
-import fr.epicanard.mapsaver.models.map.{PlayerMap, Visibility}
+import fr.epicanard.mapsaver.models.map.{MapByName, PlayerMap, Visibility}
 
 import java.util.UUID
 
@@ -66,5 +67,18 @@ object PlayerMapQueries {
       visibility: Visibility
   ): DBIO[Int] =
     sqlu"""UPDATE player_maps SET `visibility` = $visibility WHERE `player_uuid` = $owner AND data_id = $dataId"""
+
+  def selectMapByName(
+      owner: UUID,
+      mapName: String,
+      serverName: String,
+      restrictVisibility: Option[Visibility]
+  ): DBIO[Option[MapByName]] =
+    (sql"""
+      SELECT player_maps.player_uuid, player_maps.data_id, player_maps.visibility, server_maps.locked_id, server_maps.server
+      FROM player_maps
+      LEFT JOIN server_maps ON player_maps.data_id = server_maps.data_id AND server_maps.server = $serverName
+      WHERE player_maps.name = $mapName AND player_uuid = $owner
+    """ +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[MapByName].headOption
 
 }

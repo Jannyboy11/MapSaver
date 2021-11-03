@@ -8,6 +8,7 @@ case class InfoMessages(
     newMapCreated: String,
     existingMapUpdated: String,
     newMapAssociated: String,
+    mapImported: String,
     playerNoSavedMap: String
 )
 

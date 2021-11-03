@@ -72,7 +72,8 @@ object MapSaverCommand {
         "save"   -> SaveCommand(mapRepository),
         "list"   -> ListCommand(mapRepository),
         "info"   -> InfoCommand(mapRepository),
-        "update" -> UpdateCommand(mapRepository)
+        "update" -> UpdateCommand(mapRepository),
+        "import" -> ImportCommand(mapRepository)
       )
     )
 }
