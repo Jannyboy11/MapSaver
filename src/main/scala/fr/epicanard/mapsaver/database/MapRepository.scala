@@ -1,6 +1,5 @@
 package fr.epicanard.mapsaver.database
 
-import cats.Applicative
 import cats.data.{EitherT, OptionT}
 import cats.syntax.bifunctor._
 import cats.syntax.either._
@@ -83,7 +82,6 @@ class MapRepository(
       playerMap <- EitherT.fromOptionF(PlayerMapQueries.selectByDataId(serverMap.dataId), MissingMapOrNotPublic)
       _         <- EitherT.cond(playerMap.playerUuid == mapToUpdate.owner, (), NotTheOwner).leftWiden[Error]
       _         <- EitherT.cond(serverMap.lockedId != mapToUpdate.id, (), NotTheOriginal).leftWiden[Error]
-      _         <- EitherT.right[Error](updateVisibilityIfNeeded(playerMap, mapToUpdate.visibility))
       _         <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToUpdate.bytes))
       _         <- EitherT.fromEither(updateMapColors(fromId(serverMap.lockedId), mapToUpdate.bytes))
     } yield ExistingMapUpdated).value.transactionally
@@ -167,11 +165,6 @@ class MapRepository(
       )
       _ <- EitherT.right[Error](ServerMapQueries.insert(serverMap))
     } yield mapView
-
-  private def updateVisibilityIfNeeded(playerMap: PlayerMap, maybeVisibility: Option[Visibility]): DBIO[Unit] =
-    maybeVisibility
-      .map(PlayerMapQueries.updateVisibility(playerMap.playerUuid, playerMap.dataId, _).void)
-      .getOrElse(Applicative[DBIO].unit)
 
   private def createNewMap(mapToSave: MapToSave): DBIO[Either[Error, MapCreationStatus]] =
     (for {

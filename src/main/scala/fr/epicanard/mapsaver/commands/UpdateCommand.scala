@@ -5,12 +5,11 @@ import fr.epicanard.mapsaver.Permission
 import fr.epicanard.mapsaver.commands.UpdateCommand.buildMapToUpdate
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
-import fr.epicanard.mapsaver.errors.MapSaverError.WrongVisibility
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
 import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus
-import fr.epicanard.mapsaver.models.map.{MapToUpdate, Visibility}
+import fr.epicanard.mapsaver.models.map.MapToUpdate
 import fr.epicanard.mapsaver.resources.language.Help
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,20 +31,13 @@ case class UpdateCommand(mapRepository: MapRepository) extends BaseCommand(Some(
 object UpdateCommand {
   private def buildMapToUpdate(commandContext: CommandContext): Either[Error, MapToUpdate] =
     for {
-      player          <- CommandContext.getPlayer(commandContext)
-      maybeVisibility <- parseVisibility(commandContext.args)
-      mapItem         <- MapExtractor.extractFromPlayer(player)
+      player  <- CommandContext.getPlayer(commandContext)
+      mapItem <- MapExtractor.extractFromPlayer(player)
       mapToSave = MapToUpdate(
         id = mapItem.id,
         server = commandContext.config.serverName,
         bytes = mapItem.bytes,
-        owner = player.getUniqueId,
-        visibility = maybeVisibility
+        owner = player.getUniqueId
       )
     } yield mapToSave
-
-  private def parseVisibility(args: List[String]): Either[Error, Option[Visibility]] = args match {
-    case head :: _ => Visibility.withNameInsensitiveOption(head).toRight(WrongVisibility(head)).map(Some(_))
-    case Nil       => Right(None)
-  }
 }

@@ -7,5 +7,4 @@ case class MapToUpdate(
     server: String,
     bytes: Array[Byte],
     owner: UUID,
-    visibility: Option[Visibility]
 )
