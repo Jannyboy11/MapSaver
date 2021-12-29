@@ -26,6 +26,8 @@ object Permission {
 
   case object InfoMap extends Permission("mapsaver.commands.info")
 
+  case object VisibilityMap extends Permission("mapsaver.commands.visibility")
+
   case object AdminReload extends Permission("mapsaver.admin.commands.reload")
 
   case object AdminImportMap extends Permission("mapsaver.admin.commands.import")
@@ -33,4 +35,6 @@ object Permission {
   case object AdminListMap extends Permission("mapsaver.admin.commands.list")
 
   case object AdminInfoMap extends Permission("mapsaver.admin.commands.info")
+
+  case object AdminVisibilityMap extends Permission("mapsaver.admin.commands.visibility")
 }

@@ -6,5 +6,5 @@ case class MapToUpdate(
     id: Int,
     server: String,
     bytes: Array[Byte],
-    owner: UUID,
+    owner: UUID
 )

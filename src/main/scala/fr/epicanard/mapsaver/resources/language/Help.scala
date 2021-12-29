@@ -13,7 +13,8 @@ case class Help(
     update: String,
     `import`: String,
     list: String,
-    info: String
+    info: String,
+    visibility: String
 )
 
 object Help extends CapitalizeConfiguration

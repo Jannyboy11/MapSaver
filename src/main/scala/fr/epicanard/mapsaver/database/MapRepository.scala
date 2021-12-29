@@ -20,9 +20,9 @@ import fr.epicanard.mapsaver.models.map._
 import fr.epicanard.mapsaver.models.map.status.MapCreationStatus.{Associated, Created}
 import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus.ExistingMapUpdated
 import fr.epicanard.mapsaver.models.map.status.{MapCreationStatus, MapUpdateStatus}
+import fr.epicanard.mapsaver.models.UpdateVisibility
 import fr.epicanard.mapsaver.resources.config.Storage
 import org.bukkit.map.MapView
-import slick.jdbc.meta.MTable
 
 import java.util.UUID
 import java.util.logging.Logger
@@ -42,11 +42,11 @@ class MapRepository(
     ).map(maps => (maps.baseTableRow.tableName, maps.schema)).toMap
 
     run(db) {
-      MTable
-        .getTables("%")
+      sql"""show tables"""
+        .as[String]
         .flatMap { existingTables =>
           val tablesToCreate = tables.keySet
-            .diff(existingTables.map(_.name.name).toSet)
+            .diff(existingTables.toSet)
             .map(name => (name, tables(name)))
             .toArray
 
@@ -54,6 +54,7 @@ class MapRepository(
             log.info(s"Creating tables [${tablesToCreate.map(_._1).mkString(", ")}] in database")
             tablesToCreate.map(_._2).reduceLeft(_ ++ _).create
           } else {
+            log.info(s"Database already up to date")
             DBIO.successful(())
           }
         }
@@ -152,6 +153,31 @@ class MapRepository(
         .transactionally
     run(db)(requests).map(_.flatten)
   }
+
+  def updateVisibility(update: UpdateVisibility): Future[Either[Error, Unit]] = {
+    val request = (for {
+      playerMap <- update.info match {
+        case UpdateVisibility.InfoMapId(mapId) => getPlayerMapFromMapId(mapId, update.server)
+        case UpdateVisibility.InfoMapName(mapName) =>
+          EitherT.fromOptionF(
+            PlayerMapQueries.selectPlayerMapWithName(update.owner, mapName, None),
+            MissingMapOrNotPublic
+          )
+      }
+      _ <- EitherT.cond(update.canUpdate(playerMap.playerUuid), (), NotTheOwner).leftWiden[Error]
+      _ <- EitherT.right[Error](PlayerMapQueries.updateVisibility(update.owner, playerMap.dataId, update.visibility))
+    } yield ()).value.transactionally
+    run(db)(request).map(_.flatten)
+  }
+
+  private def getPlayerMapFromMapId(mapId: Int, server: String): EitherT[DBIO, Error, PlayerMap] = for {
+    serverMap <- EitherT.fromOptionF(
+      ServerMapQueries.selectByMapId(mapId, server),
+      MissingMapOrNotPublic
+    )
+    playerMap <- EitherT.fromOptionF(PlayerMapQueries.selectByDataId(serverMap.dataId), MissingMapOrNotPublic)
+    _         <- EitherT.cond(serverMap.lockedId != mapId, (), NotTheOriginal).leftWiden[Error]
+  } yield playerMap
 
   private def createServerMapFromExisting(dataId: Int, serverName: String): EitherT[DBIO, Error, MapView] =
     for {
