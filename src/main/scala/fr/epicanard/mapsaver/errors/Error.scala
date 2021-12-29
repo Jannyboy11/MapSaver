@@ -34,8 +34,8 @@ object MapSaverError {
     case AlreadySaved          => errorMessages.alreadySaved
     case NotTheOwner           => errorMessages.notTheOwner
     case NotTheOriginal        => errorMessages.notTheOriginal
-    case InvalidPageNumber     => errorMessages.permissionDenied
-    case PermissionDenied      => errorMessages.invalidPageNumber
+    case InvalidPageNumber     => errorMessages.invalidPageNumber
+    case PermissionDenied      => errorMessages.permissionDenied
     case MissingMapOrNotPublic => errorMessages.missingMapOrNotPublic
     case MissingDataMap        => errorMessages.missingDataMap
     case WrongVisibility(actual) =>
