@@ -10,7 +10,9 @@ case class InfoMessages(
     newMapAssociated: String,
     mapImported: String,
     playerNoSavedMap: String,
-    visibilityMapUpdated: String
+    visibilityMapUpdated: String,
+    lockedMapUpdated: String,
+    unlockedMapUpdated: String
 )
 
 object InfoMessages extends CapitalizeConfiguration

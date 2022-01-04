@@ -13,8 +13,9 @@ class PlayerMaps(tag: Tag) extends Table[PlayerMap](tag, "player_maps") {
   def owner      = column[Boolean]("owner")
   def visibility = column[Visibility]("visibility", O.Length(20))
   def name       = column[String]("name", O.Length(256))
+  def locked     = column[Boolean]("locked")
 
-  def *        = (playerUuid, dataId, owner, visibility, name) <> (PlayerMap.tupled, PlayerMap.unapply)
+  def *        = (playerUuid, dataId, owner, visibility, name, locked) <> (PlayerMap.tupled, PlayerMap.unapply)
   def idx      = index("idx_playeruuid_name", (playerUuid, name), unique = true)
   def dataIdFk = foreignKey("player_data_id_fk", dataId, DataMaps)(_.id, onDelete = ForeignKeyAction.Cascade)
 }

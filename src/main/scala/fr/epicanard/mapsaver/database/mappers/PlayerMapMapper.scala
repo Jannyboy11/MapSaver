@@ -10,7 +10,8 @@ object PlayerMapMapper {
       dataId = rs.nextInt(),
       owner = rs.nextBoolean(),
       visibility = VisibilityMapper.visibilityGetResult(rs),
-      name = rs.nextString()
+      name = rs.nextString(),
+      locked = rs.nextBoolean()
     )
   )
 }

@@ -28,6 +28,10 @@ object Permission {
 
   case object VisibilityMap extends Permission("mapsaver.commands.visibility")
 
+  case object LockMap extends Permission("mapsaver.commands.lock")
+
+  case object UnlockMap extends Permission("mapsaver.commands.unlock")
+
   case object AdminReload extends Permission("mapsaver.admin.commands.reload")
 
   case object AdminImportMap extends Permission("mapsaver.admin.commands.import")

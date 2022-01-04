@@ -81,4 +81,10 @@ object PlayerMapQueries {
       WHERE player_maps.name = $mapName AND player_uuid = $owner
     """ +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[MapByName].headOption
 
+  def updateLocked(
+      owner: UUID,
+      dataId: Int,
+      locked: Boolean
+  ): DBIO[Int] =
+    sqlu"""UPDATE player_maps SET `locked` = $locked WHERE `player_uuid` = $owner AND data_id = $dataId"""
 }

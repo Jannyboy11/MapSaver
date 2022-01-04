@@ -112,7 +112,8 @@ object InfoCommand {
           ChatColor.DARK_GREEN,
           s"""/mapsaver import "${playerServerMaps.playerMap.name}" ${mapsWithOwner.owner.getName}"""
         )
-      ) ++
+      ) +?
+      Option.when(playerServerMaps.playerMap.locked)(Component(s"&c${mapInfo.locked}")) ++
       msg"""&7-------------------"""
   }
 }

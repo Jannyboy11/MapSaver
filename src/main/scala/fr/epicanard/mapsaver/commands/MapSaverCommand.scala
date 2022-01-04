@@ -74,7 +74,9 @@ object MapSaverCommand {
         "info"       -> InfoCommand(mapRepository),
         "update"     -> UpdateCommand(mapRepository),
         "import"     -> ImportCommand(mapRepository),
-        "visibility" -> VisibilityCommand(mapRepository)
+        "visibility" -> VisibilityCommand(mapRepository),
+        "lock"       -> LockCommand(mapRepository),
+        "unlock"     -> UnlockCommand(mapRepository)
       )
     )
 }

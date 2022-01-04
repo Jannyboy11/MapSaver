@@ -10,7 +10,8 @@ case class MapInfo(
     visibility: String,
     originalMap: String,
     copyMaps: String,
-    actions: String
+    actions: String,
+    locked: String
 )
 
 object MapInfo extends CapitalizeConfiguration

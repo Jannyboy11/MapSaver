@@ -166,6 +166,14 @@ class MapRepository(
     run(db)(request).map(_.flatten)
   }
 
+  def setLocked(identifier: MapIdentifier, locked: Boolean): Future[Either[Error, Unit]] = {
+    val request = (for {
+      playerMap <- getPlayerMapFromIdentifier(identifier)
+      _         <- EitherT.right[Error](PlayerMapQueries.updateLocked(playerMap.playerUuid, playerMap.dataId, locked))
+    } yield ()).value.transactionally
+    run(db)(request).map(_.flatten)
+  }
+
   private def getPlayerMapFromIdentifier(identifier: MapIdentifier): EitherT[DBIO, Error, PlayerMap] =
     identifier match {
       case MapIdentifier.MapId(mapId, server) => getPlayerMapFromMapId(mapId, server)
