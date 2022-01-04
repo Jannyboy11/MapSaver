@@ -28,6 +28,7 @@ import java.util.UUID
 import java.util.logging.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+import fr.epicanard.mapsaver.models.MapIdentifier
 
 class MapRepository(
     log: Logger,
@@ -156,19 +157,24 @@ class MapRepository(
 
   def updateVisibility(update: UpdateVisibility): Future[Either[Error, Unit]] = {
     val request = (for {
-      playerMap <- update.info match {
-        case UpdateVisibility.InfoMapId(mapId) => getPlayerMapFromMapId(mapId, update.server)
-        case UpdateVisibility.InfoMapName(mapName) =>
-          EitherT.fromOptionF(
-            PlayerMapQueries.selectPlayerMapWithName(update.owner, mapName, None),
-            MissingMapOrNotPublic
-          )
-      }
-      _ <- EitherT.cond(update.canUpdate(playerMap.playerUuid), (), NotTheOwner).leftWiden[Error]
-      _ <- EitherT.right[Error](PlayerMapQueries.updateVisibility(update.owner, playerMap.dataId, update.visibility))
+      playerMap <- getPlayerMapFromIdentifier(update.identifier)
+      _         <- EitherT.cond(update.canUpdate(playerMap.playerUuid), (), NotTheOwner).leftWiden[Error]
+      _ <- EitherT.right[Error](
+        PlayerMapQueries.updateVisibility(playerMap.playerUuid, playerMap.dataId, update.visibility)
+      )
     } yield ()).value.transactionally
     run(db)(request).map(_.flatten)
   }
+
+  private def getPlayerMapFromIdentifier(identifier: MapIdentifier): EitherT[DBIO, Error, PlayerMap] =
+    identifier match {
+      case MapIdentifier.MapId(mapId, server) => getPlayerMapFromMapId(mapId, server)
+      case MapIdentifier.MapName(mapName, owner) =>
+        EitherT.fromOptionF(
+          PlayerMapQueries.selectPlayerMapWithName(owner, mapName, None),
+          MissingMapOrNotPublic
+        )
+    }
 
   private def getPlayerMapFromMapId(mapId: Int, server: String): EitherT[DBIO, Error, PlayerMap] = for {
     serverMap <- EitherT.fromOptionF(

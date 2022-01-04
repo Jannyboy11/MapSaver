@@ -18,6 +18,7 @@ import fr.epicanard.mapsaver.models.Player
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import java.util.UUID
+import fr.epicanard.mapsaver.models.MapIdentifier
 
 case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.VisibilityMap)) {
   def helpMessage(help: Help): String = help.visibility
@@ -33,7 +34,7 @@ case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(S
 
   def getUpdateVisbility(commandContext: CommandContext): Either[Error, UpdateVisibility] =
     parseArgs(commandContext)
-      .flatMap { case (info, player, vis) =>
+      .flatMap { case (identifier, vis) =>
         parseVisibility(vis)
           .map { visibility =>
             val canSetVisibility: UUID => Boolean = owner =>
@@ -44,29 +45,27 @@ case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(S
               )
             UpdateVisibility(
               canSetVisibility,
-              player.getUniqueId(),
-              commandContext.config.serverName,
               visibility,
-              info
+              identifier
             )
           }
       }
 }
 
 object VisibilityCommand {
-  private def parseArgs(commandContext: CommandContext) =
+  private def parseArgs(commandContext: CommandContext): Either[Error, (MapIdentifier, String)] =
     commandContext.args match {
       case mapName :: playerName :: visibility :: _ =>
-        Right((UpdateVisibility.InfoMapName(mapName), Player.getOfflinePlayer(playerName), visibility))
+        Right((MapIdentifier.MapName(mapName, Player.getOfflinePlayer(playerName).getUniqueId()), visibility))
       case mapName :: visibility :: _ =>
         CommandContext
           .getPlayer(commandContext)
-          .map(player => (UpdateVisibility.InfoMapName(mapName), player, visibility))
+          .map(player => (MapIdentifier.MapName(mapName, player.getUniqueId()), visibility))
       case visibility :: _ =>
         for {
           player <- CommandContext.getPlayer(commandContext)
           map    <- MapExtractor.extractMapView(player)
-        } yield (UpdateVisibility.InfoMapId(map.getId()), player, visibility)
+        } yield (MapIdentifier.MapId(map.getId(), commandContext.config.serverName), visibility)
       case Nil => Left(MissingMapName)
     }
 

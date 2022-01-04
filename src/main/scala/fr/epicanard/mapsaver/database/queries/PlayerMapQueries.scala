@@ -21,7 +21,7 @@ object PlayerMapQueries {
 
   def countForPlayer(playerUUID: UUID, restrictVisibility: Option[Visibility]): DBIO[Int] =
     (sql"""
-      SELECT count(*) FROM player_maps 
+      SELECT count(*) FROM player_maps
       WHERE `player_uuid` = $playerUUID
       """
       +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")).as[Int].head
