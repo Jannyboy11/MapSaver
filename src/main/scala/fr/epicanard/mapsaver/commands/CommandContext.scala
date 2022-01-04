@@ -11,7 +11,9 @@ case class CommandContext(
     args: List[String],
     subCommands: Map[String, BaseCommand],
     config: Config
-)
+) {
+  val server = config.serverName
+}
 
 object CommandContext {
   private val quoteArgsPattern = """(?:(?:["']+)([^"']*)?(?:["']+)|(\w*))(?:\s|$)""".r

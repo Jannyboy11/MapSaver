@@ -32,7 +32,7 @@ case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(
       restrictVisibility = Option.unless(Permission.AdminImportMap.isSetOn(player))(Visibility.Public)
       mapView <- EitherT(
         mapRepository
-          .findMapView(args.owner.getUniqueId, args.mapName, commandContext.config.serverName, restrictVisibility)
+          .findMapView(args.owner.getUniqueId, args.mapName, commandContext.server, restrictVisibility)
       )
       item      = buildItem(mapView, args.mapName, messenger.language, args.owner.getName)
       _         = player.getInventory.addItem(item)

@@ -38,7 +38,7 @@ object SaveCommand {
       mapToSave = MapToSave(
         id = mapItem.id,
         name = mapName,
-        server = commandContext.config.serverName,
+        server = commandContext.server,
         bytes = mapItem.bytes,
         owner = player.getUniqueId,
         visibility = visibility

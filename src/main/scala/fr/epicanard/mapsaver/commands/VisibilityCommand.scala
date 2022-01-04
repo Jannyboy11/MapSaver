@@ -65,7 +65,7 @@ object VisibilityCommand {
         for {
           player <- CommandContext.getPlayer(commandContext)
           map    <- MapExtractor.extractMapView(player)
-        } yield (MapIdentifier.MapId(map.getId(), commandContext.config.serverName), visibility)
+        } yield (MapIdentifier.MapId(map.getId(), commandContext.server), visibility)
       case Nil => Left(MissingMapName)
     }
 

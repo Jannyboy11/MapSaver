@@ -55,7 +55,7 @@ object InfoCommand {
       mapView <- EitherT.fromEither[Future](MapExtractor.extractMapView(player))
       playerServerMaps <- EitherT(
         mapRepository
-          .getMapInfo(player.getUniqueId, restrictVisibility, mapView.getId, commandContext.config.serverName)
+          .getMapInfo(player.getUniqueId, restrictVisibility, mapView.getId, commandContext.server)
       )
       owner = Player.getOfflinePlayer(playerServerMaps.playerMap.playerUuid)
     } yield MapsWithOwner(playerServerMaps, owner)).value

@@ -35,7 +35,7 @@ object UpdateCommand {
       mapItem <- MapExtractor.extractFromPlayer(player)
       mapToSave = MapToUpdate(
         id = mapItem.id,
-        server = commandContext.config.serverName,
+        server = commandContext.server,
         bytes = mapItem.bytes,
         owner = player.getUniqueId
       )
