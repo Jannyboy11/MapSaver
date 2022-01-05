@@ -16,7 +16,8 @@ case class ErrorMessages(
     alreadySaved: String,
     wrongVisibility: String,
     invalidPageNumber: String,
-    unexpectedError: String
+    unexpectedError: String,
+    lockedMapDenied: String
 )
 
 object ErrorMessages extends CapitalizeConfiguration

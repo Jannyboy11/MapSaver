@@ -84,8 +84,9 @@ class MapRepository(
       playerMap <- EitherT.fromOptionF(PlayerMapQueries.selectByDataId(serverMap.dataId), MissingMapOrNotPublic)
       _         <- EitherT.cond(playerMap.playerUuid == mapToUpdate.owner, (), NotTheOwner).leftWiden[Error]
       _         <- EitherT.cond(serverMap.lockedId != mapToUpdate.id, (), NotTheOriginal).leftWiden[Error]
+      _         <- EitherT.cond(!playerMap.locked, (), LockedMapDenied).leftWiden[Error]
       _         <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToUpdate.bytes))
-      _         <- EitherT.fromEither(updateMapColors(fromId(serverMap.lockedId), mapToUpdate.bytes))
+      _         <- EitherT(sync(() => updateMapColors(fromId(serverMap.lockedId), mapToUpdate.bytes)))
     } yield ExistingMapUpdated).value.transactionally
 
     run(db)(exec).map(_.flatten)
@@ -159,6 +160,7 @@ class MapRepository(
     val request = (for {
       playerMap <- getPlayerMapFromIdentifier(update.identifier)
       _         <- EitherT.cond(update.canUpdate(playerMap.playerUuid), (), NotTheOwner).leftWiden[Error]
+      _         <- EitherT.cond(!playerMap.locked, (), LockedMapDenied).leftWiden[Error]
       _ <- EitherT.right[Error](
         PlayerMapQueries.updateVisibility(playerMap.playerUuid, playerMap.dataId, update.visibility)
       )

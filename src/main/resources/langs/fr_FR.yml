@@ -24,6 +24,7 @@ ErrorMessages:
   WrongVisibility: "&cMauvaise visibilité : %s. Attendue : %s"
   InvalidPageNumber: "&cLe numéro de page n'est pas valide"
   UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails."
+  LockedMapDenied: "&cImpossible de faire cette action car la carte est verrouillée."
 InfoMessages:
   NewMapCreated: "Votre nouvelle carte est sauvegardée"
   ExistingMapUpdated: "Votre carte a été mise à jour"
