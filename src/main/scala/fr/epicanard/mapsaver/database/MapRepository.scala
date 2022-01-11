@@ -136,23 +136,21 @@ class MapRepository(
     run(db)(requests).map(_.flatten)
   }
 
-  def findMapView(
+  def findMapViewWithData(
       owner: UUID,
       mapName: String,
       serverName: String,
       restrictVisibility: Option[Visibility]
-  ): Future[Either[Error, MapView]] = {
-    val requests =
-      OptionT(PlayerMapQueries.selectMapByName(owner, mapName, serverName, restrictVisibility))
+  ): Future[Either[Error, MapViewWithData]] = {
+    val requests = (for {
+      mapByName <- OptionT(PlayerMapQueries.selectMapByName(owner, mapName, serverName, restrictVisibility))
         .toRight[Error](MissingMapOrNotPublic)
-        .flatMap { mapByName =>
-          mapByName.lockedMap match {
-            case Some(LockedMap(lockedId, _)) => EitherT.right[Error](sync(() => fromId(lockedId)))
-            case None                         => createServerMapFromExisting(mapByName.dataId, serverName)
-          }
-        }
-        .value
-        .transactionally
+      dataMap <- EitherT.fromOptionF(DataMapQueries.findById(mapByName.dataId), MissingDataMap)
+      mapView <- mapByName.lockedMap match {
+        case Some(LockedMap(lockedId, _)) => EitherT.right[Error](sync(() => fromId(lockedId)))
+        case None                         => createServerMapFromExisting(dataMap, serverName)
+      }
+    } yield MapViewWithData(mapView, dataMap)).value.transactionally
     run(db)(requests).map(_.flatten)
   }
 
@@ -195,9 +193,8 @@ class MapRepository(
     _         <- EitherT.cond(serverMap.lockedId != mapId, (), NotTheOriginal).leftWiden[Error]
   } yield playerMap
 
-  private def createServerMapFromExisting(dataId: Int, serverName: String): EitherT[DBIO, Error, MapView] =
+  private def createServerMapFromExisting(dataMap: DataMap, serverName: String): EitherT[DBIO, Error, MapView] =
     for {
-      dataMap <- EitherT.fromOptionF(DataMapQueries.findById(dataId), MissingDataMap)
       mapView <- EitherT(sync(() => newLockedWithColors(dataMap.bytes)))
       serverMap = ServerMap(
         lockedId = mapView.getId,

@@ -21,6 +21,7 @@ import org.bukkit.{Material, OfflinePlayer}
 import java.util
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
 
 case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.ImportMap)) {
   def helpMessage(help: Help): String = help.`import`
@@ -30,11 +31,14 @@ case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(
       player <- EitherT.fromEither[Future](getPlayer(commandContext))
       args   <- EitherT.fromEither[Future](parseArguments(commandContext, player))
       restrictVisibility = Option.unless(Permission.AdminImportMap.isSetOn(player))(Visibility.Public)
-      mapView <- EitherT(
+      mapViewWithData <- EitherT(
         mapRepository
-          .findMapView(args.owner.getUniqueId, args.mapName, commandContext.server, restrictVisibility)
+          .findMapViewWithData(args.owner.getUniqueId, args.mapName, commandContext.server, restrictVisibility)
       )
-      item      = buildItem(mapView, args.mapName, messenger.language, args.owner.getName)
+      item = buildItem(mapViewWithData.mapView, args.mapName, messenger.language, args.owner.getName)
+      _ <- EitherT.fromEither[Future](
+        MapViewBuilder.updateMapColors(mapViewWithData.mapView, mapViewWithData.dataMap.bytes)
+      )
       _         = player.getInventory.addItem(item)
       statusMsg = msg"${messenger.language.infoMessages.mapImported}"
     } yield statusMsg).value
