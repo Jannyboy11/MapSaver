@@ -6,15 +6,18 @@ import fr.epicanard.mapsaver.commands.MapSaverCommand
 import fr.epicanard.mapsaver.context.SyncContext
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.TechnicalError
+import fr.epicanard.mapsaver.listeners.SyncListener
 import fr.epicanard.mapsaver.message.Messenger
 import fr.epicanard.mapsaver.resources.ResourceLoader.extractAndLoadResource
 import fr.epicanard.mapsaver.resources.config.Config._
 import fr.epicanard.mapsaver.resources.language.Language
-import xyz.janboerman.scalaloader.plugin.description.{Scala, ScalaVersion}
 import xyz.janboerman.scalaloader.plugin.{ScalaPlugin, ScalaPluginDescription}
+import xyz.janboerman.scalaloader.plugin.description.{Scala, ScalaVersion}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
 @Scala(version = ScalaVersion.v2_13_6)
 object MapSaverPlugin
@@ -40,8 +43,15 @@ object MapSaverPlugin
       database      = MapRepository.buildDatabase(config.storage)
       mapRepository = new MapRepository(logger, database)
       _ <- EitherT(mapRepository.initDatabase())
-      mapSaverCommand = MapSaverCommand(messenger, config, mapRepository)
-      _               = getCommand("mapsaver").setExecutor(mapSaverCommand)
-    } yield ()).value
+      syncListener    = new SyncListener(this, mapRepository, messenger, config.serverName)
+      mapSaverCommand = MapSaverCommand(messenger, config, mapRepository, syncListener)
+    } yield {
+
+      getCommand("mapsaver").setExecutor(mapSaverCommand)
+
+      getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord")
+      getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", syncListener)
+      ()
+    }).value
 
 }

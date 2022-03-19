@@ -4,8 +4,8 @@ import cats.data.EitherT
 import cats.implicits._
 import fr.epicanard.mapsaver.commands.CommandContext.shiftArgs
 import fr.epicanard.mapsaver.database.MapRepository
-import fr.epicanard.mapsaver.errors.Error
-import fr.epicanard.mapsaver.errors.TechnicalError.UnexpectedError
+import fr.epicanard.mapsaver.errors.Error.{handleError, handleTryResult}
+import fr.epicanard.mapsaver.listeners.SyncListener
 import fr.epicanard.mapsaver.message.Messenger
 import fr.epicanard.mapsaver.resources.config.Config
 import org.bukkit.command.{Command, CommandSender, TabExecutor}
@@ -25,9 +25,9 @@ case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Ma
     (for {
       _      <- EitherT.fromEither[Future](command.canExecute(commandContext))
       result <- EitherT(command.onCommand(messenger, CommandContext.shiftArgs(commandContext)))
-    } yield result).value.onComplete { tryResult =>
-      tryResult.toEither.leftMap[Error](UnexpectedError).flatten match {
-        case Left(error)    => Error.handleError(error, messenger, commandContext.sender)
+    } yield result).value.onComplete {
+      handleTryResult(_) match {
+        case Left(error)    => handleError(error, messenger, commandContext.sender)
         case Right(message) => messenger.sendAllToSender(commandContext.sender, message)
       }
     }
@@ -63,7 +63,12 @@ case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Ma
 }
 
 object MapSaverCommand {
-  def apply(messenger: Messenger, config: Config, mapRepository: MapRepository): MapSaverCommand =
+  def apply(
+      messenger: Messenger,
+      config: Config,
+      mapRepository: MapRepository,
+      syncListener: SyncListener
+  ): MapSaverCommand =
     MapSaverCommand(
       messenger = messenger,
       config = config,
@@ -72,7 +77,7 @@ object MapSaverCommand {
         "save"       -> SaveCommand(mapRepository),
         "list"       -> ListCommand(mapRepository),
         "info"       -> InfoCommand(mapRepository),
-        "update"     -> UpdateCommand(mapRepository),
+        "update"     -> UpdateCommand(mapRepository, syncListener),
         "import"     -> ImportCommand(mapRepository),
         "visibility" -> VisibilityCommand(mapRepository),
         "lock"       -> LockCommand(mapRepository),

@@ -6,7 +6,9 @@ import fr.epicanard.mapsaver.resources.language.ErrorMessages
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
+import cats.implicits._
 import java.util.logging.Logger
+import scala.util.Try
 
 sealed trait Error
 
@@ -90,4 +92,7 @@ object Error {
       messenger.sendError(sender, _.unexpectedError)
     case msError: MapSaverError => messenger.sendError(sender, MapSaverError.getMessage(msError))
   }
+
+  def handleTryResult[T](tryResult: Try[Either[Error, T]]) =
+    tryResult.toEither.leftMap[Error](TechnicalError.UnexpectedError).flatten
 }

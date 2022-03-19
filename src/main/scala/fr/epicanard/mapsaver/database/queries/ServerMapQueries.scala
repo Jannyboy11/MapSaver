@@ -26,4 +26,7 @@ object ServerMapQueries {
 
   def selectWithDataId(dataId: Int): DBIO[Seq[ServerMap]] =
     sql"SELECT * FROM server_maps WHERE `data_id` = $dataId".as[ServerMap]
+
+  def selectServerWithDataId(dataId: Int, serverName: String): DBIO[Option[ServerMap]] =
+    sql"SELECT * FROM server_maps WHERE `data_id` = $dataId AND server = $serverName".as[ServerMap].headOption
 }

@@ -87,7 +87,7 @@ class MapRepository(
       _         <- EitherT.cond(!playerMap.locked, (), LockedMapDenied).leftWiden[Error]
       _         <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToUpdate.bytes))
       _         <- EitherT(sync(() => updateMapColors(fromId(serverMap.lockedId), mapToUpdate.bytes)))
-    } yield ExistingMapUpdated).value.transactionally
+    } yield ExistingMapUpdated(serverMap.dataId)).value.transactionally
 
     run(db)(exec).map(_.flatten)
   }
@@ -150,6 +150,21 @@ class MapRepository(
         case Some(LockedMap(lockedId, _)) => EitherT.right[Error](sync(() => fromId(lockedId)))
         case None                         => createServerMapFromExisting(dataMap, serverName)
       }
+    } yield MapViewWithData(mapView, dataMap)).value.transactionally
+    run(db)(requests).map(_.flatten)
+  }
+
+  def findMapViewWithData(
+      dataId: Int,
+      serverName: String
+  ): Future[Either[Error, MapViewWithData]] = {
+    val requests = (for {
+      serverMap <- EitherT.fromOptionF(
+        ServerMapQueries.selectServerWithDataId(dataId, serverName),
+        MissingMapOrNotPublic
+      )
+      dataMap <- EitherT.fromOptionF(DataMapQueries.findById(dataId), MissingDataMap)
+      mapView <- EitherT.right[Error](sync(() => fromId(serverMap.lockedId)))
     } yield MapViewWithData(mapView, dataMap)).value.transactionally
     run(db)(requests).map(_.flatten)
   }
