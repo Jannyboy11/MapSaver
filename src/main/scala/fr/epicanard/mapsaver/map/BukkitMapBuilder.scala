@@ -20,7 +20,10 @@ object BukkitMapBuilder {
 
     def updateMapColors(mapView: MapView, bytes: Array[Byte]): Either[Error, MapView] =
       getRenderer(mapView).map { renderer =>
-        getColorsMap(renderer).map(Array.copy(bytes, 0, _, 0, bytes.length))
+        getColorsMap(renderer).map { colorsMap =>
+          Array.copy(bytes, 0, colorsMap.bytes, 0, bytes.length)
+          colorsMap.maybeVanillaBuffer.map(buffer => Array.copy(bytes, 0, buffer, 0, bytes.length))
+        }
         mapView
       }
 
@@ -39,8 +42,12 @@ object BukkitMapBuilder {
     }
   }
 
-  def getColorsMap(mapRenderer: MapRenderer): Either[TechnicalError, Array[Byte]] =
-    getFieldByName[Any](mapRenderer, "worldMap")
-      .flatMap(getFieldByType[Array[Byte]](_, "byte[]"))
-
+  def getColorsMap(mapRenderer: MapRenderer): Either[TechnicalError, ColorsMap] =
+    for {
+      worldMap <- getFieldByName[Any](mapRenderer, "worldMap")
+      vanillaBuffer <- Right(
+        getFieldByName[Any](worldMap, "vanillaRender").flatMap(getFieldByName[Array[Byte]](_, "buffer")).toOption
+      )
+      bytes <- getFieldByType[Array[Byte]](worldMap, "byte[]")
+    } yield ColorsMap(vanillaBuffer, bytes)
 }

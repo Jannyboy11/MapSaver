@@ -27,7 +27,7 @@ object MapExtractor {
       mapRenderer <- MapViewBuilder.getRenderer(mapView)
       colorsMap   <- getColorsMap(mapRenderer)
       byteMap = new Array[Byte](16384)
-      _       = Array.copy(colorsMap, 0, byteMap, 0, 16384)
+      _       = Array.copy(colorsMap.bytes, 0, byteMap, 0, 16384)
     } yield MapItem(
       id = mapView.getId,
       bytes = byteMap
