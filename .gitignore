@@ -25,6 +25,7 @@ hs_err_pid*
 /target/
 **/target/
 project/project/
+projects/metals.sbt
 .bloop
 .bsp
 

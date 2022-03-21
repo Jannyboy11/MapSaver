@@ -16,16 +16,17 @@ object Dependencies {
     "spigot-repo" at "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
   )
 
-  lazy val scalaPluginLoader =
-    "com.github.Jannyboy11.ScalaPluginLoader" % "ScalaLoader" % scalaPluginLoaderVersion % "provided"
-  lazy val spigot = "org.spigotmc" % "spigot-api" % spigotVersion % "provided"
-  lazy val enumeratum = Seq(
+  val scalaPluginLoader = "com.github.Jannyboy11.ScalaPluginLoader" % "ScalaLoader" % scalaPluginLoaderVersion
+
+  val spigot = "org.spigotmc" % "spigot-api" % spigotVersion
+
+  val enumeratum = Seq(
     "com.beachape" %% "enumeratum",
     "com.beachape" %% "enumeratum-circe",
     "com.beachape" %% "enumeratum-slick"
   ).map(_ % enumeratumVersion)
 
-  lazy val circe = Seq(
+  val circe = Seq(
     "io.circe" %% "circe-core",
     "io.circe" %% "circe-generic",
     "io.circe" %% "circe-parser",
@@ -33,14 +34,16 @@ object Dependencies {
     "io.circe" %% "circe-generic-extras"
   ).map(_ % circeVersion)
 
-  lazy val slick = Seq(
+  val slick = Seq(
     "com.typesafe.slick" %% "slick"          % slickVersion,
     "com.typesafe.slick" %% "slick-hikaricp" % slickVersion,
     "org.slf4j"           % "slf4j-nop"      % sl4jVersion,
     "com.rms.miu"        %% "slick-cats"     % slickCatsVersion
   )
 
-  lazy val cats = Seq(
+  val cats = Seq(
     "org.typelevel" %% "cats-core" % catsVersion
   )
+
+  val libraries = enumeratum ++ circe ++ slick ++ cats
 }

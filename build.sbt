@@ -10,6 +10,7 @@ scalacOptions ++= Seq(
   "-Ywarn-unused",
   "-Ymacro-annotations"
 )
+artifactName := { (_, _, _) => s"${name.value}-${version.value}.jar" }
 
 resolvers ++= Dependencies.resolvers
 
@@ -19,15 +20,25 @@ libraryDependencies ++= Dependencies.circe
 libraryDependencies ++= Dependencies.enumeratum
 libraryDependencies ++= Dependencies.slick
 libraryDependencies ++= Dependencies.cats
-
 enablePlugins(BuildInfoPlugin)
 
-assemblyPackageScala / assembleArtifact := false
-assembly / assemblyMergeStrategy := {
-  case "plugin.yml" =>
-    MergeStrategy.first /* always choose our own plugin.yml if we shade other plugins */
-  case x =>
-    val oldStrategy = (assembly / assemblyMergeStrategy).value
-    oldStrategy(x)
+// Auto complete plugin.yml with dependencies
+unmanagedResources / excludeFilter := "plugin.yml"
+
+Compile / resourceGenerators += Def.task {
+  val content = IO.read((Compile / resourceDirectory).value / "plugin.yml")
+  val out = (Compile / resourceManaged).value / "plugin.yml"
+  IO.write(out, formatDependencies(content, scalaVersion.value))
+  Seq(out)
+}.taskValue
+
+def formatDependencies(content: String, scalaVersion: String): String = {
+  val dependencies = Dependencies.libraries.map { m =>
+    val scalaBinary = m.crossVersion match {
+      case _: Binary => "_" + CrossVersion.binaryScalaVersion(scalaVersion)
+      case _ => ""
+    }
+    s"  - ${m.organization}:${m.name}$scalaBinary:${m.revision}"
+  }.mkString("\n")
+  content.replace("${dependencies}", s"\n$dependencies")
 }
-assembly / assemblyJarName := s"${name.value}-${version.value}.jar"
