@@ -19,4 +19,9 @@ jobs:
         java-version: '16'
         distribution: 'adopt'
     - name: Compile
-      run: sbt clean scalafmtCheckAll assembly
+      run: sbt clean scalafmtCheckAll package
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: mapsaver
+        path: target/scala-2.13/MapSaver-*.jar
