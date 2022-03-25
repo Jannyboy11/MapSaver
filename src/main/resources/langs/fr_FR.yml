@@ -18,6 +18,7 @@ ErrorMessages:
   MissingMapName: "&cLe nom de carte est manquant"
   MissingMapOrNotPublic: "&cCette carte n'existe pas ou n'est pas publique"
   MissingDataMap: "&cErreur inattendue, impossible de trouver les données de la carte"
+  MissingEmptyMap: "&cVous devez avoir un item carte vide dans votre inventaire"
   NotTheOwner: "&cVous n'êtes pas le propriétaire de cette carte"
   NotTheOriginal: "&cCette carte n'est pas l'originale"
   AlreadySaved: "&cVous avez déjà enregistré cette carte.\n&fUtilises &6/mapsaver update&f pour mettre à jour cette carte"
@@ -25,6 +26,7 @@ ErrorMessages:
   InvalidPageNumber: "&cLe numéro de page n'est pas valide"
   UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails."
   LockedMapDenied: "&cImpossible de faire cette action car la carte est verrouillée."
+  InventoryFull: "&cImpossible de récupérer la carte. Votre inventaire est plein."
 InfoMessages:
   NewMapCreated: "Votre nouvelle carte est sauvegardée"
   ExistingMapUpdated: "Votre carte a été mise à jour"

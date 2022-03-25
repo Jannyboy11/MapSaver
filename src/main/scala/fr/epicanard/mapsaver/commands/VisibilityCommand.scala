@@ -7,18 +7,16 @@ import fr.epicanard.mapsaver.commands.VisibilityCommand._
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.MapSaverError.{MissingMapName, WrongVisibility}
+import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
 import fr.epicanard.mapsaver.models.map.Visibility
+import fr.epicanard.mapsaver.models.{MapIdentifier, Player, UpdateVisibility}
 import fr.epicanard.mapsaver.resources.language.Help
-import fr.epicanard.mapsaver.map.MapExtractor
-import fr.epicanard.mapsaver.models.UpdateVisibility
-import fr.epicanard.mapsaver.models.Player
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import java.util.UUID
-import fr.epicanard.mapsaver.models.MapIdentifier
 
 case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.VisibilityMap)) {
   def helpMessage(help: Help): String = help.visibility

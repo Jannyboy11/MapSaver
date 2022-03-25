@@ -6,7 +6,8 @@ import io.circe.generic.extras.ConfiguredJsonCodec
 @ConfiguredJsonCodec
 case class Options(
     pageSize: Int,
-    defaultVisibility: String
+    defaultVisibility: String,
+    consumeEmptyMap: Boolean
 )
 
 object Options extends CapitalizeConfiguration

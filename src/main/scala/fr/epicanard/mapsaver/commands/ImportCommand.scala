@@ -1,15 +1,17 @@
 package fr.epicanard.mapsaver.commands
 
 import cats.data.EitherT
+import cats.implicits._
 import fr.epicanard.mapsaver.Permission
 import fr.epicanard.mapsaver.commands.CommandContext.getPlayer
 import fr.epicanard.mapsaver.commands.ImportCommand.{buildItem, parseArguments}
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
-import fr.epicanard.mapsaver.errors.MapSaverError.MissingMapName
+import fr.epicanard.mapsaver.errors.MapSaverError.{InventoryFull, MissingEmptyMap, MissingMapName}
+import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
+import fr.epicanard.mapsaver.message.Component.toColor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
-import fr.epicanard.mapsaver.message.Component.toColor
 import fr.epicanard.mapsaver.models.Player
 import fr.epicanard.mapsaver.models.map.Visibility
 import fr.epicanard.mapsaver.resources.language.{Help, Language}
@@ -21,7 +23,7 @@ import org.bukkit.{Material, OfflinePlayer}
 import java.util
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
+import org.bukkit.entity
 
 case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.ImportMap)) {
   def helpMessage(help: Help): String = help.`import`
@@ -39,9 +41,18 @@ case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(
       _ <- EitherT.fromEither[Future](
         MapViewBuilder.updateMapColors(mapViewWithData.mapView, mapViewWithData.dataMap.bytes)
       )
-      _         = player.getInventory.addItem(item)
-      statusMsg = msg"${messenger.language.infoMessages.mapImported}"
-    } yield statusMsg).value
+      maybeMapToConsume <- EitherT.fromEither[Future](
+        ImportCommand.getItemToConsume(commandContext.config.options.consumeEmptyMap, player)
+      )
+      _ <- EitherT.cond[Future](player.getInventory.addItem(item).size <= 0, (), InventoryFull: Error)
+    } yield {
+      maybeMapToConsume.foreach { case (it, index) =>
+        it.setAmount(it.getAmount() - 1)
+        player.getInventory.setItem(index, it)
+      }
+
+      msg"${messenger.language.infoMessages.mapImported}"
+    }).value
 
   def onTabComplete(commandContext: CommandContext): List[String] = Nil
 }
@@ -69,4 +80,16 @@ object ImportCommand {
     mapItem.setItemMeta(meta)
     mapItem
   }
+
+  def getItemToConsume(consumeEmptyMap: Boolean, player: entity.Player): Either[Error, Option[(ItemStack, Int)]] =
+    if (consumeEmptyMap) {
+      player.getInventory
+        .getStorageContents()
+        .zipWithIndex
+        .find { case (it, _) => it != null && it.getType().equals(Material.MAP) }
+        .toRight(MissingEmptyMap: Error)
+        .map(Some(_))
+    } else {
+      Right(None)
+    }
 }

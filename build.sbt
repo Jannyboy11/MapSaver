@@ -16,10 +16,8 @@ resolvers ++= Dependencies.resolvers
 
 libraryDependencies += Dependencies.scalaPluginLoader
 libraryDependencies += Dependencies.spigot
-libraryDependencies ++= Dependencies.circe
-libraryDependencies ++= Dependencies.enumeratum
-libraryDependencies ++= Dependencies.slick
-libraryDependencies ++= Dependencies.cats
+libraryDependencies ++= Dependencies.libraries
+
 enablePlugins(BuildInfoPlugin)
 
 // Auto complete plugin.yml with dependencies

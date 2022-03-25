@@ -19,6 +19,7 @@ sealed trait MapSaverError extends Error
 object MapSaverError {
   case object MapInHandNeeded                extends MapSaverError
   case object MissingMapName                 extends MapSaverError
+  case object MissingEmptyMap                extends MapSaverError
   case object PlayerOnlyCommand              extends MapSaverError
   case object AlreadySaved                   extends MapSaverError
   case object NotTheOwner                    extends MapSaverError
@@ -28,11 +29,13 @@ object MapSaverError {
   case object MissingMapOrNotPublic          extends MapSaverError
   case object MissingDataMap                 extends MapSaverError
   case object LockedMapDenied                extends MapSaverError
+  case object InventoryFull                  extends MapSaverError
   case class WrongVisibility(actual: String) extends MapSaverError
 
   def getMessage(mapSaverError: MapSaverError)(errorMessages: ErrorMessages): String = mapSaverError match {
     case MapInHandNeeded       => errorMessages.mapInHandNeeded
     case MissingMapName        => errorMessages.missingMapName
+    case MissingEmptyMap       => errorMessages.missingEmptyMap
     case PlayerOnlyCommand     => errorMessages.playerOnlyCommand
     case AlreadySaved          => errorMessages.alreadySaved
     case NotTheOwner           => errorMessages.notTheOwner
@@ -42,6 +45,7 @@ object MapSaverError {
     case MissingMapOrNotPublic => errorMessages.missingMapOrNotPublic
     case MissingDataMap        => errorMessages.missingDataMap
     case LockedMapDenied       => errorMessages.lockedMapDenied
+    case InventoryFull         => errorMessages.inventoryFull
     case WrongVisibility(actual) =>
       errorMessages.wrongVisibility.format(actual, Visibility.values.map(_.entryName).mkString(", "))
   }

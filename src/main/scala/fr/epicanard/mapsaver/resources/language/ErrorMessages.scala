@@ -11,13 +11,15 @@ case class ErrorMessages(
     missingMapName: String,
     missingMapOrNotPublic: String,
     missingDataMap: String,
+    missingEmptyMap: String,
     notTheOwner: String,
     notTheOriginal: String,
     alreadySaved: String,
     wrongVisibility: String,
     invalidPageNumber: String,
     unexpectedError: String,
-    lockedMapDenied: String
+    lockedMapDenied: String,
+    inventoryFull: String
 )
 
 object ErrorMessages extends CapitalizeConfiguration

@@ -1,10 +1,10 @@
 package fr.epicanard.mapsaver.commands
 
-import fr.epicanard.mapsaver.errors.Error
-import fr.epicanard.mapsaver.resources.language.Help
 import fr.epicanard.mapsaver.Permission
+import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.MapSaverError.PermissionDenied
 import fr.epicanard.mapsaver.message.{Message, Messenger}
+import fr.epicanard.mapsaver.resources.language.Help
 
 import scala.concurrent.Future
 

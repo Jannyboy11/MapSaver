@@ -5,15 +5,14 @@ import cats.implicits._
 import fr.epicanard.mapsaver.Permission
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
+import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
+import fr.epicanard.mapsaver.models.{MapIdentifier, Player}
 import fr.epicanard.mapsaver.resources.language.Help
-import fr.epicanard.mapsaver.map.MapExtractor
-import fr.epicanard.mapsaver.models.Player
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import fr.epicanard.mapsaver.models.MapIdentifier
 
 abstract class LockableCommand(mapRepository: MapRepository, permission: Permission)
     extends BaseCommand(Some(permission)) {
