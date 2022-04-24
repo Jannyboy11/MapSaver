@@ -12,4 +12,67 @@ commands:
     aliases:
       - maps
       - msaver
+permissions:
+  mapsaver.*:
+    description: Can use all commands
+    children:
+      mapsaver.commands.*: true
+      mapsaver.admin.*: true
+  # == Commands ==
+  mapsaver.commands.*:
+    description: Can use all player commands
+    children:
+      mapsaver.commands.save: true
+      mapsaver.commands.update: true
+      mapsaver.commands.import: true
+      mapsaver.commands.list: true
+      mapsaver.commands.info: true
+      mapsaver.commands.visibility: true
+      mapsaver.commands.lock: true
+      mapsaver.commands.delete: true
+      mapsaver.commands.unlock: true
+  mapsaver.commands.save:
+    description: Can use command save
+  mapsaver.commands.update:
+    description: Can use command update
+  mapsaver.commands.import:
+    description: Can use command import
+  mapsaver.commands.list:
+    description: Can use command list
+  mapsaver.commands.info:
+    description: Can use command info
+  mapsaver.commands.visibility:
+    description: Can use command visibility
+  mapsaver.commands.lock:
+    description: Can use command lock
+  mapsaver.commands.delete:
+    description: Can use command delete
+  mapsaver.commands.unlock:
+    description: Can use command unlock
+  # == Admin ==
+  mapsaver.admin.*:
+    description: Can do every admin actions
+    children:
+      mapsaver.admin.commands.*: true
+  mapsaver.admin.commands.*:
+    description: Can execute every admin commands
+    children:
+      mapsaver.admin.commands.reload: true
+      mapsaver.admin.commands.import: true
+      mapsaver.admin.commands.list: true
+      mapsaver.admin.commands.info: true
+      mapsaver.admin.commands.visibility: true
+      mapsaver.admin.commands.delete: true
+  mapsaver.admin.commands.reload:
+    description: Can use command reload on other player maps
+  mapsaver.admin.commands.import:
+    description: Can use command import on other player maps
+  mapsaver.admin.commands.list:
+    description: Can use command list on other player maps
+  mapsaver.admin.commands.info:
+    description: Can use command info on other player maps
+  mapsaver.admin.commands.visibility:
+    description: Can use command visibility on other player maps
+  mapsaver.admin.commands.delete:
+    description: Can use command delete on other player maps
 libraries: ${dependencies}
