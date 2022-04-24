@@ -29,6 +29,7 @@ import java.util.logging.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import fr.epicanard.mapsaver.models.MapIdentifier
+import fr.epicanard.mapsaver.models.RestrictVisibility
 
 class MapRepository(
     log: Logger,
@@ -75,6 +76,9 @@ class MapRepository(
     run(db)(exec).map(_.flatten)
   }
 
+  def deletePlayerMap(playerUUID: UUID, mapName: String): Future[Either[Error, Unit]] =
+    run(db)(PlayerMapQueries.delete(playerUUID, mapName).map(_ => ()).transactionally)
+
   def updateMap(mapToUpdate: MapToUpdate): Future[Either[Error, MapUpdateStatus]] = {
     val exec = (for {
       serverMap <- EitherT.fromOptionF(
@@ -105,7 +109,7 @@ class MapRepository(
 
   def getMapInfo(
       owner: UUID,
-      restrictVisibility: Option[Visibility],
+      restrictVisibility: Option[RestrictVisibility],
       mapId: Int,
       serverName: String
   ): Future[Either[Error, PlayerServerMaps]] = {

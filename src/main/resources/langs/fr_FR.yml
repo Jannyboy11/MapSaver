@@ -11,6 +11,7 @@ Help:
   Visibility: "&6/mapsaver visibility [nom_carte] [joueur] <visibilité> &f - Met à jour la visibilité d'une carte ou de celle en main"
   Lock: "&6/mapsaver lock [nom_carte] [joueur] &f - Verrouille une carte ou de celle en main"
   Unlock: "&6/mapsaver unlock [nom_carte] [joueur] &f - Déverrouille une carte ou de celle en main"
+  Delete: "&6/mapsaver delete [nom_carte] [joueur] &f - Supprime une carte ou de celle en main"
 ErrorMessages:
   PermissionDenied: "&cVous n'êtes pas autorisé à faire cette action"
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
@@ -36,6 +37,7 @@ InfoMessages:
   VisibilityMapUpdated: "La visibilité de votre carte a été mise à jour"
   LockedMapUpdated: "Votre carte a bien été verrouillée"
   UnlockedMapUpdated: "Votre carte a bien été déverrouillée"
+  MapDeleted: "Votre carte a bien été supprimée"
 MapInfo:
   Name: "Nom"
   Owner: "Propriétaire"

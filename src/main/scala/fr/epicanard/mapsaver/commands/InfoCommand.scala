@@ -9,8 +9,8 @@ import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Component, Message, Messenger}
-import fr.epicanard.mapsaver.models.Player
 import fr.epicanard.mapsaver.models.map.{PlayerServerMaps, Visibility}
+import fr.epicanard.mapsaver.models.{Player, RestrictVisibility}
 import fr.epicanard.mapsaver.resources.language.{Help, Language, Visibilities}
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.OfflinePlayer
@@ -51,7 +51,7 @@ object InfoCommand {
   ): Future[Either[Error, MapsWithOwner]] =
     (for {
       player <- EitherT.fromEither[Future](getPlayer(commandContext))
-      restrictVisibility = Option.unless(Permission.AdminInfoMap.isSetOn(player))(Visibility.Public)
+      restrictVisibility = RestrictVisibility.unless(Permission.AdminInfoMap, player)(RestrictVisibility.OwnerOrPublic)
       mapView <- EitherT.fromEither[Future](MapExtractor.extractMapView(player))
       playerServerMaps <- EitherT(
         mapRepository

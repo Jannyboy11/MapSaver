@@ -11,6 +11,7 @@ import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map.{MapByName, PlayerMap, Visibility}
 
 import java.util.UUID
+import fr.epicanard.mapsaver.models.RestrictVisibility
 
 object PlayerMapQueries {
 
@@ -18,6 +19,9 @@ object PlayerMapQueries {
     PlayerMaps.filter(m => m.dataId === dataId).take(1).result.headOption
 
   def insert(playerMap: PlayerMap): DBIO[Int] = PlayerMaps += playerMap
+
+  def delete(playerUUID: UUID, name: String): DBIO[Int] =
+    sqlu"""DELETE FROM player_maps WHERE `player_uuid` = $playerUUID AND `name` = $name"""
 
   def countForPlayer(playerUUID: UUID, restrictVisibility: Option[Visibility]): DBIO[Int] =
     (sql"""
@@ -46,10 +50,10 @@ object PlayerMapQueries {
   def selectPlayerMap(
       owner: UUID,
       dataId: Int,
-      restrictVisibility: Option[Visibility]
+      restrictVisibility: Option[RestrictVisibility]
   ): DBIO[Option[PlayerMap]] =
     (sql"""SELECT * FROM player_maps WHERE data_id = $dataId"""
-      +? restrictVisibility.map(vis => sql" AND (player_uuid = $owner OR`visibility` = $vis) "))
+      +? restrictVisibility.map(QueryHelper.withRestrictVisibility(_, owner)))
       .as[PlayerMap]
       .headOption
 

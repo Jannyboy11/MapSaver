@@ -16,7 +16,8 @@ case class Help(
     info: String,
     visibility: String,
     lock: String,
-    unlock: String
+    unlock: String,
+    delete: String
 )
 
 object Help extends CapitalizeConfiguration
