@@ -185,9 +185,10 @@ class MapRepository(
     run(db)(request).map(_.flatten)
   }
 
-  def setLocked(identifier: MapIdentifier, locked: Boolean): Future[Either[Error, Unit]] = {
+  def setLocked(identifier: MapIdentifier, locked: Boolean)(canLock: UUID => Boolean): Future[Either[Error, Unit]] = {
     val request = (for {
       playerMap <- getPlayerMapFromIdentifier(identifier)
+      _         <- EitherT.cond(canLock(playerMap.playerUuid), (), NotTheOwner)
       _         <- EitherT.right[Error](PlayerMapQueries.updateLocked(playerMap.playerUuid, playerMap.dataId, locked))
     } yield ()).value.transactionally
     run(db)(request).map(_.flatten)

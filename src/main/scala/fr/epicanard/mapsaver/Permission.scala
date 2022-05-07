@@ -30,9 +30,9 @@ object Permission {
 
   case object LockMap extends Permission("mapsaver.commands.lock")
 
-  case object DeleteMap extends Permission("mapsaver.commands.delete")
-
   case object UnlockMap extends Permission("mapsaver.commands.unlock")
+
+  case object DeleteMap extends Permission("mapsaver.commands.delete")
 
   case object AdminReload extends Permission("mapsaver.admin.commands.reload")
 
@@ -43,6 +43,10 @@ object Permission {
   case object AdminInfoMap extends Permission("mapsaver.admin.commands.info")
 
   case object AdminVisibilityMap extends Permission("mapsaver.admin.commands.visibility")
+
+  case object AdminLockMap extends Permission("mapsaver.admin.commands.lock")
+
+  case object AdminUnlockMap extends Permission("mapsaver.admin.commands.unlock")
 
   case object AdminDeleteMap extends Permission("mapsaver.admin.commands.delete")
 }
