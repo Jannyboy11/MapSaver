@@ -1,10 +1,7 @@
 package fr.epicanard.mapsaver.models
 
 import fr.epicanard.mapsaver.Permission
-import fr.epicanard.mapsaver.models.map.Visibility
 import org.bukkit.entity.Player
-
-import java.util.UUID
 
 sealed trait RestrictVisibility
 

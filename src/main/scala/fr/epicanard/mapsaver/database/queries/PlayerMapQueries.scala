@@ -1,17 +1,16 @@
 package fr.epicanard.mapsaver.database.queries
 
 import fr.epicanard.mapsaver.database.SQLActionBuilderExt._
-import fr.epicanard.mapsaver.database.mappers.PlayerMapMapper._
 import fr.epicanard.mapsaver.database.mappers.MapByNameMapper._
+import fr.epicanard.mapsaver.database.mappers.PlayerMapMapper._
 import fr.epicanard.mapsaver.database.mappers.UUIDMapper._
 import fr.epicanard.mapsaver.database.mappers.VisibilityMapper._
 import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.schema.PlayerMaps
-import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map.{MapByName, PlayerMap, Visibility}
+import fr.epicanard.mapsaver.models.{Pageable, RestrictVisibility}
 
 import java.util.UUID
-import fr.epicanard.mapsaver.models.RestrictVisibility
 
 object PlayerMapQueries {
 
@@ -20,8 +19,8 @@ object PlayerMapQueries {
 
   def insert(playerMap: PlayerMap): DBIO[Int] = PlayerMaps += playerMap
 
-  def delete(playerUUID: UUID, name: String): DBIO[Int] =
-    sqlu"""DELETE FROM player_maps WHERE `player_uuid` = $playerUUID AND `name` = $name"""
+  def delete(playerUUID: UUID, dataId: Int): DBIO[Int] =
+    sqlu"""DELETE FROM player_maps WHERE `player_uuid` = $playerUUID AND `data_id` = $dataId"""
 
   def countForPlayer(playerUUID: UUID, restrictVisibility: Option[Visibility]): DBIO[Int] =
     (sql"""

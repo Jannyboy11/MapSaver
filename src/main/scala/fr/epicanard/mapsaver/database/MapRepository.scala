@@ -15,12 +15,11 @@ import fr.epicanard.mapsaver.errors.MapSaverError._
 import fr.epicanard.mapsaver.errors.TechnicalError.DatabaseError
 import fr.epicanard.mapsaver.errors.{Error, TechnicalError}
 import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder._
-import fr.epicanard.mapsaver.models.Pageable
 import fr.epicanard.mapsaver.models.map._
 import fr.epicanard.mapsaver.models.map.status.MapCreationStatus.{Associated, Created}
 import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus.ExistingMapUpdated
 import fr.epicanard.mapsaver.models.map.status.{MapCreationStatus, MapUpdateStatus}
-import fr.epicanard.mapsaver.models.UpdateVisibility
+import fr.epicanard.mapsaver.models.{MapIdentifier, Pageable, RestrictVisibility, UpdateVisibility}
 import fr.epicanard.mapsaver.resources.config.Storage
 import org.bukkit.map.MapView
 
@@ -28,8 +27,6 @@ import java.util.UUID
 import java.util.logging.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import fr.epicanard.mapsaver.models.MapIdentifier
-import fr.epicanard.mapsaver.models.RestrictVisibility
 
 class MapRepository(
     log: Logger,
@@ -76,8 +73,14 @@ class MapRepository(
     run(db)(exec).map(_.flatten)
   }
 
-  def deletePlayerMap(playerUUID: UUID, mapName: String): Future[Either[Error, Unit]] =
-    run(db)(PlayerMapQueries.delete(playerUUID, mapName).map(_ => ()).transactionally)
+  def deletePlayerMap(identifier: MapIdentifier)(canDelete: UUID => Boolean): Future[Either[Error, Unit]] = {
+    val request = (for {
+      playerMap <- getPlayerMapFromIdentifier(identifier)
+      _         <- EitherT.cond(canDelete(playerMap.playerUuid), (), NotTheOwner)
+      _         <- EitherT.right[Error](PlayerMapQueries.delete(playerMap.playerUuid, playerMap.dataId))
+    } yield ()).value.transactionally
+    run(db)(request).map(_.flatten)
+  }
 
   def updateMap(mapToUpdate: MapToUpdate): Future[Either[Error, MapUpdateStatus]] = {
     val exec = (for {
