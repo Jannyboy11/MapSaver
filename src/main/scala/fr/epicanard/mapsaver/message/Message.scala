@@ -24,7 +24,7 @@ object Message {
       val components = s.parts
         .zipAll(params, "", "")
         .foldLeft("") { case (acc, (line, param)) =>
-          acc + line.stripMargin + param.toString
+          acc + line.stripMargin + s"$param"
         }
         .split("\n")
         .map(Component.apply)
