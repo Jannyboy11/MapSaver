@@ -100,7 +100,7 @@ object InfoCommand {
        |&6${mapInfo.name} : &f${playerServerMaps.playerMap.name}
        |&6${mapInfo.owner} : &f${mapsWithOwner.owner.getName}
        |&6${mapInfo.visibility} : &f$visibility
-       |&6${mapInfo.originalMap} : &f${playerServerMaps.originalMap.originalId.get} - ${playerServerMaps.originalMap.server}
+       |&6${mapInfo.originalMap} : &f${playerServerMaps.originalMap.originalId.get} - ${playerServerMaps.originalMap.server}#${playerServerMaps.originalMap.world} - [${playerServerMaps.originalMap.x},${playerServerMaps.originalMap.z}]
        |&6${mapInfo.copyMaps} : &f""" ++
       Message(playerServerMaps.serverMaps.foldLeft(List[Component]()) { case (comps, serverMap) =>
         comps :+ Component(s" • ${serverMap.lockedId} - ${serverMap.server}")

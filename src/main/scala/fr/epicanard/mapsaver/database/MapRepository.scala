@@ -63,7 +63,7 @@ class MapRepository(
 
   def saveMap(mapToSave: MapToSave): Future[Either[Error, MapCreationStatus]] = {
     val exec = (for {
-      server <- ServerMapQueries.selectByMapId(mapToSave.id, mapToSave.server)
+      server <- ServerMapQueries.selectByMapId(mapToSave.item.id, mapToSave.server)
       result <- server match {
         case Some(serverMap) => createNewPlayerMap(mapToSave, serverMap)
         case None            => createNewMap(mapToSave)
@@ -218,20 +218,25 @@ class MapRepository(
 
   private def createServerMapFromExisting(dataMap: DataMap, serverName: String): EitherT[DBIO, Error, MapView] =
     for {
-      mapView <- EitherT(sync(() => newLockedWithColors(dataMap.bytes)))
+      mapView  <- EitherT(sync(() => newLockedWithColors(dataMap.bytes)))
+      original <- EitherT.fromOptionF(ServerMapQueries.selectOriginalWithDataId(dataMap.id), MissingMapOrNotPublic)
       serverMap = ServerMap(
         lockedId = mapView.getId,
         originalId = None,
+        world = original.world,
+        x = original.x,
+        z = original.z,
+        scale = original.scale,
         server = serverName,
-        dataId = dataMap.id
+        dataId = original.dataId
       )
       _ <- EitherT.right[Error](ServerMapQueries.insert(serverMap))
     } yield mapView
 
   private def createNewMap(mapToSave: MapToSave): DBIO[Either[Error, MapCreationStatus]] =
     (for {
-      lockedId <- EitherT(sync(() => newLockedWithColors(mapToSave.bytes))).map(_.getId)
-      dataId   <- EitherT.right[Error](DataMapQueries.insert(mapToSave.bytes))
+      lockedId <- EitherT(sync(() => newLockedWithColors(mapToSave.item.bytes))).map(_.getId)
+      dataId   <- EitherT.right[Error](DataMapQueries.insert(mapToSave.item.bytes))
       _        <- EitherT.right[Error](ServerMapQueries.insert(ServerMap.fromMapToSave(mapToSave, dataId, lockedId)))
       _        <- EitherT.right[Error](PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, dataId)))
     } yield Created).value
@@ -245,7 +250,7 @@ class MapRepository(
         .toLeft(())
         .leftMap(playerMap => if (playerMap.playerUuid == mapToSave.owner) AlreadySaved else NotTheOwner)
       _ <- EitherT.right[Error](PlayerMapQueries.insert(PlayerMap.fromMapToSave(mapToSave, serverMap.dataId)))
-      _ <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToSave.bytes))
+      _ <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToSave.item.bytes))
     } yield Associated).value
 }
 

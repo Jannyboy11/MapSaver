@@ -36,10 +36,9 @@ object SaveCommand {
       visibility <- parseVisibility(commandContext.args.tail)
       mapItem    <- MapExtractor.extractFromPlayer(player)
       mapToSave = MapToSave(
-        id = mapItem.id,
+        item = mapItem,
         name = mapName,
         server = commandContext.server,
-        bytes = mapItem.bytes,
         owner = player.getUniqueId,
         visibility = visibility
       )

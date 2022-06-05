@@ -30,7 +30,11 @@ object MapExtractor {
       _       = Array.copy(colorsMap.bytes, 0, byteMap, 0, 16384)
     } yield MapItem(
       id = mapView.getId,
-      bytes = byteMap
+      bytes = byteMap,
+      scale = mapView.getScale().name(),
+      x = mapView.getCenterX(),
+      z = mapView.getCenterZ(),
+      world = mapView.getWorld().getName()
     )
 
   private def extractMapMeta(itemMeta: ItemMeta): Option[MapMeta] = itemMeta match {

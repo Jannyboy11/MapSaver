@@ -8,6 +8,10 @@ object ServerMapMapper {
     ServerMap(
       lockedId = rs.nextInt(),
       originalId = rs.nextIntOption(),
+      world = rs.nextString(),
+      x = rs.nextInt(),
+      z = rs.nextInt(),
+      scale = rs.nextString(),
       server = rs.nextString(),
       dataId = rs.nextInt()
     )
