@@ -78,7 +78,16 @@ object PlayerMapQueries {
       restrictVisibility: Option[Visibility]
   ): DBIO[Option[MapByName]] =
     (sql"""
-      SELECT player_maps.player_uuid, player_maps.data_id, player_maps.visibility, server_maps.locked_id, server_maps.server
+      SELECT
+        player_maps.player_uuid,
+        player_maps.data_id,
+        player_maps.visibility,
+        server_maps.locked_id,
+        server_maps.server,
+        server_maps.scale,
+        server_maps.x,
+        server_maps.z,
+        server_maps.world
       FROM player_maps
       LEFT JOIN server_maps ON player_maps.data_id = server_maps.data_id AND server_maps.server = $serverName
       WHERE player_maps.name = $mapName AND player_uuid = $owner

@@ -4,7 +4,7 @@ import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.MapSaverError.MapInHandNeeded
 import fr.epicanard.mapsaver.errors.TechnicalError.{InvalidMapMeta, InvalidMapView}
 import fr.epicanard.mapsaver.map.BukkitMapBuilder.{getColorsMap, MapViewBuilder}
-import fr.epicanard.mapsaver.models.map.MapItem
+import fr.epicanard.mapsaver.models.map.{MapItem, McMapInfo}
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.{ItemMeta, MapMeta}
@@ -31,10 +31,12 @@ object MapExtractor {
     } yield MapItem(
       id = mapView.getId,
       bytes = byteMap,
-      scale = mapView.getScale().name(),
-      x = mapView.getCenterX(),
-      z = mapView.getCenterZ(),
-      world = mapView.getWorld().getName()
+      mapInfo = McMapInfo(
+        scale = mapView.getScale().name(),
+        x = mapView.getCenterX(),
+        z = mapView.getCenterZ(),
+        world = mapView.getWorld().getName()
+      )
     )
 
   private def extractMapMeta(itemMeta: ItemMeta): Option[MapMeta] = itemMeta match {

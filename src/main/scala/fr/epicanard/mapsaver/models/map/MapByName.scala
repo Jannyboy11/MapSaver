@@ -6,7 +6,8 @@ case class MapByName(
     playerUuid: UUID,
     dataId: Int,
     visibility: Visibility,
-    lockedMap: Option[LockedMap]
+    lockedMap: Option[LockedMap],
+    mapInfo: McMapInfo
 )
 
 case class LockedMap(

@@ -19,10 +19,10 @@ object ServerMap {
     new ServerMap(
       lockedId = lockedId,
       originalId = Some(mapToSave.item.id),
-      world = mapToSave.item.world,
-      x = mapToSave.item.x,
-      z = mapToSave.item.z,
-      scale = mapToSave.item.scale,
+      world = mapToSave.item.mapInfo.world,
+      x = mapToSave.item.mapInfo.x,
+      z = mapToSave.item.mapInfo.z,
+      scale = mapToSave.item.mapInfo.scale,
       server = mapToSave.server,
       dataId = dataId
     )

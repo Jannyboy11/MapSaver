@@ -157,6 +157,7 @@ class MapRepository(
         case Some(LockedMap(lockedId, _)) => EitherT.right[Error](sync(() => fromId(lockedId)))
         case None                         => createServerMapFromExisting(dataMap, serverName)
       }
+      _ = Try(MapView.Scale.valueOf(mapByName.mapInfo.scale)).toOption.foreach(mapView.setScale)
     } yield MapViewWithData(mapView, dataMap)).value.transactionally
     run(db)(requests).map(_.flatten)
   }

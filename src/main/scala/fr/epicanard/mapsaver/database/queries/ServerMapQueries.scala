@@ -18,7 +18,15 @@ object ServerMapQueries {
 
   def selectOriginalMap(mapId: Int, serverName: String): DBIO[Option[ServerMap]] =
     sql"""
-      SELECT b.*
+      SELECT
+        b.locked_id,
+        b.original_id,
+        b.world,
+        b.x,
+        b.z,
+        b.scale,
+        b.server,
+        b.data_id
       FROM server_maps AS a
       INNER JOIN server_maps AS b ON a.data_id = b.data_id
       WHERE (a.original_id = $mapId OR a.locked_id = $mapId) AND a.server = $serverName AND b.original_id IS NOT NULL
