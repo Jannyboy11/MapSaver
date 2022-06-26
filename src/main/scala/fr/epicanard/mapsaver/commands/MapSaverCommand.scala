@@ -2,16 +2,21 @@ package fr.epicanard.mapsaver.commands
 
 import cats.data.EitherT
 import cats.implicits._
+import cats.syntax.bifunctor._
 import fr.epicanard.mapsaver.commands.CommandContext.shiftArgs
 import fr.epicanard.mapsaver.database.MapRepository
+import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.Error.{handleError, handleTryResult}
 import fr.epicanard.mapsaver.listeners.SyncListener
 import fr.epicanard.mapsaver.message.Messenger
+import fr.epicanard.mapsaver.models.Complete
 import fr.epicanard.mapsaver.resources.config.Config
 import org.bukkit.command.{Command, CommandSender, TabExecutor}
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.jdk.CollectionConverters._
 
 case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])
@@ -42,24 +47,31 @@ case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Ma
   ): java.util.List[String] =
     onTabComplete(CommandContext(sender, args.toList, subCommands, config)).asJava
 
-  def onTabComplete(commandContext: CommandContext): List[String] = commandContext.args match {
-    case head :: Nil =>
-      subCommands
-        .filter { case (key, value) => key.startsWith(head) && value.canExecute(shiftArgs(commandContext)).isRight }
-        .keys
-        .toList
-    case head :: _ => subCommands.get(head).map(_.onTabComplete(shiftArgs(commandContext))).getOrElse(Nil)
-    case Nil =>
-      subCommands
-        .filter { case (_, value) => value.canExecute(shiftArgs(commandContext)).isRight }
-        .keys
-        .toList
+  def onTabComplete(commandContext: CommandContext): List[String] = {
+    val subContext = shiftArgs(commandContext)
+    commandContext.args match {
+      case head :: Nil =>
+        subCommands
+          .filter { case (key, value) => key.startsWith(head) && value.canExecute(subContext).isRight }
+          .keys
+          .toList
+      case head :: _ => subCommands.get(head).flatMap(onTabCompleteCommand(subContext)).getOrElse(Nil)
+      case Nil =>
+        subCommands
+          .filter { case (_, value) => value.canExecute(subContext).isRight }
+          .keys
+          .toList
+    }
   }
 
-  private def getSubCommand(args: Seq[String]): Option[BaseCommand] = args match {
-    case head :: _ => subCommands.get(head)
-    case _         => None
-  }
+  private def onTabCompleteCommand(subContext: CommandContext)(subCommand: BaseCommand) =
+    Await
+      .result(subCommand.onTabComplete(subContext), Duration(5, TimeUnit.SECONDS))
+      .leftMap(Error.handleError(_, messenger, subContext.sender))
+      .toOption
+      .map(Complete.getResults)
+
+  private def getSubCommand(args: Seq[String]): Option[BaseCommand] = args.headOption.flatMap(subCommands.get)
 }
 
 object MapSaverCommand {

@@ -11,7 +11,7 @@ import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
 import fr.epicanard.mapsaver.models.map.Visibility
-import fr.epicanard.mapsaver.models.{MapIdentifier, Player, UpdateVisibility}
+import fr.epicanard.mapsaver.models.{Complete, MapIdentifier, Player, UpdateVisibility}
 import fr.epicanard.mapsaver.resources.language.Help
 
 import java.util.UUID
@@ -28,7 +28,7 @@ case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(S
       statusMsg = messenger.language.infoMessages.visibilityMapUpdated
     } yield msg"$statusMsg").value
 
-  def onTabComplete(commandContext: CommandContext): List[String] = Nil
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
 
   def getUpdateVisbility(commandContext: CommandContext): Either[Error, UpdateVisibility] =
     parseArgs(commandContext)

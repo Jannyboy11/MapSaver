@@ -9,6 +9,7 @@ import fr.epicanard.mapsaver.errors.MapSaverError.{MissingMapName, WrongVisibili
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
+import fr.epicanard.mapsaver.models.Complete
 import fr.epicanard.mapsaver.models.map.status.MapCreationStatus
 import fr.epicanard.mapsaver.models.map.{MapToSave, Visibility}
 import fr.epicanard.mapsaver.resources.language.Help
@@ -26,7 +27,7 @@ case class SaveCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
       statusMsg = MapCreationStatus.getMessage(result, messenger.language.infoMessages)
     } yield msg"$statusMsg").value
 
-  def onTabComplete(commandContext: CommandContext): List[String] = Nil
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
 }
 object SaveCommand {
   private def buildMapToSave(commandContext: CommandContext): Either[Error, MapToSave] =

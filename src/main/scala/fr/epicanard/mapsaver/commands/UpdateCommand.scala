@@ -9,6 +9,7 @@ import fr.epicanard.mapsaver.listeners.SyncListener
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
+import fr.epicanard.mapsaver.models.Complete
 import fr.epicanard.mapsaver.models.map.MapToUpdate
 import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus
 import fr.epicanard.mapsaver.resources.language.Help
@@ -30,7 +31,7 @@ case class UpdateCommand(mapRepository: MapRepository, syncListener: SyncListene
       statusMsg = MapUpdateStatus.getMessage(result, messenger.language.infoMessages)
     } yield msg"$statusMsg").value
 
-  def onTabComplete(commandContext: CommandContext): List[String] = Nil
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
 }
 
 object UpdateCommand {

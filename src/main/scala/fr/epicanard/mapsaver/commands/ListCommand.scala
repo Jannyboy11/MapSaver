@@ -13,7 +13,7 @@ import fr.epicanard.mapsaver.message.Replacer._
 import fr.epicanard.mapsaver.message.{Component, Message, Messenger}
 import fr.epicanard.mapsaver.models.map.Visibility.{Private, Public}
 import fr.epicanard.mapsaver.models.map.{PlayerMap, Visibility}
-import fr.epicanard.mapsaver.models.{Pageable, Player}
+import fr.epicanard.mapsaver.models.{Complete, Pageable, Player}
 import fr.epicanard.mapsaver.resources.language.{Help, Language, Visibilities}
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.OfflinePlayer
@@ -29,36 +29,81 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =
     (for {
       listArgs <- EitherT.fromEither[Future](parseArguments(commandContext))
-      maybePlayer = getPlayerOpt(commandContext)
-      restrictVisibility = maybePlayer
-        .filter(player => listArgs.player.getUniqueId != player.getUniqueId && !Permission.AdminListMap.isSetOn(player))
-        .map(_ => Visibility.Public)
-      count <- EitherT(mapRepository.countPlayerMaps(listArgs.player.getUniqueId, restrictVisibility))
-      pageSize = commandContext.config.options.pageSize
-      maxPage  = Math.ceil(count.toFloat / pageSize.toFloat).toInt
-      pageable = Pageable(
-        player = listArgs.player,
-        page = Math.max(Math.min(listArgs.page, maxPage), 1),
-        maxPage = Math.max(maxPage, 1),
-        pageSize = pageSize
+      restrictVisibility = ListCommand.getRestrictVisibility(commandContext, listArgs.player)
+      pageable <- EitherT(
+        ListCommand.getPageable(
+          mapRepository,
+          commandContext,
+          listArgs.player,
+          restrictVisibility,
+          listArgs.page
+        )
       )
       maps <- EitherT(mapRepository.listPlayerMaps(pageable, restrictVisibility))
       message = buildMessage(maps, pageable, messenger.language, commandContext.sender)
     } yield message).value
 
-  def onTabComplete(commandContext: CommandContext): List[String] = Nil
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = commandContext.args match {
+    case playerNameOrPage :: Nil if playerNameOrPage.toIntOption != None =>
+      CommandContext.getPlayerOpt(commandContext) match {
+        case None => Complete.Empty.fsuccess
+        case Some(owner) =>
+          ListCommand
+            .getPageable(mapRepository, commandContext, owner, None, 0)
+            .map(
+              _.map(pageable =>
+                List.range(1, pageable.maxPage + 1).map(_.toString).filter(_.startsWith(playerNameOrPage))
+              ).map(Complete.Custom(_))
+            )
+      }
+    case _ :: Nil => Complete.Players.fsuccess
+    case ownerName :: page :: Nil =>
+      val owner = Player.getOfflinePlayer(ownerName)
+      ListCommand
+        .getPageable(mapRepository, commandContext, owner, ListCommand.getRestrictVisibility(commandContext, owner), 0)
+        .map(
+          _.map(pageable => List.range(1, pageable.maxPage + 1).map(_.toString).filter(_.startsWith(page)))
+            .map(Complete.Custom(_))
+        )
+    case _ => Complete.Empty.fsuccess
+  }
 }
 
 object ListCommand {
   private def parseArguments(commandContext: CommandContext): Either[Error, ListArgs] =
     commandContext.args match {
       case Nil => getPlayer(commandContext).map(player => ListArgs(player, 1))
-      case head :: Nil =>
-        head.toIntOption.fold[Either[Error, ListArgs]](Right(ListArgs(head, 1)))(page =>
+      case playerNameOrPage :: Nil =>
+        playerNameOrPage.toIntOption.fold[Either[Error, ListArgs]](Right(ListArgs(playerNameOrPage, 1)))(page =>
           getPlayer(commandContext).map(player => ListArgs(player, page))
         )
       case name :: page :: _ => page.toIntOption.toRight[Error](InvalidPageNumber).map(ListArgs(name, _))
     }
+
+  private def getRestrictVisibility(commandContext: CommandContext, owner: OfflinePlayer) =
+    getPlayerOpt(commandContext)
+      .filter(player => owner.getUniqueId != player.getUniqueId && !Permission.AdminListMap.isSetOn(player))
+      .map(_ => Visibility.Public)
+
+  private def getPageable(
+      mapRepository: MapRepository,
+      commandContext: CommandContext,
+      player: OfflinePlayer,
+      restrictVisibility: Option[Visibility],
+      currentPage: Int
+  ): Future[Either[Error, Pageable]] =
+    mapRepository
+      .countPlayerMaps(player.getUniqueId, restrictVisibility)
+      .map(_.map { count =>
+        val pageSize = commandContext.config.options.pageSize
+        val maxPage  = Math.ceil(count.toFloat / pageSize.toFloat).toInt
+        Pageable(
+          player = player,
+          page = Math.max(Math.min(currentPage, maxPage), 1),
+          maxPage = Math.max(maxPage, 1),
+          pageSize = pageSize
+        )
+      })
 
   private def buildMessage(
       playerMaps: List[PlayerMap],

@@ -12,18 +12,17 @@ import fr.epicanard.mapsaver.map.BukkitMapBuilder.MapViewBuilder
 import fr.epicanard.mapsaver.message.Component.toColor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
-import fr.epicanard.mapsaver.models.Player
 import fr.epicanard.mapsaver.models.map.Visibility
+import fr.epicanard.mapsaver.models.{Complete, Player}
 import fr.epicanard.mapsaver.resources.language.{Help, Language}
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapView
-import org.bukkit.{Material, OfflinePlayer}
+import org.bukkit.{entity, Material, OfflinePlayer}
 
 import java.util
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.bukkit.entity
 
 case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.ImportMap)) {
   def helpMessage(help: Help): String = help.`import`
@@ -54,7 +53,7 @@ case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(
       msg"${messenger.language.infoMessages.mapImported}"
     }).value
 
-  def onTabComplete(commandContext: CommandContext): List[String] = Nil
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
 }
 
 object ImportCommand {

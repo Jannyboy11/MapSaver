@@ -9,7 +9,7 @@ import fr.epicanard.mapsaver.errors.MapSaverError.PlayerOnlyCommand
 import fr.epicanard.mapsaver.map.MapExtractor
 import fr.epicanard.mapsaver.message.Message._
 import fr.epicanard.mapsaver.message.{Message, Messenger}
-import fr.epicanard.mapsaver.models.{MapIdentifier, Player}
+import fr.epicanard.mapsaver.models.{Complete, MapIdentifier, Player}
 import fr.epicanard.mapsaver.resources.language.Help
 import org.bukkit.entity
 
@@ -32,7 +32,7 @@ abstract class LockableCommand(mapRepository: MapRepository, permission: Permiss
     } yield ()
   }
 
-  def onTabComplete(commandContext: CommandContext): List[String] = Nil
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
 }
 
 case class LockCommand(mapRepository: MapRepository)
