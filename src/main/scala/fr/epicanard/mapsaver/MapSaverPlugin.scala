@@ -44,7 +44,7 @@ object MapSaverPlugin
       mapRepository = new MapRepository(logger, database)
       _ <- EitherT(mapRepository.initDatabase())
       syncListener    = new SyncListener(this, mapRepository, messenger, config.serverName)
-      mapSaverCommand = MapSaverCommand(messenger, config, mapRepository, syncListener)
+      mapSaverCommand = MapSaverCommand(this, messenger, config, mapRepository, syncListener)
     } yield {
 
       getCommand("mapsaver").setExecutor(mapSaverCommand)

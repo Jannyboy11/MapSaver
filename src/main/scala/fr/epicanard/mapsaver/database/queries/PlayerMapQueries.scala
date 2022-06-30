@@ -9,6 +9,7 @@ import fr.epicanard.mapsaver.database.profile.MySQLProfile.api._
 import fr.epicanard.mapsaver.database.schema.PlayerMaps
 import fr.epicanard.mapsaver.models.map.{MapByName, PlayerMap, Visibility}
 import fr.epicanard.mapsaver.models.{Pageable, RestrictVisibility}
+import org.bukkit.OfflinePlayer
 
 import java.util.UUID
 
@@ -45,6 +46,21 @@ object PlayerMapQueries {
       LIMIT $start,${pageable.pageSize}
       """).as[PlayerMap]
   }
+
+  def searchForPlayer(
+      search: String,
+      owner: OfflinePlayer,
+      restrictVisibility: Option[Visibility]
+  ): DBIO[Seq[String]] =
+    (sql"""
+      SELECT p.name FROM player_maps AS p
+      LEFT JOIN data_maps ON p.data_id = data_maps.id
+      WHERE `player_uuid` = ${owner.getUniqueId} AND `name` LIKE ${s"%$search%"}
+      """
+      +? restrictVisibility.map(vis => sql" AND `visibility` = $vis ")
+      ++ sql"""
+      ORDER BY data_maps.updated_at DESC
+      """).as[String]
 
   def selectPlayerMap(
       owner: UUID,

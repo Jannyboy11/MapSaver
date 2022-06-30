@@ -2,7 +2,7 @@ package fr.epicanard.mapsaver.commands
 
 import cats.data.EitherT
 import fr.epicanard.mapsaver.Permission
-import fr.epicanard.mapsaver.commands.CommandContext.{getPlayer, getPlayerOpt}
+import fr.epicanard.mapsaver.commands.CommandContext.getPlayer
 import fr.epicanard.mapsaver.commands.InfoCommand.{buildMessage, getPlayerServerMaps}
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
@@ -29,7 +29,8 @@ case class InfoCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
       message = buildMessage(messenger.language, playerServerMaps, commandContext.sender)
     } yield message).value
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] =
+    BaseCommand.mapTabComplete(mapRepository, commandContext)
 }
 
 object InfoCommand {
@@ -42,7 +43,7 @@ object InfoCommand {
     commandContext.args match {
       case Nil                 => getInfoMapInHand(mapRepository, commandContext)
       case name :: Nil         => getInfoOfSender(mapRepository, commandContext, name)
-      case name :: player :: _ => getInfoOfPlayer(mapRepository, commandContext, name, player)
+      case player :: name :: _ => getInfoOfPlayer(mapRepository, commandContext, name, player)
     }
 
   private def getInfoMapInHand(
@@ -76,13 +77,8 @@ object InfoCommand {
       name: String,
       playerName: String
   ): Future[Either[Error, MapsWithOwner]] = {
-    val maybePlayer = getPlayerOpt(commandContext)
-    val owner       = Player.getOfflinePlayer(playerName)
-    val restrictVisibility = maybePlayer
-      .filter(player =>
-        owner.getUniqueId != player.getUniqueId && !Permission.AdminInfoMap.isSetOn(commandContext.sender)
-      )
-      .map(_ => Visibility.Public)
+    val owner              = Player.getOfflinePlayer(playerName)
+    val restrictVisibility = Visibility.getRestrictVisibility(commandContext, owner, Permission.AdminInfoMap)
     EitherT(mapRepository.getMapInfo(owner.getUniqueId, restrictVisibility, name))
       .map(maps => MapsWithOwner(maps, owner))
       .value

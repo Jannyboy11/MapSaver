@@ -21,6 +21,7 @@ import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus.ExistingMapUpdate
 import fr.epicanard.mapsaver.models.map.status.{MapCreationStatus, MapUpdateStatus}
 import fr.epicanard.mapsaver.models.{MapIdentifier, Pageable, RestrictVisibility, UpdateVisibility}
 import fr.epicanard.mapsaver.resources.config.Storage
+import org.bukkit.OfflinePlayer
 import org.bukkit.map.MapView
 
 import java.util.UUID
@@ -197,6 +198,13 @@ class MapRepository(
     } yield ()).value.transactionally
     run(db)(request).map(_.flatten)
   }
+
+  def searchForPlayer(
+      search: String,
+      owner: OfflinePlayer,
+      restrictVisibility: Option[Visibility]
+  ): Future[Either[Error, List[String]]] =
+    run(db)(PlayerMapQueries.searchForPlayer(search, owner, restrictVisibility).map(_.toList))
 
   private def getPlayerMapFromIdentifier(identifier: MapIdentifier): EitherT[DBIO, Error, PlayerMap] =
     identifier match {

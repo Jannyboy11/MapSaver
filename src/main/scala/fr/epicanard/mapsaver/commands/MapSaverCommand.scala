@@ -12,6 +12,7 @@ import fr.epicanard.mapsaver.message.Messenger
 import fr.epicanard.mapsaver.models.Complete
 import fr.epicanard.mapsaver.resources.config.Config
 import org.bukkit.command.{Command, CommandSender, TabExecutor}
+import org.bukkit.plugin.Plugin
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +20,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.jdk.CollectionConverters._
 
-case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])
+case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])
     extends TabExecutor {
   override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean =
     onCommand(CommandContext(sender, args, subCommands, config))
@@ -45,7 +46,7 @@ case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Ma
       alias: String,
       args: Array[String]
   ): java.util.List[String] =
-    onTabComplete(CommandContext(sender, args.toList, subCommands, config)).asJava
+    onTabComplete(CommandContext(sender, args, subCommands, config)).asJava
 
   def onTabComplete(commandContext: CommandContext): List[String] = {
     val subContext = shiftArgs(commandContext)
@@ -69,19 +70,34 @@ case class MapSaverCommand(messenger: Messenger, config: Config, subCommands: Ma
       .result(subCommand.onTabComplete(subContext), Duration(5, TimeUnit.SECONDS))
       .leftMap(Error.handleError(_, messenger, subContext.sender))
       .toOption
-      .map(Complete.getResults)
+      .map(
+        Complete.getResults(
+          _,
+          search =>
+            plugin
+              .getServer()
+              .getOfflinePlayers()
+              .to(LazyList)
+              .map(_.getName())
+              .filter(_.toLowerCase.startsWith(search.toLowerCase()))
+              .take(10)
+              .toList
+        )
+      )
 
   private def getSubCommand(args: Seq[String]): Option[BaseCommand] = args.headOption.flatMap(subCommands.get)
 }
 
 object MapSaverCommand {
   def apply(
+      plugin: Plugin,
       messenger: Messenger,
       config: Config,
       mapRepository: MapRepository,
       syncListener: SyncListener
   ): MapSaverCommand =
     MapSaverCommand(
+      plugin = plugin,
       messenger = messenger,
       config = config,
       subCommands = Map(

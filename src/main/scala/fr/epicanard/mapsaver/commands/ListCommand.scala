@@ -2,7 +2,7 @@ package fr.epicanard.mapsaver.commands
 
 import cats.data.EitherT
 import fr.epicanard.mapsaver.Permission
-import fr.epicanard.mapsaver.commands.CommandContext.{getPlayer, getPlayerOpt}
+import fr.epicanard.mapsaver.commands.CommandContext.getPlayer
 import fr.epicanard.mapsaver.commands.ListCommand.{buildMessage, parseArguments}
 import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
@@ -29,7 +29,7 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =
     (for {
       listArgs <- EitherT.fromEither[Future](parseArguments(commandContext))
-      restrictVisibility = ListCommand.getRestrictVisibility(commandContext, listArgs.player)
+      restrictVisibility = Visibility.getRestrictVisibility(commandContext, listArgs.player, Permission.AdminListMap)
       pageable <- EitherT(
         ListCommand.getPageable(
           mapRepository,
@@ -56,11 +56,17 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
               ).map(Complete.Custom(_))
             )
       }
-    case _ :: Nil => Complete.Players.fsuccess
+    case name :: Nil => Complete.Players(name).fsuccess
     case ownerName :: page :: Nil =>
       val owner = Player.getOfflinePlayer(ownerName)
       ListCommand
-        .getPageable(mapRepository, commandContext, owner, ListCommand.getRestrictVisibility(commandContext, owner), 0)
+        .getPageable(
+          mapRepository,
+          commandContext,
+          owner,
+          Visibility.getRestrictVisibility(commandContext, owner, Permission.AdminListMap),
+          0
+        )
         .map(
           _.map(pageable => List.range(1, pageable.maxPage + 1).map(_.toString).filter(_.startsWith(page)))
             .map(Complete.Custom(_))
@@ -79,11 +85,6 @@ object ListCommand {
         )
       case name :: page :: _ => page.toIntOption.toRight[Error](InvalidPageNumber).map(ListArgs(name, _))
     }
-
-  private def getRestrictVisibility(commandContext: CommandContext, owner: OfflinePlayer) =
-    getPlayerOpt(commandContext)
-      .filter(player => owner.getUniqueId != player.getUniqueId && !Permission.AdminListMap.isSetOn(player))
-      .map(_ => Visibility.Public)
 
   private def getPageable(
       mapRepository: MapRepository,
@@ -122,7 +123,7 @@ object ListCommand {
       mapName: String
   ): Component = {
     val maybeInfo = Option.when(Permission.InfoMap.isSetOn(sender, defaultSender = false))(
-      link("info", language.list.infoHover, ChatColor.DARK_GREEN, s"""/mapsaver info "$mapName" ${player.getName}""")
+      link("info", language.list.infoHover, ChatColor.DARK_GREEN, s"""/mapsaver info ${player.getName} "$mapName"""")
     )
     val maybeImport = Option.when(Permission.ImportMap.isSetOn(sender, defaultSender = false))(
       link(
