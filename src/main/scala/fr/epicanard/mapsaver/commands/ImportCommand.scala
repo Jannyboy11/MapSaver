@@ -53,7 +53,8 @@ case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(
       msg"${messenger.language.infoMessages.mapImported}"
     }).value
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] =
+    BaseCommand.mapTabComplete(mapRepository, commandContext)
 }
 
 object ImportCommand {
@@ -62,7 +63,7 @@ object ImportCommand {
   private def parseArguments(commandContext: CommandContext, senderPlayer: OfflinePlayer): Either[Error, ImportArgs] =
     commandContext.args match {
       case name :: Nil         => Right(ImportArgs(name, senderPlayer))
-      case name :: player :: _ => Right(ImportArgs(name, Player.getOfflinePlayer(player)))
+      case player :: name :: _ => Right(ImportArgs(name, Player.getOfflinePlayer(player)))
       case Nil                 => Left(MissingMapName)
     }
 
