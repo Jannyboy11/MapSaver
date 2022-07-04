@@ -32,7 +32,8 @@ abstract class LockableCommand(mapRepository: MapRepository, permission: Permiss
     } yield ()
   }
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] =
+    BaseCommand.mapTabComplete(mapRepository, commandContext)
 }
 
 case class LockCommand(mapRepository: MapRepository)
@@ -58,7 +59,7 @@ object LockableCommand {
       commandContext: CommandContext
   ): Either[Error, MapIdentifier] =
     commandContext.args match {
-      case mapName :: playerName :: _ =>
+      case playerName :: mapName :: _ =>
         Right(MapIdentifier.MapName(mapName, Player.getOfflinePlayer(playerName).getUniqueId()))
       case mapName :: _ =>
         maybePlayer
