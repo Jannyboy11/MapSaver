@@ -31,7 +31,8 @@ case class DeleteCommand(mapRepository: MapRepository) extends BaseCommand(Some(
     } yield msg"""${messenger.language.infoMessages.mapDeleted}""").value
   }
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] =
+    BaseCommand.mapTabComplete(mapRepository, commandContext)
 }
 
 object DeleteCommand {
@@ -40,7 +41,7 @@ object DeleteCommand {
       commandContext: CommandContext
   ): Either[Error, MapIdentifier] =
     commandContext.args match {
-      case mapName :: playerName :: _ =>
+      case playerName :: mapName :: _ =>
         Right(MapIdentifier.MapName(mapName, Player.getOfflinePlayer(playerName).getUniqueId()))
       case mapName :: _ =>
         maybePlayer
