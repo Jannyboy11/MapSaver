@@ -20,4 +20,9 @@ object Visibility extends Enum[Visibility] {
       .filter(player => owner.getUniqueId != player.getUniqueId && !adminPermission.isSetOn(player))
       .map(_ => Visibility.Public)
 
+  def startsWithNameInsensitive(name: String): List[String] =
+    values
+      .map(_.entryName.toLowerCase())
+      .filter(_.startsWith(name.toLowerCase()))
+      .toList
 }

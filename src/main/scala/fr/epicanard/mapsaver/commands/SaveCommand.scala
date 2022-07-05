@@ -27,8 +27,12 @@ case class SaveCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
       statusMsg = MapCreationStatus.getMessage(result, messenger.language.infoMessages)
     } yield msg"$statusMsg").value
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = Complete.Empty.fsuccess
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = commandContext.args match {
+    case _ :: vis :: Nil => Complete.Visibility(vis).fsuccess
+    case _               => Complete.Empty.fsuccess
+  }
 }
+
 object SaveCommand {
   private def buildMapToSave(commandContext: CommandContext): Either[Error, MapToSave] =
     for {
