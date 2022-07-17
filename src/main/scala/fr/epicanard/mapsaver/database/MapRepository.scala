@@ -33,6 +33,7 @@ class MapRepository(
     log: Logger,
     db: Database
 )(implicit executionContext: ExecutionContext, syncContext: SyncContext) {
+  private val spaceRegex = """\s""".r
 
   def initDatabase(): Future[Either[TechnicalError, Unit]] = {
     val tables = List(
@@ -204,7 +205,11 @@ class MapRepository(
       owner: OfflinePlayer,
       restrictVisibility: Option[Visibility]
   ): Future[Either[Error, List[String]]] =
-    run(db)(PlayerMapQueries.searchForPlayer(search, owner, restrictVisibility).map(_.toList))
+    run(db)(
+      PlayerMapQueries
+        .searchForPlayer(search, owner, restrictVisibility)
+        .map(_.toList.map(elem => if (spaceRegex.findFirstMatchIn(elem).isDefined) s"\"$elem\"" else elem))
+    )
 
   private def getPlayerMapFromIdentifier(identifier: MapIdentifier): EitherT[DBIO, Error, PlayerMap] =
     identifier match {

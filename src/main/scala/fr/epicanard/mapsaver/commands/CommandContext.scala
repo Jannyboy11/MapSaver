@@ -9,14 +9,17 @@ import org.bukkit.entity.Player
 case class CommandContext(
     sender: CommandSender,
     args: List[String],
+    tabLastEmpty: Boolean,
     subCommands: Map[String, BaseCommand],
     config: Config
 ) {
   val server = config.serverName
+
+  val tabArgs = if (tabLastEmpty) args ++ List("") else args
 }
 
 object CommandContext {
-  private val quoteArgsPattern = """(?:(?:["']+)([^"']*)?(?:["']+)|(\w*))(?:\s|$)""".r
+  private val quoteArgsPattern = """(?:\s|^)(?:(?:"([^"]+)")|(?:"?([^"\s]+)))""".r
 
   def apply(
       sender: CommandSender,
@@ -33,6 +36,7 @@ object CommandContext {
     CommandContext(
       sender = sender,
       args = parsedArgs,
+      tabLastEmpty = parsedArgs.length > 0 && args.last.isEmpty(),
       subCommands = subCommands,
       config = config
     )
@@ -44,6 +48,7 @@ object CommandContext {
       case _ :: tail => tail
       case Nil       => Nil
     },
+    tabLastEmpty = commandContext.tabLastEmpty,
     subCommands = commandContext.subCommands,
     config = commandContext.config
   )

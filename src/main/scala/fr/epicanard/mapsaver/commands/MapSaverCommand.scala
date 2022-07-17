@@ -50,7 +50,7 @@ case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config,
 
   def onTabComplete(commandContext: CommandContext): List[String] = {
     val subContext = shiftArgs(commandContext)
-    commandContext.args match {
+    commandContext.tabArgs match {
       case head :: Nil =>
         subCommands
           .filter { case (key, value) => key.startsWith(head) && value.canExecute(subContext).isRight }

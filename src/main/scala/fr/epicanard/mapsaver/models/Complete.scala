@@ -17,6 +17,7 @@ object Complete {
   case class CustomWithPlayers(results: List[String], search: String)               extends Complete
   case class Players(search: String)                                                extends Complete
   case class Visibility(search: String)                                             extends Complete
+  case class VisibilityWithPlayers(search: String)                                  extends Complete
   case class CustomWithVisibility(results: List[String], search: String)            extends Complete
   case class CustomWithVisibilityWithPlayers(results: List[String], search: String) extends Complete
   case object Empty                                                                 extends Complete
@@ -26,6 +27,7 @@ object Complete {
     case CustomWithPlayers(results, search)    => results ++ withPlayers(search)
     case Players(search)                       => withPlayers(search)
     case Visibility(search)                    => MVisibility.startsWithNameInsensitive(search)
+    case VisibilityWithPlayers(search)         => MVisibility.startsWithNameInsensitive(search) ++ withPlayers(search)
     case CustomWithVisibility(results, search) => results ++ MVisibility.startsWithNameInsensitive(search)
     case CustomWithVisibilityWithPlayers(results, search) =>
       results ++ withPlayers(search) ++ MVisibility.startsWithNameInsensitive(search)

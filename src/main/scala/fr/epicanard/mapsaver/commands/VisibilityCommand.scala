@@ -28,16 +28,18 @@ case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(S
       statusMsg = messenger.language.infoMessages.visibilityMapUpdated
     } yield msg"$statusMsg").value
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = commandContext.args match {
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = commandContext.tabArgs match {
     case _ :: _ :: vis :: Nil => Complete.Visibility(vis).fsuccess
-    case ownerName :: mapOrVis :: Nil =>
+    case ownerName :: mapOrVis :: Nil if mapOrVis.length >= 1 =>
       val owner = Player.getOfflinePlayer(ownerName)
       mapRepository.searchForPlayer(mapOrVis, owner, None).map(_.map(Complete.CustomWithVisibility(_, mapOrVis)))
-    case name :: Nil =>
+    case _ :: mapOrVis :: Nil => Complete.Visibility(mapOrVis).fsuccess
+    case name :: Nil if name.length >= 1 =>
       Complete.withPlayer(commandContext) { owner =>
         mapRepository.searchForPlayer(name, owner, None).map(_.map(Complete.CustomWithVisibilityWithPlayers(_, name)))
       }
-    case _ => Complete.Empty.fsuccess
+    case name :: Nil => Complete.VisibilityWithPlayers(name).fsuccess
+    case _           => Complete.Empty.fsuccess
   }
 
   def getUpdateVisbility(commandContext: CommandContext): Either[Error, UpdateVisibility] =

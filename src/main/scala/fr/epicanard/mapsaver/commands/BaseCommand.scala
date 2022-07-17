@@ -28,7 +28,7 @@ object BaseCommand {
   def mapTabComplete(mapRepository: MapRepository, commandContext: CommandContext)(implicit
       ec: ExecutionContext
   ): Future[Either[Error, Complete]] =
-    commandContext.args match {
+    commandContext.tabArgs match {
       case name :: Nil if name.length >= 1 =>
         Complete.withPlayer(commandContext) { owner =>
           mapRepository.searchForPlayer(name, owner, None).map(_.map(Complete.CustomWithPlayers(_, name)))

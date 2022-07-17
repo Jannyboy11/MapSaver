@@ -43,7 +43,7 @@ case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Pe
       message = buildMessage(maps, pageable, messenger.language, commandContext.sender)
     } yield message).value
 
-  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = commandContext.args match {
+  def onTabComplete(commandContext: CommandContext): Future[Either[Error, Complete]] = commandContext.tabArgs match {
     case playerNameOrPage :: Nil if playerNameOrPage.toIntOption != None =>
       CommandContext.getPlayerOpt(commandContext) match {
         case None => Complete.Empty.fsuccess
