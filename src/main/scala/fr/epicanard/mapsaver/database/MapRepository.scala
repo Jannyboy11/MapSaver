@@ -65,12 +65,15 @@ class MapRepository(
 
   def saveMap(mapToSave: MapToSave): Future[Either[Error, MapCreationStatus]] = {
     val exec = (for {
-      server <- ServerMapQueries.selectByMapId(mapToSave.item.id, mapToSave.server)
+      server <- EitherT.right[Error](ServerMapQueries.selectByMapId(mapToSave.item.id, mapToSave.server))
+      _ <- OptionT(PlayerMapQueries.selectPlayerMapWithName(mapToSave.owner, mapToSave.name, None))
+        .toLeft(())
+        .leftMap[Error](_ => AlreadySaved)
       result <- server match {
-        case Some(serverMap) => createNewPlayerMap(mapToSave, serverMap)
-        case None            => createNewMap(mapToSave)
+        case Some(serverMap) => EitherT(createNewPlayerMap(mapToSave, serverMap))
+        case None            => EitherT(createNewMap(mapToSave))
       }
-    } yield result).transactionally
+    } yield result).value.transactionally
 
     run(db)(exec).map(_.flatten)
   }

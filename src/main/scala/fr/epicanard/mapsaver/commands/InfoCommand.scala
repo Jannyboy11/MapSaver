@@ -106,7 +106,7 @@ object InfoCommand {
           "import",
           language.list.importHover,
           ChatColor.DARK_GREEN,
-          s"""/mapsaver import "${playerServerMaps.playerMap.name}" ${mapsWithOwner.owner.getName}"""
+          s"""/mapsaver import ${mapsWithOwner.owner.getName} "${playerServerMaps.playerMap.name}""""
         )
       ) +?
       Option.when(playerServerMaps.playerMap.locked)(Component(s"&c${mapInfo.locked}")) ++

@@ -130,7 +130,7 @@ object ListCommand {
         "import",
         language.list.importHover,
         ChatColor.DARK_GREEN,
-        s"""/mapsaver import "$mapName" ${player.getName}"""
+        s"""/mapsaver import ${player.getName} "$mapName""""
       )
     )
 

@@ -12,7 +12,7 @@ class PlayerMaps(tag: Tag) extends Table[PlayerMap](tag, "player_maps") {
   def dataId     = column[Int]("data_id")
   def owner      = column[Boolean]("owner")
   def visibility = column[Visibility]("visibility", O.Length(20))
-  def name       = column[String]("name", O.Length(256))
+  def name       = column[String]("name", O.SqlType("VARCHAR(256) CHARACTER SET utf8 COLLATE utf8_bin"))
   def locked     = column[Boolean]("locked")
 
   def *        = (playerUuid, dataId, owner, visibility, name, locked) <> (PlayerMap.tupled, PlayerMap.unapply)
