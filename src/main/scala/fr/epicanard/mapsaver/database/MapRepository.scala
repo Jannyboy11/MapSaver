@@ -79,6 +79,7 @@ class MapRepository(
     val request = (for {
       playerMap <- getPlayerMapFromIdentifier(identifier)
       _         <- EitherT.cond(canDelete(playerMap.playerUuid), (), NotTheOwner)
+      _         <- EitherT.cond(!playerMap.locked, (), LockedMapDenied)
       _         <- EitherT.right[Error](PlayerMapQueries.delete(playerMap.playerUuid, playerMap.dataId))
     } yield ()).value.transactionally
     run(db)(request).map(_.flatten)
