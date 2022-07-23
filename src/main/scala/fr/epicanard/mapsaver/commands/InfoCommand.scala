@@ -19,7 +19,7 @@ import org.bukkit.command.CommandSender
 import scala.concurrent.{ExecutionContext, Future}
 
 case class InfoCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
-    extends BaseCommand(Some(Permission.ListMap)) {
+    extends BaseCommand(Some(Permission.InfoMap)) {
 
   def helpMessage(help: Help): String = help.info
 

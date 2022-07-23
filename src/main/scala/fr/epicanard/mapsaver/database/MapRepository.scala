@@ -88,6 +88,21 @@ class MapRepository(
     run(db)(request).map(_.flatten)
   }
 
+  def renamePlayerMap(identifier: MapIdentifier, newName: String)(
+      canRename: UUID => Boolean
+  ): Future[Either[Error, Unit]] = {
+    val request = (for {
+      playerMap <- getPlayerMapFromIdentifier(identifier)
+      _         <- EitherT.cond(canRename(playerMap.playerUuid), (), NotTheOwner)
+      _         <- EitherT.cond(!playerMap.locked, (), LockedMapDenied)
+      _ <- OptionT(PlayerMapQueries.selectPlayerMapWithName(playerMap.playerUuid, newName, None))
+        .toLeft(())
+        .leftMap[Error](_ => AlreadySaved)
+      _ <- EitherT.right[Error](PlayerMapQueries.rename(playerMap.playerUuid, playerMap.dataId, newName))
+    } yield ()).value.transactionally
+    run(db)(request).map(_.flatten)
+  }
+
   def updateMap(mapToUpdate: MapToUpdate): Future[Either[Error, MapUpdateStatus]] = {
     val exec = (for {
       serverMap <- EitherT.fromOptionF(

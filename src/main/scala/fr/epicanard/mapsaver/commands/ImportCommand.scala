@@ -18,7 +18,7 @@ import fr.epicanard.mapsaver.resources.language.{Help, Language}
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapView
-import org.bukkit.{Material, OfflinePlayer, entity}
+import org.bukkit.{entity, Material, OfflinePlayer}
 
 import java.util
 import scala.concurrent.{ExecutionContext, Future}

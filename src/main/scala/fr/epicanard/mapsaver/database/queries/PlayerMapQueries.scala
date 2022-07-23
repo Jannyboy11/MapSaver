@@ -23,6 +23,9 @@ object PlayerMapQueries {
   def delete(playerUUID: UUID, dataId: Int): DBIO[Int] =
     sqlu"""DELETE FROM player_maps WHERE `player_uuid` = $playerUUID AND `data_id` = $dataId"""
 
+  def rename(playerUUID: UUID, dataId: Int, newName: String): DBIO[Int] =
+    sqlu"""UPDATE player_maps SET `name` = $newName WHERE `player_uuid` = $playerUUID AND `data_id` = $dataId"""
+
   def countForPlayer(playerUUID: UUID, restrictVisibility: Option[Visibility]): DBIO[Int] =
     (sql"""
       SELECT count(*) FROM player_maps

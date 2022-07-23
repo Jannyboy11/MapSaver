@@ -12,6 +12,7 @@ Help:
   Lock: "&6/mapsaver lock [joueur] [nom_carte]&f - Verrouille une carte ou de celle en main"
   Unlock: "&6/mapsaver unlock [joueur] [nom_carte]&f - Déverrouille une carte ou de celle en main"
   Delete: "&6/mapsaver delete [joueur] [nom_carte]&f - Supprime une carte ou de celle en main"
+  Rename: "&6/mapsaver rename [joueur] [ancien_nom_carte] <nouveau_nom_carte>&f - Renomme une carte ou celle en main"
 ErrorMessages:
   PermissionDenied: "&cVous n'êtes pas autorisé à faire cette action"
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
@@ -22,12 +23,12 @@ ErrorMessages:
   MissingEmptyMap: "&cVous devez avoir un item carte vide dans votre inventaire"
   NotTheOwner: "&cVous n'êtes pas le propriétaire de cette carte"
   NotTheOriginal: "&cCette carte n'est pas l'originale"
-  AlreadySaved: "&cVous avez déjà enregistré cette carte.\n&fUtilises &6/mapsaver update&f pour mettre à jour cette carte"
+  AlreadySaved: "&cVous avez déjà enregistré une carte avec ce nom"
   WrongVisibility: "&cMauvaise visibilité : %s. Attendue : %s"
   InvalidPageNumber: "&cLe numéro de page n'est pas valide"
-  UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails."
-  LockedMapDenied: "&cImpossible de faire cette action car la carte est verrouillée."
-  InventoryFull: "&cImpossible de récupérer la carte. Votre inventaire est plein."
+  UnexpectedError: "&cErreur inattendue, veuillez regarder la console pour plus de détails"
+  LockedMapDenied: "&cImpossible de faire cette action car la carte est verrouillée"
+  InventoryFull: "&cImpossible de récupérer la carte. Votre inventaire est plein"
 InfoMessages:
   NewMapCreated: "Votre nouvelle carte est sauvegardée"
   ExistingMapUpdated: "Votre carte a été mise à jour"
@@ -38,6 +39,7 @@ InfoMessages:
   LockedMapUpdated: "Votre carte a bien été verrouillée"
   UnlockedMapUpdated: "Votre carte a bien été déverrouillée"
   MapDeleted: "Votre carte a bien été supprimée"
+  MapRenamed: "Votre carte a bien été renommée en %s"
 MapInfo:
   Name: "Nom"
   Owner: "Propriétaire"

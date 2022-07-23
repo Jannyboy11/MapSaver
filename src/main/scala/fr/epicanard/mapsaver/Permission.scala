@@ -34,6 +34,8 @@ object Permission {
 
   case object DeleteMap extends Permission("mapsaver.commands.delete")
 
+  case object RenameMap extends Permission("mapsaver.commands.rename")
+
   case object AdminReload extends Permission("mapsaver.admin.commands.reload")
 
   case object AdminImportMap extends Permission("mapsaver.admin.commands.import")
@@ -49,4 +51,6 @@ object Permission {
   case object AdminUnlockMap extends Permission("mapsaver.admin.commands.unlock")
 
   case object AdminDeleteMap extends Permission("mapsaver.admin.commands.delete")
+
+  case object AdminRenameMap extends Permission("mapsaver.admin.commands.rename")
 }

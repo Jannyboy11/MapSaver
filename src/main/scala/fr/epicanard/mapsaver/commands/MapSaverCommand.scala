@@ -111,7 +111,8 @@ object MapSaverCommand {
         "visibility" -> VisibilityCommand(mapRepository),
         "lock"       -> LockCommand(mapRepository),
         "unlock"     -> UnlockCommand(mapRepository),
-        "delete"     -> DeleteCommand(mapRepository)
+        "delete"     -> DeleteCommand(mapRepository),
+        "rename"     -> RenameCommand(mapRepository)
       )
     )
 }

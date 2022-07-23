@@ -31,6 +31,7 @@ permissions:
       mapsaver.commands.lock: true
       mapsaver.commands.unlock: true
       mapsaver.commands.delete: true
+      mapsaver.commands.rename: true
   mapsaver.commands.save:
     description: Can use command save
   mapsaver.commands.update:
@@ -49,6 +50,8 @@ permissions:
     description: Can use command unlock
   mapsaver.commands.delete:
     description: Can use command delete
+  mapsaver.commands.rename:
+    description: Can use command rename
   # == Admin ==
   mapsaver.admin.*:
     description: Can do every admin actions
@@ -65,6 +68,7 @@ permissions:
       mapsaver.admin.commands.lock: true
       mapsaver.admin.commands.unlock: true
       mapsaver.admin.commands.delete: true
+      mapsaver.admin.commands.rename: true
   mapsaver.admin.commands.reload:
     description: Can use command reload on other player maps
   mapsaver.admin.commands.import:
@@ -81,4 +85,6 @@ permissions:
     description: Can use command unlock on other player maps
   mapsaver.admin.commands.delete:
     description: Can use command delete on other player maps
+  mapsaver.admin.commands.rename:
+    description: Can use command rename on other player maps
 libraries: ${dependencies}
