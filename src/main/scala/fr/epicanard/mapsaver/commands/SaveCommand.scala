@@ -14,10 +14,10 @@ import fr.epicanard.mapsaver.models.map.status.MapCreationStatus
 import fr.epicanard.mapsaver.models.map.{MapToSave, Visibility}
 import fr.epicanard.mapsaver.resources.language.Help
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class SaveCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.SaveMap)) {
+case class SaveCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
+    extends BaseCommand(Some(Permission.SaveMap)) {
   def helpMessage(help: Help): String = help.save
 
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =

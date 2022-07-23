@@ -18,13 +18,13 @@ import fr.epicanard.mapsaver.resources.language.{Help, Language}
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapView
-import org.bukkit.{entity, Material, OfflinePlayer}
+import org.bukkit.{Material, OfflinePlayer, entity}
 
 import java.util
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class ImportCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.ImportMap)) {
+case class ImportCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
+    extends BaseCommand(Some(Permission.ImportMap)) {
   def helpMessage(help: Help): String = help.`import`
 
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =

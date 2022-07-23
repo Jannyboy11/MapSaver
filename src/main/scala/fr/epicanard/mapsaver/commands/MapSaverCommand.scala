@@ -15,13 +15,14 @@ import org.bukkit.command.{Command, CommandSender, TabExecutor}
 import org.bukkit.plugin.Plugin
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.jdk.CollectionConverters._
 
-case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])
-    extends TabExecutor {
+case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])(
+    implicit ec: ExecutionContext
+) extends TabExecutor {
   override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean =
     onCommand(CommandContext(sender, args, subCommands, config))
 
@@ -95,7 +96,7 @@ object MapSaverCommand {
       config: Config,
       mapRepository: MapRepository,
       syncListener: SyncListener
-  ): MapSaverCommand =
+  )(implicit ec: ExecutionContext): MapSaverCommand =
     MapSaverCommand(
       plugin = plugin,
       messenger = messenger,

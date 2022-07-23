@@ -13,11 +13,11 @@ import fr.epicanard.mapsaver.models.{Complete, MapIdentifier, Player}
 import fr.epicanard.mapsaver.resources.language.Help
 import org.bukkit.entity
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract class LockableCommand(mapRepository: MapRepository, permission: Permission, adminPermission: Permission)
-    extends BaseCommand(Some(permission)) {
+abstract class LockableCommand(mapRepository: MapRepository, permission: Permission, adminPermission: Permission)(
+    implicit ec: ExecutionContext
+) extends BaseCommand(Some(permission)) {
 
   protected def onCommand(
       commandContext: CommandContext,
@@ -36,16 +36,18 @@ abstract class LockableCommand(mapRepository: MapRepository, permission: Permiss
     BaseCommand.mapTabComplete(mapRepository, commandContext)
 }
 
-case class LockCommand(mapRepository: MapRepository)
-    extends LockableCommand(mapRepository, Permission.LockMap, Permission.AdminLockMap) {
+case class LockCommand(mapRepository: MapRepository)(implicit
+    ec: ExecutionContext
+) extends LockableCommand(mapRepository, Permission.LockMap, Permission.AdminLockMap) {
   def helpMessage(help: Help): String = help.lock
 
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =
     onCommand(commandContext, true).as(msg"${messenger.language.infoMessages.lockedMapUpdated}").value
 }
 
-case class UnlockCommand(mapRepository: MapRepository)
-    extends LockableCommand(mapRepository, Permission.UnlockMap, Permission.AdminUnlockMap) {
+case class UnlockCommand(mapRepository: MapRepository)(implicit
+    ec: ExecutionContext
+) extends LockableCommand(mapRepository, Permission.UnlockMap, Permission.AdminUnlockMap) {
   def helpMessage(help: Help): String = help.unlock
 
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =

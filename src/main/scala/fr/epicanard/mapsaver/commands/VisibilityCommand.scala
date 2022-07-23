@@ -15,10 +15,10 @@ import fr.epicanard.mapsaver.models.{Complete, MapIdentifier, Player, UpdateVisi
 import fr.epicanard.mapsaver.resources.language.Help
 
 import java.util.UUID
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class VisibilityCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.VisibilityMap)) {
+case class VisibilityCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
+    extends BaseCommand(Some(Permission.VisibilityMap)) {
   def helpMessage(help: Help): String = help.visibility
 
   def onCommand(messenger: Messenger, commandContext: CommandContext): Future[Either[Error, Message]] =

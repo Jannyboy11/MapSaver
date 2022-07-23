@@ -16,10 +16,10 @@ import net.md_5.bungee.api.ChatColor
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class InfoCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.ListMap)) {
+case class InfoCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
+    extends BaseCommand(Some(Permission.ListMap)) {
 
   def helpMessage(help: Help): String = help.info
 
@@ -39,7 +39,7 @@ object InfoCommand {
   private def getPlayerServerMaps(
       mapRepository: MapRepository,
       commandContext: CommandContext
-  ): Future[Either[Error, MapsWithOwner]] =
+  )(implicit ec: ExecutionContext): Future[Either[Error, MapsWithOwner]] =
     commandContext.args match {
       case Nil                 => getInfoMapInHand(mapRepository, commandContext)
       case name :: Nil         => getInfoOfSender(mapRepository, commandContext, name)
@@ -49,7 +49,7 @@ object InfoCommand {
   private def getInfoMapInHand(
       mapRepository: MapRepository,
       commandContext: CommandContext
-  ): Future[Either[Error, MapsWithOwner]] =
+  )(implicit ec: ExecutionContext): Future[Either[Error, MapsWithOwner]] =
     (for {
       player <- EitherT.fromEither[Future](getPlayer(commandContext))
       restrictVisibility = RestrictVisibility.unless(Permission.AdminInfoMap, player)(RestrictVisibility.OwnerOrPublic)
@@ -65,7 +65,7 @@ object InfoCommand {
       mapRepository: MapRepository,
       commandContext: CommandContext,
       name: String
-  ): Future[Either[Error, MapsWithOwner]] =
+  )(implicit ec: ExecutionContext): Future[Either[Error, MapsWithOwner]] =
     (for {
       player           <- EitherT.fromEither[Future](getPlayer(commandContext))
       playerServerMaps <- EitherT(mapRepository.getMapInfo(player.getUniqueId, None, name))
@@ -76,7 +76,7 @@ object InfoCommand {
       commandContext: CommandContext,
       name: String,
       playerName: String
-  ): Future[Either[Error, MapsWithOwner]] = {
+  )(implicit ec: ExecutionContext): Future[Either[Error, MapsWithOwner]] = {
     val owner              = Player.getOfflinePlayer(playerName)
     val restrictVisibility = Visibility.getRestrictVisibility(commandContext, owner, Permission.AdminInfoMap)
     EitherT(mapRepository.getMapInfo(owner.getUniqueId, restrictVisibility, name))

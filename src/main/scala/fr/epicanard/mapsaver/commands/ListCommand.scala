@@ -19,10 +19,10 @@ import net.md_5.bungee.api.ChatColor
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class ListCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.ListMap)) {
+case class ListCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
+    extends BaseCommand(Some(Permission.ListMap)) {
 
   def helpMessage(help: Help): String = help.list
 
@@ -92,7 +92,7 @@ object ListCommand {
       player: OfflinePlayer,
       restrictVisibility: Option[Visibility],
       currentPage: Int
-  ): Future[Either[Error, Pageable]] =
+  )(implicit ec: ExecutionContext): Future[Either[Error, Pageable]] =
     mapRepository
       .countPlayerMaps(player.getUniqueId, restrictVisibility)
       .map(_.map { count =>

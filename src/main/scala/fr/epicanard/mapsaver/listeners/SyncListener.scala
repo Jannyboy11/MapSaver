@@ -12,10 +12,11 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.messaging.PluginMessageListener
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
-class SyncListener(plugin: Plugin, mapRepository: MapRepository, messenger: Messenger, serverName: String)
-    extends PluginMessageListener {
+class SyncListener(plugin: Plugin, mapRepository: MapRepository, messenger: Messenger, serverName: String)(implicit
+    ec: ExecutionContext
+) extends PluginMessageListener {
 
   override def onPluginMessageReceived(channel: String, player: Player, message: Array[Byte]): Unit = {
     val input      = ByteStreams.newDataInput(message)

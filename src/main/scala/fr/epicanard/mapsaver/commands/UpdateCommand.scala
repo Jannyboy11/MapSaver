@@ -15,10 +15,9 @@ import fr.epicanard.mapsaver.models.map.status.MapUpdateStatus
 import fr.epicanard.mapsaver.resources.language.Help
 import org.bukkit.entity.Player
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class UpdateCommand(mapRepository: MapRepository, syncListener: SyncListener)
+case class UpdateCommand(mapRepository: MapRepository, syncListener: SyncListener)(implicit ec: ExecutionContext)
     extends BaseCommand(Some(Permission.UpdateMap)) {
   def helpMessage(help: Help): String = help.update
 

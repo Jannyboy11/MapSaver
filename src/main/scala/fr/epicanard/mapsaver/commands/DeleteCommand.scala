@@ -12,10 +12,10 @@ import fr.epicanard.mapsaver.models.{Complete, MapIdentifier, Player}
 import fr.epicanard.mapsaver.resources.language.Help
 import org.bukkit.entity
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class DeleteCommand(mapRepository: MapRepository) extends BaseCommand(Some(Permission.DeleteMap)) {
+case class DeleteCommand(mapRepository: MapRepository)(implicit ec: ExecutionContext)
+    extends BaseCommand(Some(Permission.DeleteMap)) {
 
   def helpMessage(help: Help): String = help.delete
 
