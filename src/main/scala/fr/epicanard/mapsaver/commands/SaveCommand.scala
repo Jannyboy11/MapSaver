@@ -38,7 +38,7 @@ object SaveCommand {
     for {
       player     <- CommandContext.getPlayer(commandContext)
       mapName    <- commandContext.args.headOption.toRight(MissingMapName)
-      visibility <- parseVisibility(commandContext.args.tail)
+      visibility <- parseVisibility(commandContext.args.tail, commandContext.config.options.defaultVisibility)
       mapItem    <- MapExtractor.extractFromPlayer(player)
       mapToSave = MapToSave(
         item = mapItem,
@@ -49,8 +49,9 @@ object SaveCommand {
       )
     } yield mapToSave
 
-  private def parseVisibility(args: List[String]): Either[Error, Visibility] = args match {
-    case head :: _ => Visibility.withNameInsensitiveOption(head).toRight(WrongVisibility(head))
-    case Nil       => Right(Visibility.Public)
-  }
+  private def parseVisibility(args: List[String], defaultVisibility: Visibility): Either[Error, Visibility] =
+    args match {
+      case head :: _ => Visibility.withNameInsensitiveOption(head).toRight(WrongVisibility(head))
+      case Nil       => Right(defaultVisibility)
+    }
 }

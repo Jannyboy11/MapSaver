@@ -74,15 +74,17 @@ case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config,
       .map(
         Complete.getResults(
           _,
-          search =>
+          search => {
+            val lowerSearch = search.toLowerCase()
             plugin
               .getServer()
-              .getOfflinePlayers()
-              .to(LazyList)
+              .getOnlinePlayers()
+              .asScala
               .map(_.getName())
-              .filter(_.toLowerCase.startsWith(search.toLowerCase()))
+              .filter(_.toLowerCase.startsWith(lowerSearch))
               .take(10)
               .toList
+          }
         )
       )
 

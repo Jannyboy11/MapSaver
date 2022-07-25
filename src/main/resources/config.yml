@@ -16,5 +16,5 @@ Storage:
     UseSSL: true
 Options:
   PageSize: 10
-  DefaultVisibility: "PRIVATE"
+  DefaultVisibility: "PUBLIC"
   ConsumeEmptyMap: true

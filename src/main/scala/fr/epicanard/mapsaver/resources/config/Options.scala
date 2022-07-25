@@ -1,12 +1,13 @@
 package fr.epicanard.mapsaver.resources.config
 
 import fr.epicanard.mapsaver.circe.CapitalizeConfiguration
+import fr.epicanard.mapsaver.models.map.Visibility
 import io.circe.generic.extras.ConfiguredJsonCodec
 
 @ConfiguredJsonCodec
 case class Options(
     pageSize: Int,
-    defaultVisibility: String,
+    defaultVisibility: Visibility,
     consumeEmptyMap: Boolean
 )
 
