@@ -114,7 +114,7 @@ class MapRepository(
       _         <- EitherT.cond(serverMap.lockedId != mapToUpdate.id, (), NotTheOriginal).leftWiden[Error]
       _         <- EitherT.cond(!playerMap.locked, (), LockedMapDenied).leftWiden[Error]
       _         <- EitherT.right[Error](DataMapQueries.update(serverMap.dataId, mapToUpdate.bytes))
-      _         <- EitherT(sync(() => updateMapColors(fromId(serverMap.lockedId), mapToUpdate.bytes)))
+      _         <- EitherT(sync(() => fromId(serverMap.lockedId).flatMap(updateMapColors(_, mapToUpdate.bytes))))
     } yield ExistingMapUpdated(serverMap.dataId)).value.transactionally
 
     run(db)(exec).map(_.flatten)
@@ -175,7 +175,7 @@ class MapRepository(
         .toRight[Error](MissingMapOrNotPublic)
       dataMap <- EitherT.fromOptionF(DataMapQueries.findById(mapByName.dataId), MissingDataMap)
       mapView <- mapByName.lockedMap match {
-        case Some(LockedMap(lockedId, _)) => EitherT.right[Error](sync(() => fromId(lockedId)))
+        case Some(LockedMap(lockedId, _)) => EitherT(sync(() => fromId(lockedId)))
         case None                         => createServerMapFromExisting(dataMap, serverName)
       }
       _ = Try(MapView.Scale.valueOf(mapByName.mapInfo.scale)).toOption.foreach(mapView.setScale)
@@ -193,7 +193,7 @@ class MapRepository(
         MissingMapOrNotPublic
       )
       dataMap <- EitherT.fromOptionF(DataMapQueries.findById(dataId), MissingDataMap)
-      mapView <- EitherT.right[Error](sync(() => fromId(serverMap.lockedId)))
+      mapView <- EitherT(sync(() => fromId(serverMap.lockedId)))
     } yield MapViewWithData(mapView, dataMap)).value.transactionally
     run(db)(requests).map(_.flatten)
   }

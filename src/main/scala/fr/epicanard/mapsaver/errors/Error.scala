@@ -4,7 +4,6 @@ import fr.epicanard.mapsaver.message.Messenger
 import fr.epicanard.mapsaver.models.map.Visibility
 import fr.epicanard.mapsaver.resources.language.ErrorMessages
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 
 import cats.implicits._
 import java.util.logging.Logger
@@ -57,8 +56,8 @@ object TechnicalError {
   case class ReflectionError(throwable: Throwable)               extends TechnicalError
   case class UnexpectedError(throwable: Throwable)               extends TechnicalError
   case class MissingMapRenderer(mapId: Int)                      extends TechnicalError
-  case class InvalidMapMeta(player: Player)                      extends TechnicalError
-  case class InvalidMapView(player: Player)                      extends TechnicalError
+  case object InvalidMapMeta                                     extends TechnicalError
+  case object InvalidMapView                                     extends TechnicalError
 
   def logError(technicalError: TechnicalError, logger: Logger): Unit = {
     logger.severe(getMessage(technicalError))
@@ -71,10 +70,8 @@ object TechnicalError {
     case ReflectionError(_)       => s"Unexpected error with reflection"
     case MissingMapRenderer(mapId) =>
       s"Unable to retrieve the Renderer from the map $mapId"
-    case InvalidMapMeta(player) =>
-      s"The itemMeta from the map of player ${player.getDisplayName} is not valid. Expected : MapMeta."
-    case InvalidMapView(player) =>
-      s"The mapView from the map of player ${player.getDisplayName} is not valid. Expected : MapView."
+    case InvalidMapMeta             => s"The itemMeta from the map is not valid. Expected : MapMeta."
+    case InvalidMapView             => s"The map is not valid. Missing MapView."
     case UnexpectedError(throwable) => s"Unexpected error : ${throwable.getMessage}"
   }
 
@@ -83,8 +80,8 @@ object TechnicalError {
     case DatabaseError(throwable)      => Some(throwable)
     case ReflectionError(throwable)    => Some(throwable)
     case MissingMapRenderer(_)         => None
-    case InvalidMapMeta(_)             => None
-    case InvalidMapView(_)             => None
+    case InvalidMapMeta                => None
+    case InvalidMapView                => None
     case UnexpectedError(throwable)    => Some(throwable)
   }
 }

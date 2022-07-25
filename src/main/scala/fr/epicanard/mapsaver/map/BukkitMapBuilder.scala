@@ -16,7 +16,7 @@ object BukkitMapBuilder {
       updateMapColors(newLocked, bytes)
 
     @nowarn
-    def fromId(id: Int): MapView = Bukkit.getMap(id)
+    def fromId(id: Int): Either[Error, MapView] = Option(Bukkit.getMap(id)).toRight(TechnicalError.InvalidMapView)
 
     def updateMapColors(mapView: MapView, bytes: Array[Byte]): Either[Error, MapView] =
       getRenderer(mapView).map { renderer =>

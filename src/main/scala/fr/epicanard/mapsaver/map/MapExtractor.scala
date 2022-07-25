@@ -16,8 +16,8 @@ object MapExtractor {
     val stack = player.getInventory.getItemInMainHand
     for {
       _       <- Either.cond(stack.getType == Material.FILLED_MAP, (), MapInHandNeeded)
-      mapMeta <- extractMapMeta(stack.getItemMeta).toRight[Error](InvalidMapMeta(player))
-      mapView <- Option(mapMeta.getMapView).toRight[Error](InvalidMapView(player))
+      mapMeta <- extractMapMeta(stack.getItemMeta).toRight[Error](InvalidMapMeta)
+      mapView <- Option(mapMeta.getMapView).toRight[Error](InvalidMapView)
     } yield mapView
   }
 
