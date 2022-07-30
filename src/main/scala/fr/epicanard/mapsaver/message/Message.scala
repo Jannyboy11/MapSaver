@@ -19,17 +19,16 @@ object Message {
 
   val empty: Message = Message(Nil)
 
+  def apply(input: String): Message = Message(input.split("\n").map(Component.apply).toList)
+
   implicit class MessageInterpolation(val s: StringContext) extends AnyVal {
-    def msg(params: Any*): Message = {
-      val components = s.parts
-        .zipAll(params, "", "")
-        .foldLeft("") { case (acc, (line, param)) =>
-          acc + line.stripMargin + s"$param"
-        }
-        .split("\n")
-        .map(Component.apply)
-        .toList
-      Message(components)
-    }
+    def msg(params: Any*): Message =
+      Message(
+        s.parts
+          .zipAll(params, "", "")
+          .foldLeft("") { case (acc, (line, param)) =>
+            acc + line.stripMargin + s"$param"
+          }
+      )
   }
 }

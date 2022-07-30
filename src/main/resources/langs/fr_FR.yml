@@ -14,6 +14,7 @@ Help:
   Delete: "&6/mapsaver delete [joueur] [nom_carte]&f - Supprime une carte ou de celle en main"
   Rename: "&6/mapsaver rename [joueur] [ancien_nom_carte] <nouveau_nom_carte>&f - Renomme une carte ou celle en main"
 ErrorMessages:
+  UnknownCommand: "&cCette commande n'existe pas.\n&fCommandes disponibles : %s"
   PermissionDenied: "&cVous n'êtes pas autorisé à faire cette action"
   PlayerOnlyCommand: "&cSeul un joueur peut exécuter cette commande"
   MapInHandNeeded: "&cVous devez avoir une carte rempli en main"

@@ -5,6 +5,7 @@ import io.circe.generic.extras.ConfiguredJsonCodec
 
 @ConfiguredJsonCodec
 case class ErrorMessages(
+    unknownCommand: String,
     permissionDenied: String,
     playerOnlyCommand: String,
     mapInHandNeeded: String,

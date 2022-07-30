@@ -8,27 +8,35 @@ import fr.epicanard.mapsaver.database.MapRepository
 import fr.epicanard.mapsaver.errors.Error
 import fr.epicanard.mapsaver.errors.Error.{handleError, handleTryResult}
 import fr.epicanard.mapsaver.listeners.SyncListener
-import fr.epicanard.mapsaver.message.Messenger
+import fr.epicanard.mapsaver.message.{Message, Messenger}
 import fr.epicanard.mapsaver.models.Complete
 import fr.epicanard.mapsaver.resources.config.Config
+import fr.epicanard.mapsaver.resources.language.Language
 import org.bukkit.command.{Command, CommandSender, TabExecutor}
 import org.bukkit.plugin.Plugin
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 
 case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config, subCommands: Map[String, BaseCommand])(
     implicit ec: ExecutionContext
 ) extends TabExecutor {
-  override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean =
-    onCommand(CommandContext(sender, args, subCommands, config))
+  override def onCommand(sender: CommandSender, command: Command, s: String, args: Array[String]): Boolean = {
+    val commandContext = CommandContext(sender, args, subCommands, config)
+    getSubCommand(commandContext.args) match {
+      case Some(command) => executCommand(commandContext, command)
+      case None =>
+        messenger.sendAllToSender(
+          commandContext.sender,
+          getUnknownCommandMessage(commandContext, messenger.language)
+        )
+    }
+    true
+  }
 
-  def onCommand(commandContext: CommandContext): Boolean = {
-    val command = getSubCommand(commandContext.args).getOrElse(HelpCommand)
-
+  def executCommand(commandContext: CommandContext, command: BaseCommand): Unit =
     (for {
       _      <- EitherT.fromEither[Future](command.canExecute(commandContext))
       result <- EitherT(command.onCommand(messenger, CommandContext.shiftArgs(commandContext)))
@@ -38,8 +46,6 @@ case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config,
         case Right(message) => messenger.sendAllToSender(commandContext.sender, message)
       }
     }
-    true
-  }
 
   override def onTabComplete(
       sender: CommandSender,
@@ -64,6 +70,14 @@ case class MapSaverCommand(plugin: Plugin, messenger: Messenger, config: Config,
           .keys
           .toList
     }
+  }
+
+  private def getUnknownCommandMessage(commandContext: CommandContext, lang: Language): Message = {
+    val availableSubCommands = subCommands
+      .filter { case (_, command) => command.canExecute(commandContext).isRight }
+      .keys
+      .mkString(", ")
+    Message(lang.errorMessages.unknownCommand.format(availableSubCommands))
   }
 
   private def onTabCompleteCommand(subContext: CommandContext)(subCommand: BaseCommand) =
