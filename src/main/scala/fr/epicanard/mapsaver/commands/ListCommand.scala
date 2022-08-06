@@ -115,7 +115,7 @@ object ListCommand {
     val info = buildInfoImport(language, sender, pageable.player) _
     playerMaps.foldLeft(msg"${language.list.listMaps.replace("player" -> pageable.player.getName)}") { (message, map) =>
       message +
-        (Component(s" • &6${map.name} &f- ${getVisibility(map.visibility, language.visibilities)}") + info(map.name))
+        (Component(s" • ${map.name} - ${getVisibility(map.visibility, language.visibilities)}") + info(map.name))
     } + pagination(pageable, language.pagination, s"/mapsaver list ${pageable.player.getName}")
   }
 
