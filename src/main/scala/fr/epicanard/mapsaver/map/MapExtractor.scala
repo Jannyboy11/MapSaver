@@ -35,7 +35,10 @@ object MapExtractor {
         scale = mapView.getScale().name(),
         x = mapView.getCenterX(),
         z = mapView.getCenterZ(),
-        world = mapView.getWorld().getName()
+        world = Option(mapView.getWorld())
+          .orElse(Option(player.getLocation().getWorld()))
+          .map(_.getName())
+          .getOrElse("")
       )
     )
 
