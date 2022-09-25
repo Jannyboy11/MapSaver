@@ -15,7 +15,11 @@ object Visibility extends Enum[Visibility] with CirceEnumInsensitive[Visibility]
 
   val values = findValues
 
-  def getRestrictVisibility(commandContext: CommandContext, owner: OfflinePlayer, adminPermission: Permission) =
+  def getRestrictVisibility(
+      commandContext: CommandContext,
+      owner: OfflinePlayer,
+      adminPermission: Permission
+  ): Option[Visibility] =
     CommandContext
       .getPlayerOpt(commandContext)
       .filter(player => owner.getUniqueId != player.getUniqueId && !adminPermission.isSetOn(player))

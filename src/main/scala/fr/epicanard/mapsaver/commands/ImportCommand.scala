@@ -31,7 +31,7 @@ case class ImportCommand(mapRepository: MapRepository)(implicit ec: ExecutionCon
     (for {
       player <- EitherT.fromEither[Future](getPlayer(commandContext))
       args   <- EitherT.fromEither[Future](parseArguments(commandContext, player))
-      restrictVisibility = Option.unless(Permission.AdminImportMap.isSetOn(player))(Visibility.Public)
+      restrictVisibility = Visibility.getRestrictVisibility(commandContext, args.owner, Permission.AdminImportMap)
       mapViewWithData <- EitherT(
         mapRepository
           .findMapViewWithData(args.owner.getUniqueId, args.mapName, commandContext.server, restrictVisibility)
