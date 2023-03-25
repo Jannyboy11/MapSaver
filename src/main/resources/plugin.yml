@@ -1,4 +1,4 @@
-main: fr.epicanard.mapsaver.MapSaverPlugin
+main: fr.epicanard.mapsaver.MapSaverPlugin$
 description: Plugin for saving map in database
 author: EpiCanard
 authors:
